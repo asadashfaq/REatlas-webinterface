@@ -1,0 +1,146 @@
+      html, body { 
+        height: 100%; width: 100%; margin: 0; 
+      } 
+      body{
+        background-color:white; overflow:hidden; 
+        font-family: "Trebuchet MS"; 
+      }
+      #header {
+        background-image: url(../images/banner.jpg); background-repeat: repeat-x;
+        margin: 2px;
+        border: solid 4px #224a54;
+        color:white; font-size:18pt; 
+        text-align:left; font-weight:bold; height:70px;
+      }
+      #subheader {
+        font-size:small;
+        color:white;
+        padding-left:20px;
+      }
+      #subheaderRight {
+          float: right;
+          font-size:small;
+          color:white;
+          padding-left:20px;
+          text-align: right;
+      }
+      #rightPane{
+        background-color:white;
+        color:#3f3f3f;
+        border: solid 2px #224a54;
+        width:20%;
+      }
+      #leftPane{
+        margin: 5px;
+        padding:2px;
+        background-color:white;
+        color:#3f3f3f;
+        border: solid 2px #224a54;
+        width:20%;
+     }
+      #map {
+        margin: 5px;
+        border:solid 4px #224a54;
+        -moz-border-radius: 4px;
+      }
+      #footer {
+        margin: 2px;
+        border: solid 2px #224a54;
+        background-color:#ecefe4;color:#3f3f3f;
+       font-size:10pt; text-align:center; height:40px;
+      }
+      .dijitTabInnerDiv{
+        background-color:#ecefe4;
+      }
+      #tabs{
+        padding:5px;
+      }
+      
+    
+      
+      
+#selectorTopDiv {
+    margin:4px;
+   
+    float:left;
+}
+
+#selectorTopDiv label {
+    float:left;
+    width:75px;
+    margin:2px;
+    border:1px solid #D0D0D0;
+    overflow:auto;
+    cursor: pointer;   
+}
+
+
+#selectorTopDiv label span {
+    text-align:center;
+    font-size: 18px;
+    padding:10px 0px;
+    display:block;
+}
+
+#selectorTopDiv label input {
+    position:absolute;
+    top:-20px;
+}
+
+#selectorTopDiv input:checked + span {
+    background-color:#404040;
+    color:#F7F7F7;
+}
+
+#selectorTopDiv .yellow {
+    background-color:#FFCC00;
+    color:#333;
+}
+
+#selectorTopDiv .blue {
+    background-color:#00BFFF;
+    color:#333;
+}
+
+#selectorTopDiv .pink {
+    background-color:#FF99FF;
+    color:#333;
+}
+
+#selectorTopDiv .green {
+    background-color:#A3D900;
+    color:#333;
+}
+#selectorTopDiv .purple {
+    background-color:#B399FF;
+    color:#333;
+}
+
+#selectorContentDiv {
+    clear: both;
+    background-color: lightgrey;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#selectorContentDiv input.radio {
+    
+    margin-top: 10px;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+
+#selectorContentDiv label {
+    margin:4px;
+    border:1px solid #D0D0D0;
+    font-size:large;
+}
+
+
+#cutoutInfoDiv {
+    margin-top: 20px;
+    background-color: lightsteelblue;
+    height: 200px;
+    border-radius: 10px;
+    padding: 10px;
+}

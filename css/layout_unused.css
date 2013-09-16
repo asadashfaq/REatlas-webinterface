@@ -1,0 +1,40 @@
+/* 
+    Document   : layout_unused
+    Created on : Sep 15, 2013, 8:56:32 AM
+    Author     : manila
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+  .rotate {
+     -moz-transform: rotate(-90.0deg);  /* FF3.5+ */
+       -o-transform: rotate(-90.0deg);  /* Opera 10.5 */
+        -webkit-transform: rotate(-90.0deg);  /* Saf3.1+, Chrome */
+             filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */
+         -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)"; /* IE8 */
+}
+
+
+.dijitTab .tabLabel {
+    color:red;
+    -moz-transform: rotate(-90.0deg);  /* FF3.5+ */
+    -o-transform: rotate(-90.0deg);  /* Opera 10.5 */
+    -webkit-transform: rotate(-90.0deg);  /* Saf3.1+, Chrome */
+    filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)"; /* IE8 */
+}
+
+.dijitTabContainerTop-tabs .dijitTabChecked {
+    background-image: -moz-linear-gradient(center top , #FFFFFF 0px, #FFFFFF 1px, rgba(255, 255, 255, 0) 2px, #FFFFFF 19px) !important;
+}
+
+.dijitTabChecked {
+     /* background-color: yellow !important;*/
+}
+
+.plusIcon {
+    background-repeat: no-repeat;
+    height: 60px;
+    text-align: center;
+    width: 8px !important;
+}
