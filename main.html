@@ -16,6 +16,33 @@
     <script src="http://js.arcgis.com/3.6/"></script>
     <script src="js/jquery-1.10.2.js"></script>
     <script>
+        
+      function fetchCutoutList(userName,divID) {   
+            require(["dojo/_base/xhr"], function(xhr){
+            // get some data, convert to JSON
+            xhr.post({
+                url:"/reatlas/cutoutlist_ajax.php",
+                handleAs:"json",
+                timeout: 3000, // give up after 3 seconds
+                content: { user:userName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+                load: function(data){
+                    if($("#"+divID).html() == "Loading...")
+                        $("#"+divID).html('');
+                      for(var i in data){
+                       //console.log("key", i, "value", data[i]);
+                       //console.log(data[i].cutout," ",data[i].cutoutId);
+                       if(data[i].cutout !=userName)
+                       $("#"+divID).append("<label><input type=\"radio\" class=\"radio\" name=\"cutoutSelGrpDefault\" value=\""+data[i].cutoutId+"\">"+data[i].cutout+"</label><br/>");
+                    }
+                    
+                    if($(data).size()==0 && $("#"+divID).html() == '')
+                        $("#"+divID).html('No cutout found');
+                    
+                  
+                }
+            });
+        });
+      }
       dojo.require("dijit.layout.BorderContainer");
       dojo.require("dijit.layout.ContentPane");
       dojo.require("esri.map");
@@ -44,9 +71,12 @@
        // map.addLayer(basemap);
        // map.addLayers([dynamicLayer,referenceLayer]);
       }
-      dojo.ready(init);
-
-
+        dojo.ready(init);
+        dojo.ready(function(){
+            dojo.query(".info").attr("innerHTML", dojo.version);
+            
+        });
+fetchCutoutList('auesg','cutoutSelGrpDefault');
     </script>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -59,14 +89,21 @@
                       $('#cutoutSelGrpDefault').css('display','block'); 
                       $('#cutoutSelGrpOwn').css('display','none');
                       $('#cutoutSelGrpAll').css('display','none');
+                      $('#cutoutSelGrpDefault').html('Loading...');
+                      fetchCutoutList('auesg','cutoutSelGrpDefault');
                     }else if($(this).val() =="own"){
                       $('#cutoutSelGrpDefault').css('display','none'); 
                       $('#cutoutSelGrpOwn').css('display','block');
                       $('#cutoutSelGrpAll').css('display','none');
+                       $('#cutoutSelGrpOwn').html('Loading...');
+                      fetchCutoutList('manila','cutoutSelGrpOwn');
                     }else if($(this).val() =="all"){
                       $('#cutoutSelGrpDefault').css('display','none'); 
                       $('#cutoutSelGrpOwn').css('display','none');
                       $('#cutoutSelGrpAll').css('display','block');
+                       $('#cutoutSelGrpAll').html('Loading...');
+                      fetchCutoutList('auesg','cutoutSelGrpAll');
+                      fetchCutoutList('manila','cutoutSelGrpAll');
                     }
                 }
             ); 
@@ -82,10 +119,11 @@
 
       <div id="header" 
            data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'top'">
-
+          <div id="headerLeft">
         REAtlas
        <div id="subheader">Aarhus University,Aarhus Denmark</div>
-       <div id="subheaderRight">Welcome, Manila<br/><a href="index.html">Logout</a></div>
+       </div>
+       <div id="headerRight">Welcome, Manila<br/><a href="index.html">Logout</a></div>
       </div>
       <div id="map" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center'"></div>
       <div data-dojo-type="dijit.layout.ContentPane" id="rightPane" data-dojo-props="region:'right'">
@@ -100,11 +138,11 @@
                 </div>
                 <div id="selectorContentDiv" >
                     <div id="cutoutSelGrpDefault" >
-                        <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="europe">Europe</label><br/>
+                        <!--label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="europe">Europe</label><br/>
                         <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="usa">USA</label><br/>
                         <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="india">India</label><br/>
                         <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="n-africa">North Africa</label><br/>
-                        <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="createNew">Create new</label><br/>
+                        <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="createNew">Create new</label><br/-->
                     </div>
                     <div id="cutoutSelGrpOwn" style="display: none;">Own group</div>
                     <div id="cutoutSelGrpAll" style="display: none;">All group</div>
@@ -124,6 +162,7 @@
       </div>
       
     </div>
+      <div class="info">VERSION:</div>
   </body>
 
 </html>

@@ -12,12 +12,16 @@
         color:white; font-size:18pt; 
         text-align:left; font-weight:bold; height:70px;
       }
+      #headerLeft {
+          clear: both;
+          float: left;
+      }
       #subheader {
         font-size:small;
         color:white;
         padding-left:20px;
       }
-      #subheaderRight {
+      #headerRight {
           float: right;
           font-size:small;
           color:white;
