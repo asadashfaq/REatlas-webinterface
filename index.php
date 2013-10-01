@@ -42,7 +42,7 @@ $(document).ready(function() {
     <!--END SLIDE-IN ICONS-->
 
 <!--LOGIN FORM-->
-<form name="login-form" class="login-form" action="main.html" method="post">
+<form name="login-form" class="login-form" action="main.php" method="post">
 
 	<!--HEADER-->
     <div class="header">
@@ -61,7 +61,7 @@ $(document).ready(function() {
     <!--FOOTER-->
     <div class="footer">
     <!--LOGIN BUTTON--><input type="submit" name="submit" value="Login" class="button" /><!--END LOGIN BUTTON-->
-    <!--REGISTER BUTTON--><input type="button" name="register" value="Register" class="register" onclick="document.location.href='register.html'" /><!--END REGISTER BUTTON-->
+    <!--REGISTER BUTTON--><input type="button" name="register" value="Register" class="register" onclick="document.location.href='register.php'" /><!--END REGISTER BUTTON-->
     </div>
     <!--END FOOTER-->
 

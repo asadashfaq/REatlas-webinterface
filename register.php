@@ -44,7 +44,7 @@ $(document).ready(function() {
     <!--END SLIDE-IN ICONS-->
 
 <!--LOGIN FORM-->
-<form name="register-form" class="register-form" action="main.html" method="post">
+<form name="register-form" class="register-form" action="main.php" method="post">
 
 	<!--HEADER-->
     <div class="header">
@@ -321,7 +321,7 @@ $(document).ready(function() {
     <div class="footer">
     <!--LOGIN BUTTON--><input type="submit" name="submit" value="Register" class="button" /><!--END LOGIN BUTTON-->
     <!--RESET BUTTON--><input type="reset" name="reset" value="Reset" class="register" /><!--END RESET BUTTON-->
-    <!--RESET BUTTON--><input type="button" name="login" value="Back to Login" class="button" style="float: left;" onclick="document.location.href='index.html'"/><!--END RESET BUTTON-->
+    <!--RESET BUTTON--><input type="button" name="login" value="Back to Login" class="button" style="float: left;" onclick="document.location.href='index.php'"/><!--END RESET BUTTON-->
     </div>
     <!--END FOOTER-->
 

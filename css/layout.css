@@ -42,10 +42,13 @@
         border: solid 2px #224a54;
         width:20%;
      }
-      #map {
+      #mapDiv {
         margin: 5px;
         border:solid 4px #224a54;
         -moz-border-radius: 4px;
+        padding: 0;
+        margin: 0;
+        height: 100%;
       }
       #footer {
         margin: 2px;
@@ -60,9 +63,73 @@
         padding:5px;
       }
       
+      #HomeButton {
+      position: absolute;
+      top: 100px;
+      left: 20px;
+      z-index: 50;
+    }
+    #LocateButton {
+      position: absolute;
+      top: 140px;
+      left: 20px;
+      z-index: 50;
+    }
+      
+    #header-tool {
+        left: 100px;
+        overflow: auto;
+        padding: 0.5em;
+        position: absolute;
+        z-index: 50;
+        margin: 5px;
+        border:solid 1px #224a54;
+        -moz-border-radius: 1px;
+        background-color: #D3D3D3;
+      }
+      #header-tool button {
+            padding: 0 0.3em;
+            text-align: center;
+            -moz-user-select: none;
+            cursor: pointer;
+            background-repeat: repeat-x;
+            white-space: nowrap;
+            background-color: #BCD8F4;
+            background-image: linear-gradient(#FFFFFF 0px, rgba(255, 255, 255, 0) 3px, rgba(255, 255, 255, 0.75) 100%);
+            background-repeat: repeat-x;
+            border: 1px solid #759DC0;
+            border-radius: 4px 4px 4px 4px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+            color: #000000;
+            padding: 2px 4px 4px;
+            font-size: 0.9em;
+      }
+      
+      #header-tool button.down {
+        background: #bbb;
+        border-top: solid 2px #777;
+        border-left: solid 2px #777;
+        border-bottom:solid 2px  #eaeaea;
+        border-right: solid 2px #eaeaea;
+        }
     
-      
-      
+        #header-tool button.clearall {
+            padding: 0 0.3em;
+            text-align: center;
+            -moz-user-select: none;
+            cursor: pointer;
+            background-repeat: repeat-x;
+            white-space: nowrap;
+            background-color: #FFA07A;
+            background-image: linear-gradient(#FFFFFF 0px, rgba(255, 255, 255, 0) 3px, rgba(255, 255, 255, 0.75) 100%);
+            background-repeat: repeat-x;
+            border: 1px solid #759DC0;
+            border-radius: 4px 4px 4px 4px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+            color: #000000;
+            padding: 2px 4px 4px;
+            font-size: 0.9em;
+      }
 #selectorTopDiv {
     margin:4px;
    
