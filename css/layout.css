@@ -5,6 +5,15 @@
         background-color:white; overflow:hidden; 
         font-family: "Trebuchet MS"; 
       }
+      input[type=checkbox]
+        {
+          /* Double-sized Checkboxes */
+          -ms-transform: scale(1.5); /* IE */
+          -moz-transform: scale(1.5); /* FF */
+          -webkit-transform: scale(1.5); /* Safari and Chrome */
+          -o-transform: scale(1.5); /* Opera */
+          padding: 10px;
+        }
       #header {
         background-image: url(../images/banner.jpg); background-repeat: repeat-x;
         margin: 2px;
@@ -138,7 +147,7 @@
 
 #selectorTopDiv label {
     float:left;
-    width:75px;
+    width:60px;
     margin:2px;
     border:1px solid #D0D0D0;
     overflow:auto;
@@ -148,7 +157,7 @@
 
 #selectorTopDiv label span {
     text-align:center;
-    font-size: 18px;
+    font-size: 15px;
     padding:10px 0px;
     display:block;
 }
@@ -198,6 +207,7 @@
     
     margin-top: 10px;
     margin-bottom: 5px;
+    margin-right: 10px;
     padding: 5px;
 }
 
