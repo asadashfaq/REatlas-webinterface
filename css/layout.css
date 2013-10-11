@@ -30,6 +30,42 @@
         color:white;
         padding-left:20px;
       }
+       #top-tool {
+            background-color: #D3D3D3;
+            border: 1px solid #224A54;
+            border-radius: 10px 10px 0 0;
+            left: 35%;
+            margin: 20px;
+            overflow: auto;
+            padding: 0.5em;
+            position: absolute;
+            z-index: 50;
+      }
+      #top-tool button {
+            padding: 0 0.3em;
+            text-align: center;
+            -moz-user-select: none;
+            cursor: pointer;
+            background-repeat: repeat-x;
+            white-space: nowrap;
+            background-color: #BCD8F4;
+            background-image: linear-gradient(#FFFFFF 0px, rgba(255, 255, 255, 0) 3px, rgba(255, 255, 255, 0.75) 100%);
+            background-repeat: repeat-x;
+            border: 1px solid #759DC0;
+            border-radius: 4px 4px 4px 4px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+            color: #000000;
+            padding: 2px 4px 4px;
+            font-size: 0.6em;
+      }
+      
+      #top-tool button.down {
+        background: #bbb;
+        border-top: solid 2px #777;
+        border-left: solid 2px #777;
+        border-bottom:solid 2px  #eaeaea;
+        border-right: solid 2px #eaeaea;
+        }
       #headerRight {
           float: right;
           font-size:small;

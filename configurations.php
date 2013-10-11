@@ -23,4 +23,3 @@ define('DEFAULT_USER','manila');
 
 //selection
 define('SELECTION_TOOLBAR',false);
-define('SINGLE_SELECT',true);
