@@ -4,9 +4,195 @@
  * and open the template in the editor.
  */
 
+var _map, tb, tbForNew, editToolbar, ctxMenuForGraphics, ctxMenuForMap;
+var selected, currentLocation;
+var lastCreatedGraphics;
+var contaxtMouseOver, contaxtMouseOut;
 
+
+function activateContaxtMenuForGraphics(enable)
+{
+    if (enable == true) {
+        contaxtMouseOver = _map.graphics.on("mouse-over", function(evt) {
+            // We'll use this "selected" graphic to enable editing tools
+            // on this graphic when the user click on one of the tools
+            // listed in the menu.
+            selected = evt.graphic;
+
+            // Let's bind to the graphic underneath the mouse cursor           
+            ctxMenuForGraphics.bindDomNode(evt.graphic.getDojoShape().getNode());
+        });
+
+        contaxtMouseOut = _map.graphics.on("mouse-out", function(evt) {
+            ctxMenuForGraphics.unBindDomNode(evt.graphic.getDojoShape().getNode());
+        });
+    } else
+    {
+        contaxtMouseOver.remove();
+        contaxtMouseOut.remove();
+
+    }
+}
+function  initializeEvents(divID) {
+    $("#" + divID + " input[name^='cutoutSelGrp']:radio").change(
+            function() {
+                var data = $(this).val().split('/');
+
+                require(["dojo/_base/xhr"], function(xhr) {
+                    var cutoutName = data[1];
+                    var userName = data[0];
+
+                    var targetNode = dojo.byId("cutoutInfoDiv");
+                    // get some data, convert to JSON
+                    xhr.post({
+                        url: "cutoutDetails_ajax.php",
+                        handleAs: "json",
+                        timeout: 3000, // give up after 3 seconds
+                        content: {user: userName, cutout: cutoutName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+                        load: function(data) {
+                            if (targetNode.innerHTML === "Loading..." ||
+                                    targetNode.innerHTML === "No details found")
+                                targetNode.innerHTML = '';
+
+                            if ($(data).size() === 0 && targetNode.innerHTML === '') {
+                                targetNode.innerHTML = 'No details found';
+                                return;
+                            }
+
+                            if ($(data).size() !== 0) {
+                                targetNode.innerHTML = '<b>Name of the selected cutout:</b><br/>' + cutoutName + '<br/>';
+                                targetNode.innerHTML += '<b>Type of the selected cutout:</b><br/>' + data.cutout_type + '<br/>';
+                                if (data.cutout_type == "Rectangle") {
+                                    targetNode.innerHTML += '<b>Coordinates:</b><br/>(<br/>(' + data.min_latitude + ',' + data.min_longitude + '),(' + data.max_latitude + ',' + data.max_longitude + ')<br/>)<br/>';
+                                } else if (data.cutout_type == "MultiPoint") {
+                                    targetNode.innerHTML += '<b>Points:</b><br/>(<br/>'
+                                    for (key in data.points) {
+                                        targetNode.innerHTML += '(' + data.points[key].latitude + ',' + data.points[key].longitude + ')';
+                                    }
+                                    targetNode.innerHTML += '<br/>)<br/>';
+                                }
+
+                                drawGraphicslayerOnMap(data);
+
+                            }
+                        }
+                    });
+                });
+
+            });
+}
+
+function drawGraphicslayerOnMap(data)
+{
+    require([
+        "esri/geometry/Point",
+        "esri/geometry/Polygon",
+        "esri/graphic",
+        "dojo/_base/Color",
+        "esri/symbols/SimpleLineSymbol",
+        "esri/symbols/SimpleFillSymbol",
+        "esri/symbols/SimpleMarkerSymbol",
+        "esri/SpatialReference",
+        "esri/geometry/webMercatorUtils",
+        "dojo/domReady!"
+    ], function(
+            Point, Polygon,
+            Graphic, Color, SimpleLineSymbol, SimpleFillSymbol, SimpleMarkerSymbol,
+            SpatialReference, webMercatorUtils
+
+            ) {
+        if (!_map || _map == 'undefined')
+            return;
+
+        _map.graphics.clear();
+        activateContaxtMenuForGraphics(false);
+
+        // Adds pre-defined geometries to map
+        var polygonSymbol = new SimpleFillSymbol(
+                SimpleFillSymbol.STYLE_SOLID,
+                new SimpleLineSymbol(
+                SimpleLineSymbol.STYLE_DOT,
+                new Color([151, 249, 0, .80]),
+                3
+                ),
+                new Color([151, 249, 0, 0.45])
+                );
+
+        var wgs = new SpatialReference({
+            "wkid": 4326
+        });
+        if (data.cutout_type == "Rectangle") {
+            var latlng_max = new Point(parseFloat(data.max_longitude), parseFloat(data.max_latitude), wgs);
+            var webMercator_max = webMercatorUtils.geographicToWebMercator(latlng_max);
+            var latlng_min = new Point(parseFloat(data.min_longitude), parseFloat(data.min_latitude), wgs);
+            var webMercator_min = webMercatorUtils.geographicToWebMercator(latlng_min);
+
+
+            var rectangle = new Polygon({
+                "rings": [
+                    [
+                        [webMercator_max.x, webMercator_min.y],
+                        [webMercator_max.x, webMercator_max.y],
+                        [webMercator_min.x, webMercator_max.y],
+                        [webMercator_min.x, webMercator_min.y],
+                        [webMercator_max.x, webMercator_min.y]
+                    ]
+                ],
+                "spatialReference": {
+                    "wkid": 102100
+                }
+            });
+
+            var esriExtent = new esri.geometry.Extent(data.min_longitude, data.min_latitude, data.max_longitude, data.max_latitude, new esri.SpatialReference({wkid:4326}));
+          _map.setExtent(esri.geometry.geographicToWebMercator(esriExtent));
+          
+            var myPolygonCenterLatLon = esriExtent.getCenter()
+          zoomTo(parseFloat(myPolygonCenterLatLon.y), parseFloat(myPolygonCenterLatLon.x));
+            
+            _map.graphics.add(new Graphic(rectangle, polygonSymbol));
+        } else if (data.cutout_type == "MultiPoint") {
+            //create a random color for the symbols
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            var symbol,tmp_pt,webMercator_pt;
+            for (key in data.points) {
+
+                 tmp_pt = new Point(parseFloat(data.points[key].longitude), parseFloat(data.points[key].latitude), _map.spatialReference);
+                 webMercator_pt = webMercatorUtils.geographicToWebMercator(tmp_pt);
+                symbol = new SimpleMarkerSymbol(
+                        SimpleMarkerSymbol.STYLE_CIRCLE,
+                        10, new SimpleLineSymbol(
+                        SimpleLineSymbol.STYLE_SOLID,
+                        new Color([r, g, b, 0.5]),
+                        5
+                        ),
+                        new Color([r, g, b, 0.9]));
+
+                var graphic = new Graphic(webMercator_pt, symbol);
+                _map.graphics.add(graphic);
+                
+            }
+             zoomTo(parseFloat(tmp_pt.y), parseFloat(tmp_pt.x));
+        
+        }
+    });
+}
+
+
+      function zoomTo(lat, lon) {
+        var point = new esri.geometry.Point(lon, lat, {
+          wkid: "4326"
+        });
+        var wmpoint = esri.geometry.geographicToWebMercator(point);
+        _map.centerAt(wmpoint);
+      }
+      
 function fetchCutoutList(userName, divID) {
+
     require(["dojo/_base/xhr"], function(xhr) {
+
+        var targetNode = dojo.byId(divID);
         // get some data, convert to JSON
         xhr.post({
             url: "cutoutlist_ajax.php",
@@ -14,26 +200,29 @@ function fetchCutoutList(userName, divID) {
             timeout: 3000, // give up after 3 seconds
             content: {user: userName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
             load: function(data) {
-                if ($("#" + divID).html() == "Loading...")
-                    $("#" + divID).html('');
-                for (var i in data) {
-                    if (data[i].cutout != userName)
-                        $("#" + divID).append("<label><input type=\"radio\" class=\"radio\" name=\"cutoutSelGrpDefault\" value=\"" + data[i].cutoutId + "\">" + data[i].cutout + "</label><br/>");
+                if (targetNode.innerHTML === "Loading..." ||
+                        targetNode.innerHTML === "No cutout found")
+                    targetNode.innerHTML = '';
+
+                if ($(data).size() === 0 && targetNode.innerHTML === '') {
+                    targetNode.innerHTML = 'No cutout found';
+                    return;
                 }
 
-                if ($(data).size() == 0 && $("#" + divID).html() == '')
-                    $("#" + divID).html('No cutout found');
+                if ($(data).size() !== 0) {
+                    for (var i in data) {
+                        if (data[i].cutout !== userName)
+                            $("#" + divID).append("<label><input type=\"radio\" class=\"radio\" name=\"cutoutSelGrpDefault\" value=\"" + userName + "/" + data[i].cutout + "\">" + data[i].cutout + "</label><br/>");
+                    }
 
-
+                    initializeEvents(divID);
+                }
             }
         });
     });
 }
 
 
-var map, tb, tbForNew, editToolbar, ctxMenuForGraphics, ctxMenuForMap;
-var selected, currentLocation;
-var lastCreatedGraphics;
 
 require([
     "esri/map",
@@ -77,7 +266,7 @@ require([
         ) {
     // parser.parse();
 
-    map = new Map("mapDiv", {
+    _map = new Map("mapDiv", {
         center: [-85.772, 38.255],
         zoom: 3,
         basemap: "topo"
@@ -91,27 +280,27 @@ require([
      var dynamicLayer = new esri.layers.ArcGISDynamicMapServiceLayer(dynamicUrl,{opacity:0.45});
      var referenceLayer = new esri.layers.ArcGISTiledMapServiceLayer(referenceUrl);
      
-     dojo.connect(map, "onLayersAddResult", function(results) {
+     dojo.connect(_map, "onLayersAddResult", function(results) {
      
      });
      
-     // map.addLayer(basemap);
-     // map.addLayers([dynamicLayer,referenceLayer]);
+     // _map.addLayer(basemap);
+     // _map.addLayers([dynamicLayer,referenceLayer]);
      */
     if (showToolbar) {
-        map.on("load", initToolbar);
+        _map.on("load", initToolbar);
     }
-    map.on("load", createToolbarAndContextMenu);
-    map.on("load", initNewCutoutOptions);
+    _map.on("load", createToolbarAndContextMenu);
+    _map.on("load", initNewCutoutOptions);
 
     function createToolbarAndContextMenu() {
-        // Add some graphics to the map
+        // Add some graphics to the _map
         //  addGraphics();
 
         // Create and setup editing tools
-        editToolbar = new Edit(map);
+        editToolbar = new Edit(_map);
 
-        map.on("click", function(evt) {
+        _map.on("click", function(evt) {
             editToolbar.deactivate();
         });
 
@@ -120,10 +309,10 @@ require([
     }
 
     function createMapMenu() {
-        // Creates right-click context menu for map
+        // Creates right-click context menu for _map
         ctxMenuForMap = new Menu({
             onOpen: function(box) {
-                // Lets calculate the map coordinates where user right clicked.
+                // Lets calculate the _map coordinates where user right clicked.
                 // We'll use this to create the graphic when the user clicks
                 // on the menu item to "Add Point"
                 currentLocation = getMapPointFromMenuPosition(box);
@@ -143,12 +332,12 @@ require([
          2
          ), new Color([200, 235, 254, 0.5]));
          var graphic = new Graphic(geometryJsonUtils.fromJson(currentLocation.toJson()), symbol);
-         map.graphics.add(graphic);
+         _map.graphics.add(graphic);
          }
          }));
          */
         ctxMenuForMap.startup();
-        ctxMenuForMap.bindDomNode(map.container);
+        ctxMenuForMap.bindDomNode(_map.container);
     }
 
     function createGraphicsMenu() {
@@ -196,25 +385,12 @@ require([
             label: "Delete",
             onClick: function() {
                 lastCreatedGraphics = null;
-                map.graphics.remove(selected);
+                _map.graphics.remove(selected);
             }
         }));
 
         ctxMenuForGraphics.startup();
-
-        map.graphics.on("mouse-over", function(evt) {
-            // We'll use this "selected" graphic to enable editing tools
-            // on this graphic when the user click on one of the tools
-            // listed in the menu.
-            selected = evt.graphic;
-
-            // Let's bind to the graphic underneath the mouse cursor           
-            ctxMenuForGraphics.bindDomNode(evt.graphic.getDojoShape().getNode());
-        });
-
-        map.graphics.on("mouse-out", function(evt) {
-            ctxMenuForGraphics.unBindDomNode(evt.graphic.getDojoShape().getNode());
-        });
+        activateContaxtMenuForGraphics(true);
     }
 
     // Helper Methods
@@ -233,8 +409,8 @@ require([
                 break;
         }
 
-        var screenPoint = new Point(x - map.position.x, y - map.position.y);
-        return map.toMap(screenPoint);
+        var screenPoint = new Point(x - _map.position.x, y - _map.position.y);
+        return _map.toMap(screenPoint);
     }
 
 
@@ -279,31 +455,30 @@ require([
     var fillSymbol = new PictureFillSymbol(
             "images/mangrove.png",
             new SimpleLineSymbol(
-                    SimpleLineSymbol.STYLE_SOLID,
-                    new Color('#000'),
-                    1
-                    ),
+            SimpleLineSymbol.STYLE_SOLID,
+            new Color('#000'),
+            1
+            ),
             42,
             42
             );
 
     var home = new HomeButton({
-        map: map
+        map: _map
     }, "HomeButton");
     home.startup();
 
     geoLocate = new LocateButton({
-        map: map
+        map: _map
     }, "LocateButton");
     geoLocate.startup();
 
     //add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
     var basemapGallery = new BasemapGallery({
         showArcGISBasemaps: true,
-        map: map
+        map: _map
     }, "basemapGallery");
     basemapGallery.startup();
-
     basemapGallery.on("error", function(msg) {
         console.log("basemap gallery error:  ", msg);
     });
@@ -318,7 +493,7 @@ require([
     var selectedTool = null;
 
     function initToolbar() {
-        tb = new Draw(map);
+        tb = new Draw(_map);
         tb.on("draw-end", dojo.partial(addGraphic, tb));
 
 
@@ -328,17 +503,17 @@ require([
             if (evt.target.id === "header-tool") {
                 return;
             } else if (evt.target.id === "clear-graphics") {
-                map.graphics.clear();
+                _map.graphics.clear();
                 return;
             }
             if (lastCreatedGraphics)
-                map.graphics.clear();
+                _map.graphics.clear();
 
             selectedTool = evt.target;
             $(evt.target).toggleClass("down");
 
             var tool = evt.target.id.toLowerCase();
-            map.disableMapNavigation();
+            _map.disableMapNavigation();
             tb.activate(tool);
         });
 
@@ -346,7 +521,7 @@ require([
 
 
     function initNewCutoutOptions() {
-        tbForNew = new Draw(map);
+        tbForNew = new Draw(_map);
         tbForNew.on("draw-end", dojo.partial(addGraphic, tbForNew));
 
         // 
@@ -358,7 +533,7 @@ require([
                     evt.target.id == "newcutoutname") {
                 return;
             } else if (evt.target.value === "clear-graphics") {
-                map.graphics.clear();
+                _map.graphics.clear();
                 lastCreatedGraphics = null;
                 return;
             }
@@ -366,7 +541,7 @@ require([
             if (lastCreatedGraphics) {
                 var didConfirm = confirm("Redraw will remove previous drawing.\nAre you sure for new selection?\n\n(You can edit existing selection using right click on selection.)");
                 if (didConfirm == true) {
-                    map.graphics.clear();
+                    _map.graphics.clear();
                     lastCreatedGraphics = null;
 
                 } else {
@@ -376,11 +551,11 @@ require([
                 }
 
             }
-
+            _map.graphics.clear();
             selectedTool = evt.target;
             var tool = evt.target.value.toLowerCase();
 
-            map.disableMapNavigation();
+            _map.disableMapNavigation();
             tbForNew.activate(tool);
         });
 
@@ -389,7 +564,7 @@ require([
     function addGraphic(parentToolbar, evt) {
         //deactivate the toolbar and clear existing graphics 
         parentToolbar.deactivate();
-        map.enableMapNavigation();
+        _map.enableMapNavigation();
         // figure out which symbol to use
         var symbol;
         if (evt.geometry.type === "point" || evt.geometry.type === "multipoint") {
@@ -403,7 +578,7 @@ require([
 
         lastCreatedGraphics = new Graphic(evt.geometry, symbol);
 
-        map.graphics.add(lastCreatedGraphics);
+        _map.graphics.add(lastCreatedGraphics);
         $(selectedTool).toggleClass("down");
         var group = "input:checkbox[name='cutoutSelTool']";
         $(group).prop("checked", false);
@@ -414,5 +589,5 @@ dojo.ready(function() {
     dojo.query(".info").attr("innerHTML", dojo.version);
 
 });
-fetchCutoutList('<?php echo DEFAULT_USER_GROUP; ?>', 'cutoutSelGrpDefault');
+
 

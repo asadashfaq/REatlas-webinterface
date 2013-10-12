@@ -27,7 +27,7 @@ require_once 'configurations.php';
   <?php } ?>  
         var defaultUserGroup = '<?php echo DEFAULT_USER_GROUP; ?>';
         var defaultUser = '<?php echo DEFAULT_USER; ?>';
-        
+        var currentUser = defaultUser;
         </script>
         <script src="js/reatlas.js"></script>
         <script src="js/reatlas-divselection.js"></script>
@@ -73,7 +73,7 @@ require_once 'configurations.php';
                 <?php } ?>
             </div>
             <div data-dojo-type="dijit.layout.ContentPane" id="rightPane" data-dojo-props="region:'right', splitter:false" style="width: 300px;overflow:hidden;">
-                <div id="cutoutselectorContainer" data-dojo-type="dijit.layout.TabContainer" style="display:block;"><!-- tabPosition="left-h" tabStrip="false"-->
+                <div id="cutoutselectorContainer" data-dojo-type="dijit.layout.TabContainer" style="display:block;height:100%"><!-- tabPosition="left-h" tabStrip="false"-->
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Cutouts', selected:true" >
 
                         <div id="selectorDiv">
@@ -86,48 +86,7 @@ require_once 'configurations.php';
                             <div id="selectorContentDiv" >
                                 <div id="cutoutSelGrpDefault" >
                                     No cutout found
-                                    <!--label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="europe">Europe</label><br/>
-                                    <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="usa">USA</label><br/>
-                                    <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="india">India</label><br/>
-                                    <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="n-africa">North Africa</label><br/>
-                                    <label><input type="radio" class="radio" name="cutoutSelGrpDefault" value="createNew">Create new</label><br/-->
-                                </div>
-                                <div id="cutoutSelGrpOwn" style="display: none;">Own group</div>
-                                <div id="cutoutSelGrpAll" style="display: none;">All group</div>
-                                <div id="cutoutSelGrpNew" style="display: none;">
-                                    <label for="newcutoutname">Cutout name:</label>
-                                    <input type="text" id="newcutoutname" name="newcutoutname" />
-                                    <br/>
-                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Rectangle">Rectangle</label><br/>
-                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Multipoint">Multipoint</label><br/>
-
-                                    <br/>
-                                    <button id="clear-graphics" class="clearall" value="clear-graphics">Clear All</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="cutoutInfoDiv">iuyoiyioyoyoi</div>
-                    </div>
-
-                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Maps',showTitle:true" >
-                        <div id="basemapGallery" ></div>
-                    </div>
-
-                </div>
-                <div id="capacitymapContainer" data-dojo-type="dijit.layout.TabContainer" style="display:none;"><!-- tabPosition="left-h" tabStrip="false"-->
-                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Solar tech', selected:true" >
-
-                        <div id="selectorDiv">
-                            <div id="selectorTopDiv">
-                                <label class="blue"><input type="radio" name="cutoutSelectorGroup" value="default" checked="checked"><span>Default</span></label>
-                                <label class="green"><input type="radio" name="cutoutSelectorGroup" value="own"><span>Own</span></label>
-                                <label class="yellow"><input type="radio" name="cutoutSelectorGroup" value="all"><span>All</span></label>
-                                <label class="purple"><input type="radio" name="cutoutSelectorGroup" value="new"><span>New</span></label>
-                            </div>
-                            <div id="selectorContentDiv" >
-                                <div id="cutoutSelGrpDefault" >
-                                    No cutout found
-                                </div>
+                                       </div>
                                 <div id="cutoutSelGrpOwn" style="display: none;">Own group</div>
                                 <div id="cutoutSelGrpAll" style="display: none;">All group</div>
                                 <div id="cutoutSelGrpNew" style="display: none;">
@@ -145,11 +104,21 @@ require_once 'configurations.php';
                         <div id="cutoutInfoDiv">Info</div>
                     </div>
 
-                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Wind tech',showTitle:true" >
+                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Maps',showTitle:true" >
                         <div id="basemapGallery" ></div>
                     </div>
+
+                </div>
+                <div id="capacitymapContainer" data-dojo-type="dijit.layout.TabContainer" style="display:none;height:100%"><!-- tabPosition="left-h" tabStrip="false"-->
+                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Solar tech', selected:true" >
+                        
+                    </div>
+
+                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Wind tech',showTitle:true" >
+                        
+                    </div>
                      <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Color',showTitle:true" >
-                        <div id="basemapGallery" ></div>
+                       
                     </div>
                 </div>
             </div>

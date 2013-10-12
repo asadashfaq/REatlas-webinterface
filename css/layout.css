@@ -20,6 +20,7 @@
         border: solid 4px #224a54;
         color:white; font-size:18pt; 
         text-align:left; font-weight:bold; height:70px;
+        overflow: hidden;
       }
       #headerLeft {
           clear: both;

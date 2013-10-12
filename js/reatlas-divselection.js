@@ -15,19 +15,27 @@ $(document).ready(function() {
                     $('#cutoutSelGrpAll').css('display', 'none');
                     $('#cutoutSelGrpNew').css('display', 'none');
                     $('#cutoutSelGrpDefault').html('Loading...');
+                     $('#cutoutSelGrpOwn').html('No cutout found');
+                      $('#cutoutSelGrpAll').html('No cutout found');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpDefault');
+                    
                 } else if ($(this).val() == "own") {
                     $('#cutoutSelGrpDefault').css('display', 'none');
                     $('#cutoutSelGrpOwn').css('display', 'block');
                     $('#cutoutSelGrpAll').css('display', 'none');
                     $('#cutoutSelGrpNew').css('display', 'none');
+                    $('#cutoutSelGrpDefault').html('No cutout found');
                     $('#cutoutSelGrpOwn').html('Loading...');
+                    $('#cutoutSelGrpAll').html('No cutout found');
+                      
                     fetchCutoutList(defaultUser, 'cutoutSelGrpOwn');
                 } else if ($(this).val() == "all") {
                     $('#cutoutSelGrpDefault').css('display', 'none');
                     $('#cutoutSelGrpOwn').css('display', 'none');
                     $('#cutoutSelGrpAll').css('display', 'block');
                     $('#cutoutSelGrpNew').css('display', 'none');
+                    $('#cutoutSelGrpDefault').html('No cutout found');
+                    $('#cutoutSelGrpOwn').html('No cutout found');
                     $('#cutoutSelGrpAll').html('Loading...');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpAll');
                     fetchCutoutList(defaultUser, 'cutoutSelGrpAll');
@@ -51,5 +59,12 @@ $(document).ready(function() {
 
     var group = "input:checkbox[name='cutoutSelTool']";
     $(group).prop("checked", false);
+    
+    /**
+     * Load Default group cutouts
+     */
+    $('#cutoutSelGrpDefault').html('Loading...');
+    fetchCutoutList(defaultUserGroup, 'cutoutSelGrpDefault');
+  
 });
 

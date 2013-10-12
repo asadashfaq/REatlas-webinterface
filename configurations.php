@@ -18,7 +18,7 @@ define('DB_USER','');
 // Users
 
 define('DEFAULT_USER_GROUP','auesg');
-define('DEFAULT_USER','manila');
+define('DEFAULT_USER','gorm');
 
 
 //selection
