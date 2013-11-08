@@ -48,7 +48,7 @@ $(document).ready(function() {
             }
     );
 
-    $("input:checkbox").click(function() {
+    $("#cutoutselectorContainer input:checkbox").click(function() {
         var group = "input:checkbox[name='" + $(this).prop("name") + "']";
         $(group).prop("checked", false);
         $(this).prop("checked", true);
@@ -66,5 +66,13 @@ $(document).ready(function() {
     $('#cutoutSelGrpDefault').html('Loading...');
     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpDefault');
   
+  
+      $('#ModalDialogOpenLink').click(function () {
+            $('#ModalDialogDiv').load(this.href, function () {
+                $(this).dialog();
+            });
+            return false;
+        });
+
 });
 

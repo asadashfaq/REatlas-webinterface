@@ -577,7 +577,6 @@ require([
         }
 
         lastCreatedGraphics = new Graphic(evt.geometry, symbol);
-
         _map.graphics.add(lastCreatedGraphics);
         $(selectedTool).toggleClass("down");
         var group = "input:checkbox[name='cutoutSelTool']";

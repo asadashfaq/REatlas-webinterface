@@ -1,0 +1,224 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+/* ---------------------------------------------------------------------- */
+/* HTML5/CSS3 Gray Navigation Menu 
+/* ----------------------------------------------------------------------
+Version: 1.0
+Author: Ixtendo
+Author URI: http://www.ixtendo.com
+License: MIT License
+License URI: http://www.opensource.org/licenses/mit-license.php
+------------------------------------------------------------------------- */
+
+
+* {
+	margin: 0;
+	padding: 0;
+	outline: none;	
+}
+body {
+    background: url("../images/bgnoise_lg.png") repeat scroll left top rgba(0, 0, 0, 0) !important;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+ul {
+	list-style: none;	
+}
+
+#header {
+    width: 100%; 
+    margin: 0;
+}
+#top-header {
+    background-image: url("../../images/banner.jpg");
+    background-repeat: repeat-x;
+    border: 4px solid #224A54;
+    color: #FFFFFF;
+    font-size: 18pt;
+    font-weight: bold;
+    height: 70px;
+    margin: 2px;
+    overflow: hidden;
+    text-align: left;
+}
+#subheader {
+    color: #FFFFFF;
+    font-size: small;
+    padding-left: 20px;
+}
+#navigation {
+	color: #444444;
+        font: bold 12px/18px "Helvetica Neue",Helvetica,Arial,sans-serif;
+        left: 30%;
+        margin: 40px 0;
+        position: relative;
+        text-transform: uppercase;
+}
+
+#navigation:after {
+	clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+
+#navigation ul {	
+	float: left;
+	border-radius: 100px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.07);
+	-webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+
+#navigation li {
+	float: left;
+	border-style: solid; 
+	border-width: 1px;
+    border-color: #BABABA #BABABA #BABABA #FFF;
+	box-shadow: 0 1px rgba(255,255,255,1) inset;
+	-webkit-box-shadow: 0 1px rgba(255,255,255,1) inset;
+	background: #F7F7F7; /* Old browsers */
+	background: -moz-linear-gradient(top, #F7F7F7 0%, #EDEDED 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#F7F7F7), color-stop(100%,#EDEDED)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #F7F7F7 0%,#EDEDED 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #F7F7F7 0%,#EDEDED 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #F7F7F7 0%,#EDEDED 100%); /* IE10+ */
+	background: linear-gradient(top, #F7F7F7 0%,#EDEDED 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#F7F7F7', endColorstr='#EDEDED',GradientType=0 ); /* IE6-9 */	
+}
+
+#navigation li:hover, #navigation li.current {
+	box-shadow: 0 1px rgba(255,255,255,0.2) inset;
+	-webkit-box-shadow: 0 1px rgba(255,255,255,0.2) inset;
+	border-color: #262626 !important;
+	background: #4D4D4D; /* Old browsers */
+	background: -moz-linear-gradient(top, #4D4D4D 0%, #262626 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#4D4D4D), color-stop(100%,#262626)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #4D4D4D 0%,#262626 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #4D4D4D 0%,#262626 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #4D4D4D 0%,#262626 100%); /* IE10+ */
+	background: linear-gradient(top, #4D4D4D 0%,#262626 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4D4D4D', endColorstr='#262626',GradientType=0 ); /* IE6-9 */
+}
+
+#navigation a {
+	display: block;
+	padding: 10px 15px;
+	color: #444;
+	text-decoration: none;
+	text-shadow: 0 1px #FFF;
+}
+
+#navigation a:hover, #navigation li.current a {
+	color: #FFF;
+	text-shadow: 0 1px #000;
+}
+
+#navigation li:first-child {
+	border-left-color: #BABABA;
+	border-radius: 100px 0 0 100px;
+}
+
+#navigation li:last-child {
+	border-radius: 0 100px 100px 0;
+}
+#container{
+    height: 800px;
+    margin: 30px;
+}
+
+/*
+Pretty Table Styling
+CSS Tricks also has a nice writeup: http://css-tricks.com/feature-table-design/
+*/
+
+table {
+        overflow:hidden;
+        border:1px solid #d3d3d3;
+        background:#fefefe;
+        width:70%;
+       /* margin:5% auto 0;*/
+       margin: auto;
+        -moz-border-radius:5px; /* FF1+ */
+        -webkit-border-radius:5px; /* Saf3-4 */
+        border-radius:5px;
+        -moz-box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+        -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+th, td {padding:18px 28px 18px; text-align:center; }
+
+th {padding-top:22px; text-shadow: 1px 1px 1px #fff; background:#e8eaeb;}
+
+td {border-top:1px solid #e0e0e0; border-right:1px solid #e0e0e0;}
+
+tr.odd-row td {background:#f6f6f6;}
+
+td.first, th.first {text-align:left}
+
+td.last {border-right:none;}
+
+/*
+Background gradients are completely unnecessary but a neat effect.
+*/
+
+td {
+        background: -moz-linear-gradient(100% 25% 90deg, #fefefe, #f9f9f9);
+        background: -webkit-gradient(linear, 0% 0%, 0% 25%, from(#f9f9f9), to(#fefefe));
+}
+
+tr.odd-row td {
+        background: -moz-linear-gradient(100% 25% 90deg, #f6f6f6, #f1f1f1);
+        background: -webkit-gradient(linear, 0% 0%, 0% 25%, from(#f1f1f1), to(#f6f6f6));
+}
+
+th {
+        background: -moz-linear-gradient(100% 20% 90deg, #e8eaeb, #ededed);
+        background: -webkit-gradient(linear, 0% 0%, 0% 20%, from(#ededed), to(#e8eaeb));
+}
+
+tr.theader td{
+    background: -moz-linear-gradient(100% 20% 90deg, #E8E2EB, #ededed);
+    background: -webkit-gradient(linear, 0% 0%, 0% 20%, from(#ede2ed), to(#e8eaeb));
+}
+/*
+I know this is annoying, but we need additional styling so webkit will recognize rounded corners on background elements.
+Nice write up of this issue: http://www.onenaught.com/posts/266/css-inner-elements-breaking-border-radius
+
+And, since we've applied the background colors to td/th element because of IE, Gecko browsers also need it.
+*/
+
+tr:first-child th.first {
+        -moz-border-radius-topleft:5px;
+        -webkit-border-top-left-radius:5px; /* Saf3-4 */
+}
+
+tr:first-child th.last {
+        -moz-border-radius-topright:5px;
+        -webkit-border-top-right-radius:5px; /* Saf3-4 */
+}
+
+tr:last-child td.first {
+        -moz-border-radius-bottomleft:5px;
+        -webkit-border-bottom-left-radius:5px; /* Saf3-4 */
+}
+
+tr:last-child td.last {
+        -moz-border-radius-bottomright:5px;
+        -webkit-border-bottom-right-radius:5px; /* Saf3-4 */
+}
+#footer {
+    background-color: #ECEFE4;
+    border: 2px solid #224A54;
+    bottom: 0;
+    color: #3F3F3F;
+    font-size: 10pt;
+    height: 20px;
+    margin: 2px;
+    padding: 10px;
+    text-align: center;
+    width: 98%;
+}

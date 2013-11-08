@@ -1,5 +1,12 @@
 <?php
-require_once 'configurations.php';
+include("init.php");
+
+if (!$session->logged_in)
+    include 'login.php';
+else {
+    $profile = new Profile($session->profileid);
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -14,10 +21,12 @@ require_once 'configurations.php';
         <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css">
         <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
         <link rel="stylesheet" href="css/layout.css"/> 
-
+        
         <script>var dojoConfig = {parseOnLoad: true};</script>
         <script src="http://js.arcgis.com/3.7/"></script>
-        <script src="js/jquery-1.10.2.js"></script>
+        <script src="js/jquery/jquery-1.9.1.js"></script>
+        <script src="js/jquery/ui/jquery-ui.js"></script>
+        
         <script>
 
 <?php if (SELECTION_TOOLBAR) { ?>
@@ -28,12 +37,15 @@ require_once 'configurations.php';
         var defaultUserGroup = '<?php echo DEFAULT_USER_GROUP; ?>';
         var defaultUser = '<?php echo DEFAULT_USER; ?>';
         var currentUser = defaultUser;
+        
+    
         </script>
         <script src="js/reatlas.js"></script>
         <script src="js/reatlas-divselection.js"></script>
     </head>
 
     <body class="claro">
+      
         <div id="mainWindow" 
              data-dojo-type="dijit.layout.BorderContainer" 
              data-dojo-props="design:'headline', gutters:false" 
@@ -49,7 +61,12 @@ require_once 'configurations.php';
                     <button id="cutoutselectorBtn" class="down">Cutout Selector</button>
                     <button id="capacitymapBtn">Capacity Map</button>
                 </div>
-                <div id="headerRight">Welcome, Manila<br/><a href="index.php">Logout</a></div>
+                <div id="headerRight"><?php if ($session->logged_in): ?>
+                    Welcome, <?php echo $profile->fullname;?><br/>
+                    <a href="profile.php?ref=main">My Account</a>
+                    <a href="process.php?ref=front">Logout</a>
+                <?php endif; ?>
+                </div>
             </div>
             <div id="mapDiv" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center', splitter:false" style="width: 100%;overflow:hidden;">
                 <div id="HomeButton"></div>

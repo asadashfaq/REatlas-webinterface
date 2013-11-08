@@ -168,6 +168,7 @@ CONTENT
 	color: #9d9e9e;
 	text-shadow: 1px 1px 0 rgba(256,256,256,1.0);
 	line-height: 6em;
+        float: left;
         clear: both;
 }
 
@@ -217,6 +218,7 @@ CONTENT
 
 /* Animation */
 .input, .user-icon, .pass-icon, .button, .register {
+    
 	transition: all 0.5s;
 	-moz-transition: all 0.5s;
 	-webkit-transition: all 0.5s;
@@ -307,4 +309,36 @@ FOOTER
 .register-form .footer .register:focus {
 	position: relative;
 	bottom: -1px;
+}
+
+
+div.form-error {
+    background: none repeat scroll 0 0 #FFE5ED;
+    border-radius: 4px 4px 4px 4px;
+    color: #8B0000;
+    line-height: 180%;
+    margin: 22px;
+    padding: 6px 12px;
+}
+.alert-danger, .alert-error {
+    background-color: #F2DEDE;
+    border-color: #EED3D7;
+    color: #B94A48;
+}
+.alert {
+    background-color: #FCF8E3;
+    border: 1px solid #FBEED5;
+    border-radius: 4px 4px 4px 4px;
+    color: #C09853;
+    margin-bottom: 20px;
+    padding: 8px 35px 8px 14px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+span.form-error.help-block {
+    color: #FF0000;
+    display: block;
+    margin-top: 6px;
+    padding-left: 0;
+     float: left;
 }

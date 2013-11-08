@@ -1,16 +1,22 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<?php
+include("init.php");
+
+?>
+<!DOCTYPE html>
 <html>
 <head>
 
 <!--META-->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Login Form</title>
+<meta name="viewport" content="width=device-width;">
+<title>REAtlas Login</title>
 
 <!--STYLESHEETS-->
 <link href="css/style.css" rel="stylesheet" type="text/css" />
-
+<link href="css/login.css" rel="stylesheet" type="text/css" />
 <!--SCRIPTS-->
-<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="js/jquery/jquery-1.10.2.js"></script>
+
 <!--Slider-in icons-->
 <script type="text/javascript">
 $(document).ready(function() {
@@ -42,7 +48,7 @@ $(document).ready(function() {
     <!--END SLIDE-IN ICONS-->
 
 <!--LOGIN FORM-->
-<form name="login-form" class="login-form" action="main.php" method="post">
+<form name="login-form" class="login-form" action="process.php" method="post">
 
 	<!--HEADER-->
     <div class="header">
@@ -50,11 +56,28 @@ $(document).ready(function() {
     <!--DESCRIPTION--><span>Please provide login information before continue.</span><!--END DESCRIPTION-->
     </div>
     <!--END HEADER-->
-	
+	<!-- ERROR SHORT-->
+        <div class="form-error alert alert-danger" <?php if($form->num_errors <=0) echo "style=\"display:none;\""; ?>>
+            <?php       
+            if(is_array($form->errors)){
+                foreach ($form->errors as $key => $value) {
+                    echo $value."<br/>";
+                }
+            }
+            
+            ?>
+        </div>
+        <!-- ERROR SHORT END -->
 	<!--CONTENT-->
     <div class="content">
-	<!--USERNAME--><input name="username" type="text" class="input username" value="Username" onfocus="this.value=''" /><!--END USERNAME-->
-    <!--PASSWORD--><input name="password" type="password" class="input password" value="Password" onfocus="this.value=''" /><!--END PASSWORD-->
+	  <!--USERNAME--><input name="username" type="text" class="input username" value="<?php echo ($form->value("username")) ? $form->value("username") : "Username"; ?>" onfocus="this.value = ''" /><!--END USERNAME-->
+                <!--PASSWORD--><input name="password" type="password" class="input password" value="<?php echo ($form->value("password")) ? $form->value("password") : "Password"; ?>" onfocus="this.value = ''" /><!--END PASSWORD-->
+                <br/><input type="checkbox" name="remember" <?php if ($form->value("remember") != "") {
+    echo "checked";
+} ?>>
+                &nbsp;&nbsp;<span> Remember me next time </span>
+                <input type="hidden" name="sublogin" value="1">
+                <input type="hidden" name="ref" value="front">
     </div>
     <!--END CONTENT-->
     

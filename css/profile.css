@@ -1,0 +1,305 @@
+/*******************
+LOGIN FORM STYLESHEET
+by: Amit Jakhu
+www.amitjakhu.com
+*******************/
+
+/*******************
+FONTS
+*******************/
+
+@import url(http://fonts.googleapis.com/css?family=Bree+Serif);
+
+/*******************
+SELECTION STYLING
+*******************/
+
+::selection {
+	color: #fff;
+	background: #f676b2; /* Safari */
+}
+::-moz-selection {
+	color: #fff;
+	background: #f676b2; /* Firefox */
+}
+
+/*******************
+BODY STYLING
+*******************/
+
+* {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	background: url(../images/login/bg.png) repeat;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-weight:300;
+	text-align: left;
+	text-decoration: none;
+}
+
+#wrapper {
+	/* Center wrapper perfectly */
+	width: 300px;
+	height: 400px;
+	position: absolute;
+	left: 35%;
+	margin-left: -130px;
+	margin-top: 20px;
+        margin-bottom: 20px;
+}
+
+/*
+.gradient {
+	width: 600px;
+	height: 600px;
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	margin-left: -300px;
+	margin-top: -300px;
+	
+	background: url(../images/login/gradient.png) no-repeat;
+}
+*/
+
+/*******************
+LOGIN FORM
+*******************/
+
+.register-form, #leftPane {
+	width: 600px;
+	margin: 0 auto;
+	position: relative;
+	z-index:5;
+	
+	background: #f3f3f3;
+	border: 1px solid #fff;
+	border-radius: 5px;
+	
+	box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/*******************
+HEADER
+*******************/
+
+.register-form .header {
+	padding: 40px 30px 30px 30px;
+}
+
+.register-form .header h1 {
+	font-family: 'Bree Serif', serif;
+	font-weight: 300;
+	font-size: 28px;
+	line-height:34px;
+	color: #414848;
+	text-shadow: 1px 1px 0 rgba(256,256,256,1.0);
+	margin-bottom: 10px;
+}
+
+.register-form .header span {
+	font-size: 11px;
+	line-height: 16px;
+	color: #678889;
+	text-shadow: 1px 1px 0 rgba(256,256,256,1.0);
+}
+
+.description {
+	font-size: 11px;
+	line-height: 16px;
+	color: #678889;
+	text-shadow: 1px 1px 0 rgba(256,256,256,1.0);
+}
+
+/*******************
+CONTENT
+*******************/
+
+.register-form .content {
+	padding: 0 30px 25px 30px;
+}
+
+/* Input field */
+.register-form .content .input {
+	padding: 10px;
+        
+	text-shadow: 1px 1px 0 rgba(256,256,256,1.0);
+	
+	background: #fff;
+	border: 1px solid #fff;
+	border-radius: 5px;
+	
+	box-shadow: inset 0 1px 3px rgba(0,0,0,0.50);
+	-moz-box-shadow: inset 0 1px 3px rgba(0,0,0,0.50);
+	-webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,0.50);
+}
+
+.register-form .content .input.readonly {
+    color: #9d9e9e;
+}
+
+.register-form .content label {
+    display: inline-block;
+    width: 200px;	
+}
+
+/* Second input field */
+.register-form .content .password, .register-form .content .pass-icon {
+	margin-top: 25px;
+}
+
+/*******************
+FOOTER
+*******************/
+
+.register-form .footer {
+      padding: 25px 30px 40px 30px;
+	overflow: auto;
+	
+	background: #d4dedf;
+	border-top: 1px solid #fff;
+	
+	box-shadow: inset 0 1px 0 rgba(0,0,0,0.15);
+	-moz-box-shadow: inset 0 1px 0 rgba(0,0,0,0.15);
+	-webkit-box-shadow: inset 0 1px 0 rgba(0,0,0,0.15);
+}
+
+/* Login button */
+.register-form .footer .button {
+	float:right;
+	padding: 11px 25px;
+	
+	font-family: 'Bree Serif', serif;
+	font-weight: 300;
+	font-size: 18px;
+	color: #fff;
+	text-shadow: 0px 1px 0 rgba(0,0,0,0.25);
+	
+	background: #56c2e1;
+	border: 1px solid #46b3d3;
+	border-radius: 5px;
+	cursor: pointer;
+	
+	box-shadow: inset 0 0 2px rgba(256,256,256,0.75);
+	-moz-box-shadow: inset 0 0 2px rgba(256,256,256,0.75);
+	-webkit-box-shadow: inset 0 0 2px rgba(256,256,256,0.75);
+}
+
+.register-form .footer .button:hover {
+	background: #3f9db8;
+	border: 1px solid rgba(256,256,256,0.75);
+	
+	box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+	-moz-box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.register-form .footer .button:focus {
+	position: relative;
+	bottom: -1px;
+	
+	background: #56c2e1;
+	
+	box-shadow: inset 0 1px 6px rgba(256,256,256,0.75);
+	-moz-box-shadow: inset 0 1px 6px rgba(256,256,256,0.75);
+	-webkit-box-shadow: inset 0 1px 6px rgba(256,256,256,0.75);
+}
+
+/* Register button */
+.register-form .footer .register {
+	display: block;
+	float: right;
+	padding: 10px;
+	margin-right: 20px;
+	
+	background: none;
+	border: none;
+	cursor: pointer;
+	
+	font-family: 'Bree Serif', serif;
+	font-weight: 300;
+	font-size: 18px;
+	color: #414848;
+	text-shadow: 0px 1px 0 rgba(256,256,256,0.5);
+}
+
+.register-form .footer .register:hover {
+	color: #3f9db8;
+}
+
+.register-form .footer .register:focus {
+	position: relative;
+	bottom: -1px;
+}
+
+
+div.form-error {
+    background: none repeat scroll 0 0 #FFE5ED;
+    border-radius: 4px 4px 4px 4px;
+    color: #8B0000;
+    line-height: 180%;
+    margin: 22px;
+    padding: 6px 12px;
+}
+.alert-danger, .alert-error {
+    background-color: #F2DEDE;
+    border-color: #EED3D7;
+    color: #B94A48;
+}
+.alert {
+    background-color: #FCF8E3;
+    border: 1px solid #FBEED5;
+    border-radius: 4px 4px 4px 4px;
+    color: #C09853;
+    margin-bottom: 20px;
+    padding: 8px 35px 8px 14px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+span.form-error.help-block {
+    color: #FF0000;
+    display: block;
+ /*   margin-top: 6px;*/
+    padding-left: 0;
+   /*  float: left;*/
+}
+
+div.form-success {
+    background: none repeat scroll 0 0 #0ACC24;
+    border-radius: 4px 4px 4px 4px;
+    color: #8B0000;
+    line-height: 180%;
+    margin: 22px;
+    padding: 6px 12px;
+    width: 500px;
+}
+
+#leftmenu {
+    float: left;
+    padding: 20px;
+}
+#leftmenu ul
+{
+list-style-type: none;
+padding: 0px;
+margin: 0px;
+}
+#leftmenu ul li
+{
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #F5FAE8;
+    display: block;
+    padding: 10px;
+    width: 240px;
+}
+#leftmenu ul li.selected
+{
+     background: none repeat scroll 0 0 #CADEFF;
+  
+}
