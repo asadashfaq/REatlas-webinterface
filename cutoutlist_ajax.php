@@ -3,7 +3,7 @@
 $filterUser = $_REQUEST["user"];
 $param = "";
 
-$command = "python /development/AU/REatlas-client/scripts/cutoutList.py";
+$command = "python ".REATLAS_CLIENT_PATH."/scripts/cutoutList.py";
 $command .= " $param 2>&1";
 
 $pid = popen( $command,"r");

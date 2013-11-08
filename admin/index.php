@@ -76,7 +76,15 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
     <?php 
     if($action == "users") {
         $adminUsers = new AdminUsers();
-        $adminUsers->display();
+        if(isset($_REQUEST['activate'])){
+            $adminUsers->processActivation();
+        }else if(isset($_REQUEST['edit'])){
+            $adminUsers->editUser();
+            $adminUsers->display();
+        }else {
+            $adminUsers->userListHTML();
+            $adminUsers->display();
+        }
     }else {
         $adminUsers = new AdminFront();
         $adminUsers->display();

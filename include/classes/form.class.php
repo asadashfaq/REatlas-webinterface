@@ -6,10 +6,6 @@
  * track of errors in user submitted forms and the form
  * field values that were entered correctly.
  *
- * Written by: Jpmaster77 a.k.a. The Grandmaster of C++ (GMC)
- * Last Updated: August 19, 2004
- * Modified by: Arman G. de Castro, October 3, 2008
- * email: armandecastro@gmail.com
  */
  
 class Form
@@ -95,6 +91,4 @@ class Form
    function getErrorArray(){
       return $this->errors;
    }
-};
- 
-?>
+}

@@ -112,3 +112,9 @@ define("EMAIL_WELCOME", true);
  * converted automatically.
  */
 define("ALL_LOWERCASE", true);
+
+
+/* REATlas Client API Settings
+ * 
+ */
+define("REATLAS_CLIENT_PATH", "/development/AU/REatlas-client");

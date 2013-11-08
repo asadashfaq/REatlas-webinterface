@@ -1,18 +1,5 @@
 @charset "utf-8";
 /* CSS Document */
-
-
-/* ---------------------------------------------------------------------- */
-/* HTML5/CSS3 Gray Navigation Menu 
-/* ----------------------------------------------------------------------
-Version: 1.0
-Author: Ixtendo
-Author URI: http://www.ixtendo.com
-License: MIT License
-License URI: http://www.opensource.org/licenses/mit-license.php
-------------------------------------------------------------------------- */
-
-
 * {
 	margin: 0;
 	padding: 0;
@@ -126,13 +113,22 @@ ul {
 	border-radius: 0 100px 100px 0;
 }
 #container{
-    height: 800px;
-    margin: 30px;
+    min-height: 600px;
+    margin: 0 0 0 10%;
 }
 
+#paginationBar {
+  float: left;
+  clear: none;
+  width:88%; 
+  padding: 10px;
+ /* margin: 50px auto;*/
+}
+#content {
+    float: left;
+}
 /*
 Pretty Table Styling
-CSS Tricks also has a nice writeup: http://css-tricks.com/feature-table-design/
 */
 
 table {
@@ -149,7 +145,7 @@ table {
         -webkit-box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
 }
 
-th, td {padding:18px 28px 18px; text-align:center; }
+th, td {padding:18px; text-align:center; }
 
 th {padding-top:22px; text-shadow: 1px 1px 1px #fff; background:#e8eaeb;}
 
@@ -210,6 +206,19 @@ tr:last-child td.last {
         -moz-border-radius-bottomright:5px;
         -webkit-border-bottom-right-radius:5px; /* Saf3-4 */
 }
+#contentEdit {
+    background: none repeat scroll 0 0 #FEFEFE;
+    border: 1px solid #D3D3D3;
+    border-radius: 5px;
+    margin: auto;
+    overflow: hidden;
+    width: 70%;
+}
+#contentEdit h1{
+   padding: 10px;
+   color: #3F3F3F;
+}
+
 #footer {
     background-color: #ECEFE4;
     border: 2px solid #224A54;
@@ -221,4 +230,5 @@ tr:last-child td.last {
     padding: 10px;
     text-align: center;
     width: 98%;
+    float: left;
 }

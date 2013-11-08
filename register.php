@@ -1,5 +1,5 @@
 <?php
-include("include/classes/session.php");
+include("init.php");
 ?>
 <!DOCTYPE html>
 <html>

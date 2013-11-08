@@ -211,10 +211,10 @@ class Process
       
       /* Registration attempt */
       $retval = $session->SessionMemberRegister($_POST['username'], $_POST['password'], $_POST['email']);
-      
+      /*
       if(isset($_REQUEST['redirect_to']))
           $session->referrer = $_POST['redirect_to'];
-     
+     */
       /* Registration Successful */
       if($retval == 0){
          $_SESSION['reguname'] = $_POST['username'];
