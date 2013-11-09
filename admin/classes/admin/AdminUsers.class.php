@@ -88,7 +88,7 @@ class AdminUsers {
         $localHtml = '';
         $localHtml .= '<tr id="filterBar" class="theader">'
                 . '<td><input type="text" id="id" style="width:35px;" value="'.(isset($filterVal['id'])?$filterVal['id']:'').'"/></td>'
-                . '<td><input type="text" id="username" value="'.(isset($filterVal['username'])?$filterVal['username']:'').'"/></td>'
+                . '<td><input type="text" id="username" style="width:100px;" value="'.(isset($filterVal['username'])?$filterVal['username']:'').'"/></td>'
                 . '<td><select id="userlevel">'
                 . '<option value="">--</option>'
                 . '<option value="0">Guest</option>'
@@ -97,14 +97,14 @@ class AdminUsers {
                 . '<option value="8">Master</option>'
                 . '<option value="9">Admin</option>'
                 . '</select></td>'
-                . '<td><input type="text" id="email" value="'.(isset($filterVal['email'])?$filterVal['email']:'').'"/></td>'
-                . '<td><input type="text" id="parent_dir" value="'.(isset($filterVal['parent_dir'])?$filterVal['parent_dir']:'').'"/></td>'
+                . '<td><input type="text" id="email" style="width:100px;" value="'.(isset($filterVal['email'])?$filterVal['email']:'').'"/></td>'
+/*                . '<td><input type="text" id="parent_dir" style="width:100px;" value="'.(isset($filterVal['parent_dir'])?$filterVal['parent_dir']:'').'"/></td>' */
                 . '<td><select id="active">'
                 . '<option value="">--</option>'
                 . '<option value="0">NO</option>'
                 . '<option value="1">YES</option>'
                 . '</select></td>'
-                . '<td><input type="text" id="aulogin" value="'.(isset($filterVal['aulogin'])?$filterVal['aulogin']:'').'"/></td>'
+                . '<td><input type="text" id="aulogin" style="width:100px;" value="'.(isset($filterVal['aulogin'])?$filterVal['aulogin']:'').'"/></td>'
                 . '<td><input type="button" onclick="resetFilter()" value="Reset Filter"/></td></tr>';
          $localHtml .= '<script>'
                  . 'function resetFilter(){'
@@ -155,7 +155,7 @@ class AdminUsers {
         $this->_html .= $this->listPagination($totalRec,$pageLimit,$pageOffset,$queryFilter);
         $this->_html .= '<div id="content">';
         $this->_html .= '<table cellspacing="0">';
-        $this->_html .= '<tr><th>ID</th><th>User Name</th><th>User Level</th><th>E-mail</th><th>Parent Dir</th><th>Active</th><th>AU login</th><th>&nbsp;</th></tr>';
+        $this->_html .= '<tr><th>ID</th><th>User Name</th><th>User Level</th><th>E-mail</th><!--th>Parent Dir</th--><th>Active</th><th>AU login</th><th>&nbsp;</th></tr>';
         $this->_html .= $this->listFilter($pageLimit,$currentPage,$queryFilter);
         if($res){
             foreach ($res as $row) {
@@ -164,7 +164,7 @@ class AdminUsers {
                         . '<td>'.$row['username'].'</td>'
                         . '<td>'.($this->_userLevelArr[$row['userlevel']]).'</td>'
                         . '<td>'.$row['email'].'</td>'
-                        . '<td>'.$row['parent_directory'].'</td>'
+/*                        . '<td>'.$row['parent_directory'].'</td>' */
                         . '<td><a href="'.$_SERVER['PHP_SELF'].'?action=users&activate&id='.$row['id'].(isset($_REQUEST['limit'])?'&limit='.$_REQUEST['limit']:'').(isset($_REQUEST['page'])?'&page='.$_REQUEST['page']:'').(isset($_REQUEST['query'])?'&query='.$_REQUEST['query']:'').'">'
                         . '<img src="images/'.($row['active']==1?'check.png':'cross.png').'"/>'
                         . '</a></td>'

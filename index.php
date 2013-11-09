@@ -1,6 +1,6 @@
 <?php
 include("init.php");
-
+$action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
 ?>
 <!DOCTYPE html>
 <html>
@@ -49,10 +49,17 @@ $(document).ready(function() {
 
 <!--LOGIN FORM-->
 <form name="login-form" class="login-form" action="process.php" method="post">
-
 	<!--HEADER-->
     <div class="header">
-    <!--TITLE--><h1>REAtlas Login</h1><!--END TITLE-->
+    <!--TITLE--><h1>REAtlas </h1><!--END TITLE-->
+<?php 
+    if($action == "lostpassword")
+    {
+    ?>
+ <h3>Forgot password</h3>
+<?php 
+}
+?>
     <!--DESCRIPTION--><span>Please provide login information before continue.</span><!--END DESCRIPTION-->
     </div>
     <!--END HEADER-->
@@ -70,6 +77,21 @@ $(document).ready(function() {
         <!-- ERROR SHORT END -->
 	<!--CONTENT-->
     <div class="content">
+<?php 
+    if($action == "lostpassword")
+    {
+    ?>
+    <p>
+	  <!--USERNAME--><input name="username" type="text" class="input username" value="<?php echo ($form->value("username")) ? $form->value("username") : "Username"; ?>" onfocus="this.value = ''" /><!--END USERNAME-->
+	</p>
+    <p>
+      <span>  Password will be sent to your registered email.</span>
+    </p>
+                <input type="hidden" name="subforgot" value="1"/>
+    <?php 
+    }else
+    {
+    ?>
 	  <!--USERNAME--><input name="username" type="text" class="input username" value="<?php echo ($form->value("username")) ? $form->value("username") : "Username"; ?>" onfocus="this.value = ''" /><!--END USERNAME-->
                 <!--PASSWORD--><input name="password" type="password" class="input password" value="<?php echo ($form->value("password")) ? $form->value("password") : "Password"; ?>" onfocus="this.value = ''" /><!--END PASSWORD-->
                 <br/><input type="checkbox" name="remember" <?php if ($form->value("remember") != "") {
@@ -78,13 +100,40 @@ $(document).ready(function() {
                 &nbsp;&nbsp;<span> Remember me next time </span>
                 <input type="hidden" name="sublogin" value="1">
                 <input type="hidden" name="ref" value="front">
+<?php 
+        }
+        ?>
+<br/>
+  <?php 
+    if($action != "lostpassword")
+    {
+    ?>
+    
+	<a href="<?php echo _SITE_DIRECTORY_; ?>?action=lostpassword" title="Password Lost and Found"><span>Lost your password?</span></a>
+        <?php 
+    }
+    ?>
     </div>
     <!--END CONTENT-->
     
     <!--FOOTER-->
     <div class="footer">
+  <?php 
+    if($action == "lostpassword")
+    {
+    ?>
+    <!--LOGIN BUTTON--><input type="submit" name="submit" value="Login" class="button" /><!--END LOGIN BUTTON-->
+    <!--BACK TO LOGIN BUTTON--><input type="button" name="register" value="Back..." class="register" onclick="document.location.href='index.php'" /><!--END BACK TO LOGIN BUTTON-->
+ <?php
+    }else {
+    ?>
+
     <!--LOGIN BUTTON--><input type="submit" name="submit" value="Login" class="button" /><!--END LOGIN BUTTON-->
     <!--REGISTER BUTTON--><input type="button" name="register" value="Register" class="register" onclick="document.location.href='register.php'" /><!--END REGISTER BUTTON-->
+ <?php
+    }
+ ?>
+
     </div>
     <!--END FOOTER-->
 

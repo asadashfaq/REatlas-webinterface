@@ -1,4 +1,5 @@
 <?php
+include_once('init.php');
 
 $filterUser = $_REQUEST["user"];
 $cutout = $_REQUEST["cutout"];
