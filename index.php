@@ -122,7 +122,9 @@ $(document).ready(function() {
     if($action == "lostpassword")
     {
     ?>
-    <!--LOGIN BUTTON--><input type="submit" name="submit" value="Login" class="button" /><!--END LOGIN BUTTON-->
+         <input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>?action=lostpassword" type="hidden"/>
+              
+    <!--LOGIN BUTTON--><input type="submit" name="submit" value="Send" class="button" /><!--END LOGIN BUTTON-->
     <!--BACK TO LOGIN BUTTON--><input type="button" name="register" value="Back..." class="register" onclick="document.location.href='index.php'" /><!--END BACK TO LOGIN BUTTON-->
  <?php
     }else {

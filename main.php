@@ -1,12 +1,6 @@
 <?php
 include("init.php");
 
-if (!$session->logged_in)
-    include 'login.php';
-else {
-    $profile = new Profile($session->profileid);
-}
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -45,7 +39,14 @@ else {
     </head>
 
     <body class="claro">
+      <?php
       
+if (!$session->logged_in)
+    include 'login.php';
+else {
+    $profile = new Profile($session->profileid);
+}
+?>
         <div id="mainWindow" 
              data-dojo-type="dijit.layout.BorderContainer" 
              data-dojo-props="design:'headline', gutters:false" 

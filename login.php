@@ -81,6 +81,8 @@ if (isset($_GET['error'])) {
 } ?>>
                 &nbsp;&nbsp;<span> Remember me next time </span>
                 <input type="hidden" name="sublogin" value="1">
+                <input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>main.php" type="hidden"/>
+               
             </div>
             <!--END CONTENT-->
 
