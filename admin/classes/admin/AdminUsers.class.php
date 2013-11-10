@@ -290,7 +290,7 @@ class AdminUsers {
              $this->_html = '<div id="contentEdit">';
              $this->_html .= '<header id="contentHeader">';
              $this->_html .= '<h1>Edit User</h1>';
-             $this->_html .= '<a href="" >Back to List</a>';
+             $this->_html .= '<a href="'.$_SERVER['PHP_SELF'].'?action=users'.(isset($_SESSION['limit'])?'&limit='.$_SESSION['limit']:'').(isset($_SESSION['page'])?'&page='.$_SESSION['page']:'').(isset($_SESSION['query'])?'&query='.$_SESSION['query']:'').'" >Back to List</a>';
              $this->_html .= '</header>';
              $this->_html .= '<hr/>';
              $this->_html .= '<form name="loginform" id="loginform" action="'.$_SERVER['PHP_SELF'].'?action=users'.(isset($_SESSION['limit'])?'&limit='.$_SESSION['limit']:'').(isset($_SESSION['page'])?'&page='.$_SESSION['page']:'').(isset($_SESSION['query'])?'&query='.$_SESSION['query']:'').'" method="post">'
