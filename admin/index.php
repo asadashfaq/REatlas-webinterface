@@ -78,8 +78,15 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
         $adminUsers = new AdminUsers();
         if(isset($_REQUEST['activate'])){
             $adminUsers->processActivation();
+        }else if(isset($_REQUEST['block'])){
+            $adminUsers->processBlocking();
         }else if(isset($_REQUEST['edit'])){
             $adminUsers->editUser();
+            $adminUsers->display();
+        }else if(isset($_REQUEST['user_edit_save'])){
+          
+            $adminUsers->userEditSave();
+            $adminUsers->userListHTML();
             $adminUsers->display();
         }else {
             $adminUsers->userListHTML();

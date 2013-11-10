@@ -1,6 +1,9 @@
 <?php
 include("init.php");
 
+if ($session->logged_in)
+    $profile = new Profile($session->profileid);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -30,7 +33,7 @@ include("init.php");
   <?php } ?>  
         var defaultUserGroup = '<?php echo DEFAULT_USER_GROUP; ?>';
         var defaultUser = '<?php echo DEFAULT_USER; ?>';
-        var currentUser = defaultUser;
+        var currentUser = '<?php echo $_SESSION['aulogin']; ?>';
         
     
         </script>
@@ -43,9 +46,7 @@ include("init.php");
       
 if (!$session->logged_in)
     include 'login.php';
-else {
-    $profile = new Profile($session->profileid);
-}
+
 ?>
         <div id="mainWindow" 
              data-dojo-type="dijit.layout.BorderContainer" 

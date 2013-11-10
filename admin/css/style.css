@@ -214,10 +214,26 @@ tr:last-child td.last {
     overflow: hidden;
     width: 70%;
 }
+#contentHeader{
+    padding: 10px;
+    text-align: left;
+    position: relative;
+}
+
+
+#contentHeader a{
+     float: none;
+    position: absolute;
+    right: 40px;
+    top: 33px;
+    float: right;
+}
 #contentEdit h1{
    padding: 10px;
    color: #3F3F3F;
+   z-index:10;
 }
+
 
 #footer {
     background-color: #ECEFE4;

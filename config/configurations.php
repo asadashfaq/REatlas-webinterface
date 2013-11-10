@@ -51,6 +51,7 @@ define("TBL_USER_PROFILE", "users_profile");
 define("TBL_ACTIVE_USERS",  "active_users");
 define("TBL_ACTIVE_GUESTS", "active_guests");
 define("TBL_BANNED_USERS",  "banned_users");
+define("TBL_LOGIN_ATTEMPTS",  "login_attempts");
 
 /**
  * Special Names and Level Constants - the admin
@@ -63,11 +64,11 @@ define("TBL_BANNED_USERS",  "banned_users");
  */
 define("ADMIN_NAME", "admin");    //1. admin conrol all
 define("GUEST_NAME", "Guest");   
-define("ADMIN_LEVEL", 9);        // 2. admin level .. control the master
-define("MASTER_LEVEL", 8);       // 3. master level .. master control the agent
-define("AGENT_LEVEL",  1);       // 4. agent level .. agent control the member
-define("AGENT_MEMBER_LEVEL", 2); // 5. agent member level .. member control his/her own account
-define("GUEST_LEVEL", 0);        // 6. guest level .. guest only control himself
+define("ADMIN_LEVEL", 19);        // 2. admin level .. control the master
+define("MASTER_LEVEL", 18);       // 3. master level .. master control the agent
+define("AGENT_LEVEL",  11);       // 4. agent level .. agent control the member
+define("AGENT_MEMBER_LEVEL", 12); // 5. agent member level .. member control his/her own account
+define("GUEST_LEVEL", 10);        // 6. guest level .. guest only control himself
 
 /**
  * This boolean constant controls whether or
@@ -84,7 +85,7 @@ define("TRACK_VISITORS", true);
  */
 define("USER_TIMEOUT", 30);
 define("GUEST_TIMEOUT", 15);
-
+define("LOGIN_ATTEMPTS",  5);
 /**
  * Cookie Constants - these are the parameters
  * to the setcookie function call, change them
@@ -105,6 +106,7 @@ define("COOKIE_PATH", "/");  //Avaible in whole domain
 define("EMAIL_FROM_NAME", "Admin AU");
 define("EMAIL_FROM_ADDR", "manila@au.dk");
 define("EMAIL_WELCOME", true);
+define("EMAIL_HTML",false);
 
 /**
  * This constant forces all users to have
@@ -118,3 +120,7 @@ define("ALL_LOWERCASE", true);
  * 
  */
 define("REATLAS_CLIENT_PATH", "/development/AU/REatlas-client");
+
+
+if (!defined('_MAGIC_QUOTES_GPC_'))
+	define('_MAGIC_QUOTES_GPC_',         get_magic_quotes_gpc());

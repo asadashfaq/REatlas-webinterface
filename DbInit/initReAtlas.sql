@@ -67,6 +67,13 @@ CREATE TABLE `banned_users` (
   PRIMARY KEY  (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+CREATE TABLE `login_attempts` (
+    `username` varchar(30) NOT NULL,
+    `count` int(11) DEFAULT 0,
+    `timestamp` int(11) unsigned NOT NULL,
+    UNIQUE KEY  (`username`)
+) ENGINE=MyISAM;
+
 -- ----------------------------
 -- Table structure for users
 -- ----------------------------

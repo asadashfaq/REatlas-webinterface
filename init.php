@@ -22,7 +22,9 @@ $include_classes = array(
     'Tools' => 'include/classes/Tools.class.php',
     'functions' => 'functions.php',
     'Profile'=>'include/classes/profile.class.php',
-    'session'=>'include/classes/session.class.php'
+    'session'=>'include/classes/session.class.php',
+    'alias'=>'config/alias.php',
+    'swiftMailer'=>'Tools/SwiftMailer/swift_required.php'
     
 );
 

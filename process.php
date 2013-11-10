@@ -6,11 +6,7 @@
  * user submitted forms, redirecting the user to the correct
  * pages if errors are found, or if form is successful, either
  * way. Also handles the logout procedure.
- *
- * Written by: Jpmaster77 a.k.a. The Grandmaster of C++ (GMC)
- * Last Updated: August 19, 2004
- * Modified by: Arman G. de Castro, October 3, 2008
- * email: armandecastro@gmail.com
+
  */
 require_once 'init.php';
 

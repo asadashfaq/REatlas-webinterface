@@ -5,10 +5,6 @@
  * The Session class is meant to simplify the task of keeping
  * track of logged in users and also guests.
  *
- * Written by: Jpmaster77 a.k.a. The Grandmaster of C++ (GMC)
- * Last Updated: August 19, 2004
- * Modified by: Arman G. de Castro, October 3, 2008
- * email: armandecastro@gmail.com
  */
 
 class Session
@@ -33,6 +29,7 @@ class Session
    var $url;          //The page url current being viewed
    var $referrer;     //Last recorded site page viewed
    var $profileid;
+   var $aulogin;
    
     
     /**
@@ -193,29 +190,33 @@ class Session
 
       /* Checks that username is in database and password is correct */
       $subuser = stripslashes($subuser);
-      
-      
-      $result = $database->confirmUserActive($subuser);
       /* Check error codes */
-      if($result == 1){
+      if($database->confirmUserActive($subuser)){
          $field = "username";
         // $form->setError($field, "* Username not found");
          $form->setError("errmsg", "* User is not active.");
       }
-     else {
-        $result = $database->confirmUserPass($subuser, md5($subpass));
-
-        /* Check error codes */
-        if($result == 1){
-           $field = "username";
-          // $form->setError($field, "* Username not found");
-           $form->setError("errmsg", "* Authentication failure");
-        }
-        else if($result == 2){
-           $field = "password";
-           //$form->setError($field, "* Invalid password");
-            $form->setError("errmsg", "* Authentication failure");
-        }
+     /* Check if username is banned */
+         else if($database->usernameBanned($subuser)){
+            $form->setError($field, "* User is banned");
+         }else {
+            $result = $database->confirmUserPass($subuser, md5($subpass));
+            $failed = false;
+            /* Check error codes */
+            if($result == 1){
+               $field = "username";
+              // $form->setError($field, "* Username not found");
+               $form->setError("errmsg", "* Authentication failure");
+               $failed = true;
+            }
+            else if($result == 2){
+               $field = "password";
+               //$form->setError($field, "* Invalid password");
+                $form->setError("errmsg", "* Authentication failure");
+                $failed = true;
+            }
+            
+            $database->addLoginAttempts($subuser,$this->time,$failed);
       }
       /* Return if form errors exist */
       if($form->num_errors > 0){
@@ -224,8 +225,23 @@ class Session
 
       /* Username and password correct, register session variables */
       $this->userinfo  = $database->getUserInfo($subuser);
+      
+      if($this->userinfo['userlevel'] != 19 && 
+              (!isset($this->userinfo['aulogin']) || $this->userinfo['aulogin']==null || $this->userinfo['aulogin']='')){
+         $field = "aulogin";
+        // $form->setError($field, "* Username not found");
+         $form->setError("errmsg", "* User is not active.");
+      }
+      
+      /* Return if form errors exist */
+      if($form->num_errors > 0){
+         return false;
+      }
+
+      
       $this->username  = $_SESSION['username'] = $this->userinfo['username'];
       $this->userkey    = $_SESSION['userkey']   = $this->generateRandID();
+      $this->aulogin  = $_SESSION['aulogin'] = $this->userinfo['aulogin'];
       $this->userlevel = $this->userinfo['userlevel'];
       $this->userid = $this->userinfo['id'];
       $this->profileid =$this->userinfo['profileid'];
@@ -272,6 +288,7 @@ class Session
       /* Unset PHP session variables */
       unset($_SESSION['username']);
       unset($_SESSION['userkey']);
+      unset($_SESSION['aulogin']);
 
       /* Reflect fact that user has logged out */
       $this->logged_in = false;
@@ -287,6 +304,7 @@ class Session
       $this->username  = GUEST_NAME;
       $this->userlevel = GUEST_LEVEL;
       $this->userid = 0;
+      $this->aulogin = '';
    }
 
    /**

@@ -882,7 +882,7 @@ class Tools {
     }
 
     public static function stripslashes($string) {
-        if (_PS_MAGIC_QUOTES_GPC_)
+        if (_MAGIC_QUOTES_GPC_)
             $string = stripslashes($string);
         return $string;
     }

@@ -10,7 +10,8 @@ require_once("../init.php");
 $include_classes = array(
     'user'=>'classes/user.class.php',
     'AdminFront'=>'classes/admin/AdminFront.class.php',
-    'AdminUsers'=>'classes/admin/AdminUsers.class.php'
+    'AdminUsers'=>'classes/admin/AdminUsers.class.php',
+    'alias'=>'../config/alias.php'
     
 );
 

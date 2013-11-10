@@ -5,10 +5,6 @@
  * The Database class is meant to simplify the task of accessing
  * information from the website's database.
  *
- * Written by: Jpmaster77 a.k.a. The Grandmaster of C++ (GMC)
- * Last Updated: August 17, 2004
- * Modified by: Arman G. de Castro, October 3, 2008
- * email: armandecastro@gmail.com
  */
 
 class MySQLDB
@@ -50,7 +46,7 @@ class MySQLDB
     */
    function confirmUserActive($username){
       /* Add slashes if necessary (for query) */
-      if(!get_magic_quotes_gpc()) {
+      if(!_MAGIC_QUOTES_GPC_) {
 	      $username = addslashes($username);
       }
 
@@ -75,7 +71,7 @@ class MySQLDB
     */
    function confirmUserPass($username, $password){
       /* Add slashes if necessary (for query) */
-      if(!get_magic_quotes_gpc()) {
+      if(!_MAGIC_QUOTES_GPC_) {
 	      $username = addslashes($username);
       }
 
@@ -111,7 +107,7 @@ class MySQLDB
     */
    function confirmUserKey($username, $userkey){
       /* Add slashes if necessary (for query) */
-      if(!get_magic_quotes_gpc()) {
+      if(!_MAGIC_QUOTES_GPC_) {
 	      $username = addslashes($username);
       }
 
@@ -141,7 +137,7 @@ class MySQLDB
     * been taken by another user, false otherwise.
     */
    function usernameTaken($username){
-      if(!get_magic_quotes_gpc()){
+      if(!_MAGIC_QUOTES_GPC_){
          $username = addslashes($username);
       }
       $q = "SELECT username FROM ".TBL_USERS." WHERE username = '$username'";
@@ -154,7 +150,7 @@ class MySQLDB
     * been banned by the administrator.
     */
    function usernameBanned($username){
-      if(!get_magic_quotes_gpc()){
+      if(!_MAGIC_QUOTES_GPC_){
          $username = addslashes($username);
       }
       $q = "SELECT username FROM ".TBL_BANNED_USERS." WHERE username = '$username'";
@@ -351,7 +347,33 @@ class MySQLDB
       $this->connection->execute($q);
       $this->calcNumActiveGuests();
    }
- 
+   
+  /* Add login attempts */
+   function addLoginAttempts($username, $time,$failure=false){
+       
+       $q = "";
+       
+       if($failure){
+        $q = "INSERT INTO ".TBL_LOGIN_ATTEMPTS." (username, count, timestamp) "
+               . " VALUES ('$username', 1, '$time') ON DUPLICATE KEY UPDATE count = count + 1,timestamp='$time'";
+       }else {
+        $q = "INSERT INTO ".TBL_LOGIN_ATTEMPTS." (username, count, timestamp) "
+               . " VALUES ('$username', 0, '$time') ON DUPLICATE KEY UPDATE count = 0,timestamp='$time'";
+       }
+    
+      $this->connection->execute($q);
+      
+      /* Calculate number of users at site */
+      $q = "SELECT count FROM ".TBL_LOGIN_ATTEMPTS." WHERE username = '$username'";
+      $result = $this->connection->executeS($q);
+      $failure_attempts = $result[0]['count'];
+      
+      if($failure_attempts >= LOGIN_ATTEMPTS){
+        $q = "INSERT INTO ".TBL_BANNED_USERS." VALUES ('$username', '$time')";
+        $this->connection->execute($q);
+      }
+   }
+   
 };
 
 /* Create database connection */
