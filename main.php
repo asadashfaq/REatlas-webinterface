@@ -117,6 +117,7 @@ if (!$session->logged_in)
 
                                     <br/>
                                     <button id="clear-graphics" class="clearall" value="clear-graphics">Clear All</button>
+                                    <button id="submit-graphics" class="clearall" value="submit-graphics">Submit</button>
                                 </div>
                             </div>
                         </div>

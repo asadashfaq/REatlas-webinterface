@@ -88,6 +88,7 @@ CREATE TABLE `users` (
   `parent_directory` varchar(30) NOT NULL,
    `active` tinyint(1) NOT NULL default 0,
    `aulogin` varchar(30) default NULL,
+    `aupass` varchar(100) default NULL,
   UNIQUE KEY  (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -126,4 +127,29 @@ CREATE TABLE `users_profile` (
     `website` varchar(50) default NULL,
     `userid` int(10) NOT NULL,
     PRIMARY KEY  (`profileid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for profile
+-- ----------------------------
+CREATE TABLE `user_configuration` (
+    `config_id` int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `userid` int(10) NOT NULL,
+    `key` varchar(100) NOT NULL,
+    `value` varchar(200) default NULL,
+    UNIQUE KEY  (`userid`,`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for jobs
+-- ----------------------------
+CREATE TABLE `jobs` (
+    `job_id` int(10) NOT NULL,
+    `userid` int(10) NOT NULL,
+    `start_time` int(11) unsigned,
+    `end_time` int(11) unsigned,
+    `desc` varchar(300) NOT NULL,
+    `data` varchar(2000) default NULL,
+    `status` VARCHAR(10) default NULL,
+    PRIMARY KEY  (`job_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

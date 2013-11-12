@@ -101,11 +101,41 @@ class AdminFront {
               </div>';
     }
     private function runningJobsBlock() {
-        return ' <div class="portlet">
-                <div class="portlet-header">Running Jobs</div>
-                <div class="portlet-content">No jobs running</div>
-              </div>';
+        
+        $param = PEPSI_SERVER." --username ".PEPSI_ADMIN_USER." --password ".PEPSI_ADMIN_PASS." --output JSON";
+        $command = "python ".REATLAS_CLIENT_PATH."/cmd_job_list.py";
+        $command .= " $param 2>&1";
+
+        $pid = popen( $command,"r");
+        $result = '';
+
+        while( !feof( $pid ) )
+        {
+        $result .= fread($pid, 256);
+        }
+        pclose($pid);
+        $resJson = json_decode($result);
+        
+        $res = ' <div class="portlet">
+                <div class="portlet-header">Running Jobs</div>';
+        if($result){
+            $res .="<h5>Total running jobs: ".$resJson[0]->total_jobs." <=> Total ETA: ".$resJson[0]->total_ETA."</h5>";
+            if($resJson[0]->total_jobs >0){
+                $res .= "<div class=\"portlet-content\">"
+                        ."<table><tr><th>Job ID</th><th>User</th><th>Job Name</th><th>ETA</th>";
+                $jobs = $resJson[1]->jobs;
+                foreach ($jobs as $job) {
+                    $res .="<tr><td>$job->job_id</td><td>$job->user</td><td>$job->name</td><td>$job->time_estimate</td></tr>";
+                }
+                $res .="</table></div>";
+            }
+        }
+        else
+            $res.= "<div class=\"portlet-content\">No jobs running</div>";
+        $res.= "</div>";
+        return $res;
     }
+    
     public function display() {
         echo $this->_html;
     }

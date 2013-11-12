@@ -312,6 +312,10 @@ class AdminUsers {
                      .'<td><input name="aulogin"  class="input" size="20" type="text" value="'.$res[0]['aulogin'].'"/></td>'
                      .'</tr>'
                      .'<tr>'
+                     .'<td><label >AU unix user pass</label></td>'
+                     .'<td><input name="aupass"  class="input" size="20" type="text" value="'.$res[0]['aupass'].'"/></td>'
+                     .'</tr>'
+                     .'<tr>'
                      .'<td><label >Active</label></td>'
                      . '<td>'.$this->comboFilter("active",array(0=>"NO",1=>"YES"),(isset($res[0]['active'])?$res[0]['active']:NULL)).'</td>'
                      .'</tr>'
@@ -336,6 +340,7 @@ class AdminUsers {
                     . "userlevel = '".$_REQUEST['userlevel']."'"
                     . ", email = '".$_REQUEST['email']."'"
                     . ", aulogin = '".$_REQUEST['aulogin']."'"
+                    . ", aupass = '".$_REQUEST['aupass']."'"
                     . ", active = '".$_REQUEST['active']."'"
                     ." WHERE id='".$userId."'";
             

@@ -23,9 +23,19 @@ Each line should be prefixed with
 }
 .portlet-header .ui-icon { 
     float: right; 
+    
 }
+.portlet h5{ 
+    
+    padding: 0.3em; 
+}
+
 .portlet-content { 
     padding: 0.4em; 
+    font-size: 12px;
+    max-height: 500px;
+    overflow-y: auto;
+    
 }
 .ui-sortable-placeholder { 
     border: 1px dotted black; 

@@ -8,7 +8,7 @@ var _map, tb, tbForNew, editToolbar, ctxMenuForGraphics, ctxMenuForMap;
 var selected, currentLocation;
 var lastCreatedGraphics;
 var contaxtMouseOver, contaxtMouseOut;
-
+var graphicsDataForMapLayer = {};
 
 function activateContaxtMenuForGraphics(enable)
 {
@@ -45,11 +45,12 @@ function  initializeEvents(divID) {
                     var targetNode = dojo.byId("cutoutInfoDiv");
                     // get some data, convert to JSON
                     xhr.post({
-                        url: "cutoutDetails_ajax.php",
+                        url: "commands/cutoutDetails_ajax.php",
                         handleAs: "json",
-                        timeout: 3000, // give up after 3 seconds
+                        timeout: 300000, // give up after 3 seconds
                         content: {user: userName, cutout: cutoutName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
                         load: function(data) {
+                             
                             if (targetNode.innerHTML === "Loading..." ||
                                     targetNode.innerHTML === "No details found")
                                 targetNode.innerHTML = '';
@@ -195,7 +196,7 @@ function fetchCutoutList(userName, divID) {
         var targetNode = dojo.byId(divID);
         // get some data, convert to JSON
         xhr.post({
-            url: "cutoutlist_ajax.php",
+            url: "commands/cutoutlist_ajax.php",
             handleAs: "json",
             timeout: 3000, // give up after 3 seconds
             content: {user: userName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
@@ -210,6 +211,7 @@ function fetchCutoutList(userName, divID) {
                 }
 
                 if ($(data).size() !== 0) {
+                   
                     for (var i in data) {
                         if (data[i].cutout !== userName)
                             $("#" + divID).append("<label><input type=\"radio\" class=\"radio\" name=\"cutoutSelGrpDefault\" value=\"" + userName + "/" + data[i].cutout + "\">" + data[i].cutout + "</label><br/>");
@@ -222,6 +224,28 @@ function fetchCutoutList(userName, divID) {
     });
 }
 
+   
+function submitGraphicsForMapLayerGen() {
+
+if(!graphicsDataForMapLayer.hasOwnProperty('geomatry_data')) {
+    alert("Please draw layer before submitting");
+    return false;
+}
+    require(["dojo/_base/xhr"], function(xhr) {
+       
+     //   {"cutoutName":"rrg","geomatry_type":"polygon","geomatry_data":{"southwest_latitude":-72.23684375000217,"southwest_longitude":31.259294953114185,"northeast_latitude":-108.44778124999252,"northeast_longitude":47.79802337889069}}
+        // get some data, convert to JSON
+        xhr.post({
+            url: "commands/submitGraphicsForMapLayerGen_ajax.php",
+            handleAs: "json",
+            timeout: 300000, // give up after 3 seconds
+            content:{"cutoutName":graphicsDataForMapLayer.cutoutName,"geomatry_type":graphicsDataForMapLayer.geomatry_type,"geomatry_data":JSON.stringify(graphicsDataForMapLayer.geomatry_data)}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+            load: function(data) {
+               
+            }
+        });
+    });
+}
 
 
 require([
@@ -536,6 +560,9 @@ require([
                 _map.graphics.clear();
                 lastCreatedGraphics = null;
                 return;
+            }else if (evt.target.value === "submit-graphics") {
+                submitGraphicsForMapLayerGen();
+                return;
             }
 
             if (lastCreatedGraphics) {
@@ -581,6 +608,19 @@ require([
         $(selectedTool).toggleClass("down");
         var group = "input:checkbox[name='cutoutSelTool']";
         $(group).prop("checked", false);
+      
+        /* collect data for server request*/
+        graphicsDataForMapLayer.cutoutName =$("#newcutoutname").val();
+        graphicsDataForMapLayer.geomatry_type = evt.geometry.type;
+        var coordinates= evt.geometry.getExtent();
+        var southWest = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymin);
+        var northEast = esri.geometry.xyToLngLat(coordinates.xmin, coordinates.ymax);
+        graphicsDataForMapLayer.geomatry_data = {};
+        graphicsDataForMapLayer.geomatry_data['southwest_latitude']= southWest[0];
+        graphicsDataForMapLayer.geomatry_data['southwest_longitude']=southWest[1];
+        graphicsDataForMapLayer.geomatry_data['northeast_latitude']=northEast[0];
+        graphicsDataForMapLayer.geomatry_data['northeast_longitude']=northEast[1];
+      
     }
 });
 
