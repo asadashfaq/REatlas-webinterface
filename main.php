@@ -31,8 +31,8 @@ if ($session->logged_in)
 <?php } else {?>
             var showToolbar=0;
   <?php } ?>  
-        var defaultUserGroup = '<?php echo DEFAULT_USER_GROUP; ?>';
-        var defaultUser = '<?php echo DEFAULT_USER; ?>';
+        var defaultUserGroup = '<?php echo Configurations::getConfiguration('PEPSI_DEFAULT_USER_GROUP'); ?>';
+        var defaultUser = '<?php echo Configurations::getConfiguration('PEPSI_ADMIN_USER'); ?>';
         var currentUser = '<?php echo $_SESSION['aulogin']; ?>';
         
     

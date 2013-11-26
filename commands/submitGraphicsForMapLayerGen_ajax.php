@@ -28,15 +28,15 @@ cmd_create_CFSR_rectangular_cutout.py [-h] [-p [PORT]]
                                              northeast_longitude
 */
 
-$param = PEPSI_SERVER." ".$cutoutName." "
-        ." --username ".PEPSI_ADMIN_USER
-        ." --password ".PEPSI_ADMIN_PASS
+$param = Configurations::getConfiguration('PEPSI_SERVER')." ".$cutoutName." "
+        ." --username ".Configurations::getConfiguration('PEPSI_ADMIN_USER')
+        ." --password ".Configurations::getConfiguration('PEPSI_ADMIN_PASS')
         ." ".$geomatry_data->southwest_latitude
         ." ".$geomatry_data->southwest_longitude
         ." ".$geomatry_data->northeast_latitude
         ." ".$geomatry_data->northeast_longitude;
 
-$command = "python ".REATLAS_CLIENT_PATH."/cmd_create_CFSR_rectangular_cutout.py";
+$command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_create_CFSR_rectangular_cutout.py";
 $command .= " $param ";
 echo $command;
 $pid = popen( $command,"r");

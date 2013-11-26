@@ -6,7 +6,7 @@
  * information from the website's database.
  *
  */
-
+include_once 'Configurations.class.php';
 class MySQLDB
 {
    var $connection;         //The MySQL database connection
@@ -27,7 +27,7 @@ class MySQLDB
        */
       $this->num_members = -1;
       
-      if(TRACK_VISITORS){
+      if(Configurations::getConfiguration('TRACK_VISITORS')){
          /* Calculate number of users at site */
          $this->calcNumActiveUsers();
       
@@ -204,7 +204,7 @@ class MySQLDB
       $ulevel = AGENT_MEMBER_LEVEL;
        $q = "INSERT INTO ".TBL_USERS." (`username`, `password`, `userkey`, `userlevel`, `email`, `timestamp`, `parent_directory`) ";
        $q .=" VALUES ('$username', '$password', '0', $ulevel, '$email', $time, '$parent_directory')";
-       Tools::p($q);
+   
       return $this->connection->executeS($q); 
    }
    
@@ -298,7 +298,7 @@ class MySQLDB
       $q = "UPDATE ".TBL_USERS." SET timestamp = '$time' WHERE username = '$username'";
       $this->connection->execute($q);
       
-      if(!TRACK_VISITORS) return;
+      if(!Configurations::getConfiguration('TRACK_VISITORS')) return;
       $q = "REPLACE INTO ".TBL_ACTIVE_USERS." VALUES ('$username', '$time')";
       $this->connection->executeS($q);
       $this->calcNumActiveUsers();
@@ -306,7 +306,7 @@ class MySQLDB
    
    /* addActiveGuest - Adds guest to active guests table */
    function addActiveGuest($ip, $time){
-      if(!TRACK_VISITORS) return;
+      if(!Configurations::getConfiguration('TRACK_VISITORS')) return;
       $q = "REPLACE INTO ".TBL_ACTIVE_GUESTS." VALUES ('$ip', '$time')";
       $this->connection->execute($q);
       $this->calcNumActiveGuests();
@@ -316,7 +316,7 @@ class MySQLDB
    
    /* removeActiveUser */
    function removeActiveUser($username){
-      if(!TRACK_VISITORS) return;
+      if(!Configurations::getConfiguration('TRACK_VISITORS')) return;
       $q = "DELETE FROM ".TBL_ACTIVE_USERS." WHERE username = '$username'";
       $this->connection->execute($q);
       $this->calcNumActiveUsers();
@@ -324,7 +324,7 @@ class MySQLDB
    
    /* removeActiveGuest */
    function removeActiveGuest($ip){
-      if(!TRACK_VISITORS) return;
+      if(!Configurations::getConfiguration('TRACK_VISITORS')) return;
       $q = "DELETE FROM ".TBL_ACTIVE_GUESTS." WHERE ip = '$ip'";
       $this->connection->execute($q);
       $this->calcNumActiveGuests();
@@ -332,8 +332,8 @@ class MySQLDB
    
    /* removeInactiveUsers */
    function removeInactiveUsers(){
-      if(!TRACK_VISITORS) return;
-      $timeout = time()-USER_TIMEOUT*60;
+      if(!Configurations::getConfiguration('TRACK_VISITORS')) return;
+      $timeout = time()-Configurations::getConfiguration('USER_TIMEOUT')*60;
       $q = "DELETE FROM ".TBL_ACTIVE_USERS." WHERE timestamp < $timeout";
       $this->connection->execute($q);
       $this->calcNumActiveUsers();
@@ -341,8 +341,8 @@ class MySQLDB
 
    /* removeInactiveGuests */
    function removeInactiveGuests(){
-      if(!TRACK_VISITORS) return;
-      $timeout = time()-GUEST_TIMEOUT*60;
+      if(!Configurations::getConfiguration('TRACK_VISITORS')) return;
+      $timeout = time()-Configurations::getConfiguration('GUEST_TIMEOUT')*60;
       $q = "DELETE FROM ".TBL_ACTIVE_GUESTS." WHERE timestamp < $timeout";
       $this->connection->execute($q);
       $this->calcNumActiveGuests();
@@ -368,7 +368,7 @@ class MySQLDB
       $result = $this->connection->executeS($q);
       $failure_attempts = $result[0]['count'];
       
-      if($failure_attempts >= LOGIN_ATTEMPTS){
+      if($failure_attempts >= Configurations::getConfiguration('LOGIN_ATTEMPTS')){
         $q = "INSERT INTO ".TBL_BANNED_USERS." VALUES ('$username', '$time')";
         $this->connection->execute($q);
       }

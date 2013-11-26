@@ -10,14 +10,17 @@
  *
  * @author manila
  */
-class AdminUsers {
+class AdminUsersController extends FrontController {
     
     private $_userLevelArr = array(GUEST_LEVEL=>'Guest',AGENT_LEVEL=>'Agent',AGENT_MEMBER_LEVEL=>'Member',MASTER_LEVEL=>'Master',ADMIN_LEVEL=>'Admin');
     var $_html;
-    var $_dbCon;
+    var $action;
     
-    public function AdminUsers() {
-        $this->_dbCon = DB::getInstance();
+    function __construct() {
+        parent::__construct();
+    }
+    public function AdminUsersController() {
+        
         $this->filterParams();
     }
     
@@ -181,24 +184,12 @@ class AdminUsers {
         
         $res = $this->_dbCon->executeS($_query);
         
-        $this->_html .= $this->listPagination($totalRec,$pageLimit,$pageOffset,$queryFilter);
-        $this->_html .= '<div id="content">';
-        $this->_html .= '<table cellspacing="0">';
-        $this->_html .= '<tr>'
-                . '<th>ID</th>'
-                . '<th>User Name</th>'
-                . '<th>User Level</th>'
-                . '<th>E-mail</th>'
-             /*   . '<!--th>Parent Dir</th-->'*/
-                 . '<th>AU login</th>'
-                . '<th>Active</th>'               
-                . '<th>Blocked</th>'
-                . '<th>&nbsp;</th>'
-                . '</tr>';
-        $this->_html .= $this->listFilter($pageLimit,$currentPage,$queryFilter);
+        $this->smarty->assign('listPagination', $this->listPagination($totalRec,$pageLimit,$pageOffset,$queryFilter));
+        $this->smarty->assign('listFilter',$this->listFilter($pageLimit,$currentPage,$queryFilter));
+        $userList = '';
         if($res){
             foreach ($res as $row) {
-                $this->_html .= '<tr>'
+                $userList.= '<tr>'
                         . '<td>'.$row['id'].'</td>'
                         . '<td>'.$row['username'].'</td>'
                         . '<td>'.($this->_userLevelArr[$row['userlevel']]).'</td>'
@@ -219,15 +210,34 @@ class AdminUsers {
             
          
         }else{
-            $this->_html .= '<tr><td colspan="8">No records found.</td></tr>';
+            $userList .= '<tr><td colspan="8">No records found.</td></tr>';
         }
-         $this->_html .= '</table>';
-         $this->_html .= '</div>';
+        $this->smarty->assign('userList',$userList);
+
     }
     
     public function display() {
-        
-        echo $this->_html;
+        $this->handleAction();
+    }
+    
+     private function handleAction() {
+            $displayUserList = true;
+            if (Tools::getIsset('activate')) {
+                $this->processActivation();
+            } else if (Tools::getIsset('block')) {
+                $this->processBlocking();
+            } else if (Tools::getIsset('edit')) {
+                $this->editUser();
+                $displayUserList = false;
+            } else if (Tools::getIsset('user_edit_save')) {
+                $this->userEditSave();
+            } 
+            
+            if($displayUserList){
+                $this->userListHTML();
+                $this->smarty->display("admin-users.tpl");
+            }
+     
     }
     
     public function processActivation() {
@@ -287,61 +297,27 @@ class AdminUsers {
             $_query->where(" id='$userId'");
             $res = $this->_dbCon->executeS($_query);
           
-             $this->_html = '<div id="contentEdit">';
-             $this->_html .= '<header id="contentHeader">';
-             $this->_html .= '<h1>Edit User</h1>';
-             $this->_html .= '<a href="'.$_SERVER['PHP_SELF'].'?action=users'.(isset($_SESSION['limit'])?'&limit='.$_SESSION['limit']:'').(isset($_SESSION['page'])?'&page='.$_SESSION['page']:'').(isset($_SESSION['query'])?'&query='.$_SESSION['query']:'').'" >Back to List</a>';
-             $this->_html .= '</header>';
-             $this->_html .= '<hr/>';
-             $this->_html .= '<form name="loginform" id="loginform" action="'.$_SERVER['PHP_SELF'].'?action=users'.(isset($_SESSION['limit'])?'&limit='.$_SESSION['limit']:'').(isset($_SESSION['page'])?'&page='.$_SESSION['page']:'').(isset($_SESSION['query'])?'&query='.$_SESSION['query']:'').'" method="post">'
-                     . '<table>'
-                     .'<tr>'
-                     .'<td><label >Username</label></td>'
-                     .'<td>'.$res[0]['username'].'</td>'
-                     .'</tr>'
-                     .'<tr>'
-                     .'<td><label for="user_login">User level</label></td>'
-                     . '<td>'.$this->comboFilter("userlevel",$this->_userLevelArr,(isset($res[0]['userlevel'])?$res[0]['userlevel']:NULL)).'</td>'
-                     .'</tr>'
-                     .'<tr>'
-                     .'<td><label >E-mail</label></td>'
-                     .'<td><input name="email" class="input" size="20" type="text" value="'.$res[0]['email'].'"/></td>'
-                     .'</tr>'
-                     .'<tr>'
-                     .'<td><label >AU unix user name</label></td>'
-                     .'<td><input name="aulogin"  class="input" size="20" type="text" value="'.$res[0]['aulogin'].'"/></td>'
-                     .'</tr>'
-                     .'<tr>'
-                     .'<td><label >AU unix user pass</label></td>'
-                     .'<td><input name="aupass"  class="input" size="20" type="text" value="'.$res[0]['aupass'].'"/></td>'
-                     .'</tr>'
-                     .'<tr>'
-                     .'<td><label >Active</label></td>'
-                     . '<td>'.$this->comboFilter("active",array(0=>"NO",1=>"YES"),(isset($res[0]['active'])?$res[0]['active']:NULL)).'</td>'
-                     .'</tr>'
-                     .'<tr><td colspan="2"></td></tr>'
-                     . '<input type="hidden" name="id" value="'.$res[0]['id'].'"/>'
-                     . '<input type="hidden" name="user_edit_save" value="1"/>'
-                     .'<tr><td colspan="2">'
-                     . '<input value="Save" type="submit"/>'
-                     . '</td></tr>'
-                     . '</table>'
-                     . '</form><br/>';
-             $this->_html .= '</div><br/>';
-        
+             $this->smarty->assign(array(
+                 'requestURL'=>$_SERVER['PHP_SELF'],
+                 'user'=>(isset($res[0])?$res[0]:NULL),
+                 'userLevelComboFilter'=>$this->comboFilter("userlevel",$this->_userLevelArr,(isset($res[0]['userlevel'])?$res[0]['userlevel']:NULL)),
+                 'activeComboFilter'=>$this->comboFilter("active",array(0=>"NO",1=>"YES"),(isset($res[0]['active'])?$res[0]['active']:NULL)),
+                 ));
+             $this->smarty->display("admin-user-edit.tpl");
         }
     }
     
     public function userEditSave() {
-         $userId = isset($_REQUEST['id'])?$_REQUEST['id']:NULL;
+        
+         $userId = Tools::getValue("id");
          
-        if(isset($_REQUEST['user_edit_save']) && $userId){
+        if(Tools::getValue("user_edit_save") && $userId){
             $_query="UPDATE users SET "
-                    . "userlevel = '".$_REQUEST['userlevel']."'"
-                    . ", email = '".$_REQUEST['email']."'"
-                    . ", aulogin = '".$_REQUEST['aulogin']."'"
-                    . ", aupass = '".$_REQUEST['aupass']."'"
-                    . ", active = '".$_REQUEST['active']."'"
+                    . "userlevel = '".Tools::getValue("userlevel")."'"
+                    . ", email = '".Tools::getValue("email")."'"
+                    . ", aulogin = '".Tools::getValue("aulogin")."'"
+                    . ", aupass = '".Tools::getValue("aupass")."'"
+                    . ", active = '".Tools::getValue("active")."'"
                     ." WHERE id='".$userId."'";
             
             $res = $this->_dbCon->execute($_query);

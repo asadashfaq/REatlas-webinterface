@@ -109,7 +109,7 @@ $(document).ready(function() {
     {
     ?>
     
-	<a href="<?php echo _SITE_DIRECTORY_; ?>?action=lostpassword" title="Password Lost and Found"><span>Lost your password?</span></a>
+	<a href="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>?action=lostpassword" title="Password Lost and Found"><span>Lost your password?</span></a>
         <?php 
     }
     ?>
@@ -122,7 +122,7 @@ $(document).ready(function() {
     if($action == "lostpassword")
     {
     ?>
-         <input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>?action=lostpassword" type="hidden"/>
+         <input name="redirect_to" value="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>?action=lostpassword" type="hidden"/>
               
     <!--LOGIN BUTTON--><input type="submit" name="submit" value="Send" class="button" /><!--END LOGIN BUTTON-->
     <!--BACK TO LOGIN BUTTON--><input type="button" name="register" value="Back..." class="register" onclick="document.location.href='index.php'" /><!--END BACK TO LOGIN BUTTON-->

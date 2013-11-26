@@ -7,8 +7,8 @@
  */
 require_once 'config/configurations.php';
 
-
-$include_classes = array(
+$include_classes= array(
+    'Smarty3' => 'Tools/Smarty3/Smarty.class.php',
     'Db' => 'include/classes/db/Db.php',
     'DbMySQLi' => 'include/classes/db/DbMySQLi.php',
     'DbPDO' => 'include/classes/db/DbPDO.php',
@@ -19,6 +19,7 @@ $include_classes = array(
     'form'=>'include/classes/form.class.php',
     'FBCore' => 'Tools/FirePHPCore/FirePHP.class.php',
     'FB' => 'Tools/FirePHPCore/fb.php',
+    'Configurations' => 'include/classes/Configurations.class.php',
     'Tools' => 'include/classes/Tools.class.php',
     'functions' => 'functions.php',
     'Profile'=>'include/classes/profile.class.php',
@@ -30,9 +31,12 @@ $include_classes = array(
 
 $root_dir = dirname(__FILE__) . '/';
 
-foreach ($include_classes as $classname => $classpath) {
-    if (file_exists($root_dir . $classpath))
-        require_once $root_dir . $classpath;
+if (is_array($include_classes))
+{
+    foreach ($include_classes as $classpath) {
+       if (file_exists($root_dir . $classpath))
+           include_once $root_dir . $classpath;
+       }
 }
 
 ob_start();

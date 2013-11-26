@@ -395,7 +395,7 @@ class Session
       /* No errors, add the new account to the */
       else{
          if($database->addNewUser($subuser, md5($subpass), $subemail)){
-            if(EMAIL_WELCOME){
+            if(Configurations::getConfiguration('NOTIF_TO_USR_WELCOME')){
                $mailer->sendWelcome($subuser,$subemail,$subpass);
             }
             return 0;  //New user added succesfully
@@ -489,7 +489,7 @@ class Session
 	  //THE NAME OF THE CURRENT USER THE PARENT...
 	  $parent = $this->username;
          if($database->addNewMaster($subuser, md5($subpass), $subemail, $parent)){
-            if(EMAIL_WELCOME){
+            if(Configurations::getConfiguration('NOTIF_TO_USR_WELCOME')){
                $mailer->sendWelcome($subuser,$subemail,$subpass);
             }
             return 0;  //New user added succesfully
@@ -512,11 +512,11 @@ class Session
       else{
          /* Spruce up username, check length */
          $subuser = stripslashes($subuser);
-         if(strlen($subuser) < 5){
-            $form->setError($field, "* Username below 5 characters");
+         if(strlen($subuser) < Configurations::getConfiguration('USER_ID_SIZE_MIN')){
+            $form->setError($field, "* Username below ".Configurations::getConfiguration('USER_ID_SIZE_MIN')." characters");
          }
-         else if(strlen($subuser) > 30){
-            $form->setError($field, "* Username above 30 characters");
+         else if(strlen($subuser) > Configurations::getConfiguration('USER_ID_SIZE_MAX')){
+            $form->setError($field, "* Username above ".Configurations::getConfiguration('USER_ID_SIZE_MAX')." characters");
          }
          /* Check if username is not alphanumeric */
          //else if(!eregi("^([0-9a-z])+$", $subuser)){
@@ -545,8 +545,10 @@ class Session
       else{
          /* Spruce up password and check length*/
          $subpass = stripslashes($subpass);
-         if(strlen($subpass) < 4){
-            $form->setError($field, "* Password too short");
+         if(strlen($subpass) < Configurations::getConfiguration('USER_PASS_SIZE_MIN')){
+            $form->setError($field, "* Password too short. Min ".Configurations::getConfiguration('USER_PASS_SIZE_MIN')." characters.");
+         }else if(strlen($subpass) > Configurations::getConfiguration('USER_PASS_SIZE_MAX')){
+            $form->setError($field, "* Password above ".Configurations::getConfiguration('USER_PASS_SIZE_MAX')." characters");
          }
          /* Check if password is not alphanumeric */
         // else if(!eregi("^([0-9a-z])+$", ($subpass = trim($subpass)))){
@@ -579,7 +581,6 @@ class Session
          $subemail = stripslashes($subemail);
       }
 
-      Tools::p($form);
       /* Errors exist, have user correct them */
       if($form->num_errors > 0){
          return 1;  //Errors with form
@@ -589,7 +590,7 @@ class Session
 	  //THE NAME OF THE CURRENT USER THE PARENT...
 	  $parent = $this->username;
          if($database->addNewMember($subuser, md5($subpass), $subemail, $parent)){
-            if(EMAIL_WELCOME){
+            if(Configurations::getConfiguration('NOTIF_TO_USR_WELCOME')){
                $mailer->sendWelcome($subuser,$subemail,$subpass);
             }
             return 0;  //New user added succesfully
@@ -684,7 +685,7 @@ class Session
 	  //THE NAME OF THE CURRENT USER THE PARENT...
 	  $parent = $this->username;
          if($database->addNewAgent($subuser, md5($subpass), $subemail, $parent)){
-            if(EMAIL_WELCOME){
+            if(Configurations::getConfiguration('NOTIF_TO_USR_WELCOME')){
                $mailer->sendWelcome($subuser,$subemail,$subpass);
             }
             return 0;  //New user added succesfully

@@ -51,22 +51,29 @@ class Mailer
              ."My Account page after signing in.\n\n"
              ."- AU";
      
-        if(EMAIL_HTML)
+        if(Configurations::getConfiguration('EMAIL_HTML'))
             $message->setBody($body,'text/html');
          else
             $message->setBody($body,'text/plain');
          
-        $message->setFrom(EMAIL_FROM_ADDR,EMAIL_FROM_NAME);
+        $message->setFrom(Configurations::getConfiguration('EMAIL_FROM_ADDR'),Configurations::getConfiguration('EMAIL_FROM_NAME'));
 
         // Send the email
           $message->setTo($email, $user);
         
         //Pass a variable name to the send() method
-        return $mailer->send($message, $failures);
+        $mailer->send($message, $failures);
 
+        if(Configurations::getConfiguration("NOTIF_USR_REG")){
+             // Send the email NOTIF_EMAIL
+          $message->setTo(Configurations::getConfiguration('NOTIF_EMAIL'), $user);
+        
+            //Pass a variable name to the send() method
+            $mailer->send($message, $failures);
+        }
         /*
       
-      $from = "From: ".EMAIL_FROM_NAME." <".EMAIL_FROM_ADDR.">";
+      $from = "From: ".Configurations::getConfiguration('EMAIL_FROM_NAME')." <".Configurations::getConfiguration('EMAIL_FROM_ADDR').">";
       $subject = "REAtlas registration - Welcome!";
       $body = $user.",\n\n"
              ."Welcome! You've just registered at REAtlas "
@@ -121,13 +128,13 @@ class Mailer
              ."after signing in.\n\n"
              ."- AU";
         
-        if(EMAIL_HTML)
+        if(Configurations::getConfiguration('EMAIL_HTML'))
             $message->setBody($body,'text/html');
          else
             $message->setBody($body,'text/plain');
             
             
-        $message->setFrom(EMAIL_FROM_ADDR,EMAIL_FROM_NAME);
+        $message->setFrom(Configurations::getConfiguration('EMAIL_FROM_ADDR'),Configurations::getConfiguration('EMAIL_FROM_NAME'));
 
         // Send the email
           $message->setTo($email, $user);
@@ -136,7 +143,7 @@ class Mailer
         return $mailer->send($message, $failures);
         
         /*
-      $from = "From: ".EMAIL_FROM_NAME." <".EMAIL_FROM_ADDR.">";
+      $from = "From: ".Configurations::getConfiguration('EMAIL_FROM_NAME')." <".Configurations::getConfiguration('EMAIL_FROM_ADDR').">";
       $subject = "REAtlas - Your new password";
       $body = $user.",\n\n"
              ."We've generated a new password for you at your "

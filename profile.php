@@ -201,7 +201,7 @@ $action=isset($_GET['action'])?$_GET['action']:"profile";
                                                data-validation-error-msg="E-mail is empty or not valid"/>
                                     </div><!--END EMAIL--><br/>
                                      <input type="hidden" name="subedit" value="1">
-                                     <input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>profile.php?action=settings" type="hidden"/>
+                                     <input name="redirect_to" value="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>profile.php?action=settings" type="hidden"/>
                                 </div>
                                 <?php 
                                 }
@@ -504,7 +504,7 @@ $action=isset($_GET['action'])?$_GET['action']:"profile";
                                                data-validation-error-msg="WebSite is not valid" value="<?php echo $profile->website;?>"/>
                                     </div><!--END WEBSITE--><br/>
                                      <input type="hidden" name="member_profile" value="1">
-                                     <input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>profile.php?action=profile" type="hidden"/>
+                                     <input name="redirect_to" value="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>profile.php?action=profile" type="hidden"/>
                                 </div>
                                 <?php 
                                 }
@@ -512,7 +512,7 @@ $action=isset($_GET['action'])?$_GET['action']:"profile";
                                 {
                                 ?>
                                  <input type="hidden" name="member_preference" value="1">
-                                 <input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>profile.php?action=preferences" type="hidden"/>
+                                 <input name="redirect_to" value="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>profile.php?action=preferences" type="hidden"/>
                                  <?php 
                                     }                                
                                 ?>

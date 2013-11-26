@@ -6,35 +6,36 @@
  * and open the template in the editor.
  */
 
+ini_set('date.timezone', 'Europe/Copenhagen');
 // Main stuff here
 define('START',microtime());
-
-// Users
-
-define('DEFAULT_USER_GROUP','auesg');
-define('DEFAULT_USER','gorm');
-
 
 //selection
 define('SELECTION_TOOLBAR',false);
 
 define('_MODE_DEV_', true);
 
-// Report all PHP errors
-error_reporting(-1);
+if(_MODE_DEV_) {
+    // Report all PHP errors
+    error_reporting(-1);
 
-// Same as error_reporting(E_ALL);
-ini_set('error_reporting', E_ALL);
-
-
+    // Same as error_reporting(E_ALL);
+    ini_set('error_reporting', E_ALL);
+    ini_set( "display_errors", 1 );
+}else {
+    // Report all PHP errors
+    error_reporting(0);
+    ini_set( "display_errors", 0);
+}
 /**
  * Database Constants - these constants are required
  * in order for there to be a successful connection
  * to the MySQL database. Make sure the information is
  * correct.
  */
+define("SERVER_URL", "localhost");
+define('SITE_DIRECTORY', '/reatlas/');
 define("_DB_SERVER_", "localhost");
-define('_SITE_DIRECTORY_', '/reatlas/');
 define("_DB_USER_", "reatlas");
 define("_DB_PASS_", "reatlas");
 define("_DB_NAME_", "reatlas");
@@ -105,7 +106,7 @@ define("COOKIE_PATH", "/");  //Avaible in whole domain
  */
 define("EMAIL_FROM_NAME", "Admin AU");
 define("EMAIL_FROM_ADDR", "manila@au.dk");
-define("EMAIL_WELCOME", true);
+define("NOTIF_TO_USR_WELCOME", true);
 define("EMAIL_HTML",false);
 
 /**

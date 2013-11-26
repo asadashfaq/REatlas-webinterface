@@ -115,12 +115,12 @@ class Tools {
     }
 
     /**
-     * getShopProtocol return the available protocol for the current shop in use
+     * getSiteProtocol return the available protocol for the current shop in use
      * SSL if Configuration is set on and available for the server
      * @static
      * @return String
      */
-    public static function getShopProtocol() {
+    public static function getSiteProtocol() {
         $protocol = (Configuration::get('PS_SSL_ENABLED') || (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off')) ? 'https://' : 'http://';
         return $protocol;
     }
@@ -137,7 +137,7 @@ class Tools {
     /**
      * getHttpHost return the <b>current</b> host used, with the protocol (http or https) if $http is true
      * This function should not be used to choose http or https domain name.
-     * Use Tools::getShopDomain() or Tools::getShopDomainSsl instead
+     * Use Tools::getSiteDomain() or Tools::getSiteDomainSsl instead
      *
      * @param boolean $http
      * @param boolean $entities
@@ -155,14 +155,13 @@ class Tools {
     }
 
     /**
-     * getShopDomain returns domain name according to configuration and ignoring ssl
+     * getSiteDomain returns domain name according to configuration and ignoring ssl
      *
      * @param boolean $http if true, return domain name with protocol
      * @param boolean $entities if true,
      * @return string domain
      */
-    public static function getShopDomain($http = false, $entities = false) {
-        if (!$domain = ShopUrl::getMainShopDomain())
+    public static function getSiteDomain($http = false, $entities = false) {
             $domain = Tools::getHttpHost();
         if ($entities)
             $domain = htmlspecialchars($domain, ENT_COMPAT, 'UTF-8');
@@ -172,14 +171,13 @@ class Tools {
     }
 
     /**
-     * getShopDomainSsl returns domain name according to configuration and depending on ssl activation
+     * getSiteDomainSsl returns domain name according to configuration and depending on ssl activation
      *
      * @param boolean $http if true, return domain name with protocol
      * @param boolean $entities if true,
      * @return string domain
      */
-    public static function getShopDomainSsl($http = false, $entities = false) {
-        if (!$domain = ShopUrl::getMainShopDomainSSL())
+    public static function getSiteDomainSsl($http = false, $entities = false) {
             $domain = Tools::getHttpHost();
         if ($entities)
             $domain = htmlspecialchars($domain, ENT_COMPAT, 'UTF-8');
@@ -291,7 +289,7 @@ class Tools {
         if ($cookie->id_lang) {
             //echo $cookie->id_lang;exit;
             $lang = new Language((int) $cookie->id_lang);
-            if (!Validate::isLoadedObject($lang) || !$lang->active || !$lang->isAssociatedToShop())
+            if (!Validate::isLoadedObject($lang) || !$lang->active || !$lang->isAssociatedToSite())
                 $cookie->id_lang = null;
         }
 
@@ -352,174 +350,6 @@ class Tools {
     }
 
     /**
-     * Set cookie currency from POST or default currency
-     *
-     * @return Currency object
-     */
-    public static function setCurrency($cookie) {
-        if (Tools::isSubmit('SubmitCurrency'))
-            if (isset($_POST['id_currency']) && is_numeric($_POST['id_currency'])) {
-                $currency = Currency::getCurrencyInstance($_POST['id_currency']);
-                if (is_object($currency) && $currency->id && !$currency->deleted && $currency->isAssociatedToShop())
-                    $cookie->id_currency = (int) $currency->id;
-            }
-
-        if ((int) $cookie->id_currency) {
-            $currency = Currency::getCurrencyInstance((int) $cookie->id_currency);
-            if (is_object($currency) && (int) $currency->id && (int) $currency->deleted != 1 && $currency->active)
-                if ($currency->isAssociatedToShop())
-                    return $currency;
-                else {
-                    // get currency from context
-                    $currency = Shop::getEntityIds('currency', Context::getContext()->shop->id);
-                    $cookie->id_currency = $currency[0]['id_currency'];
-                    return Currency::getCurrencyInstance((int) $cookie->id_currency);
-                }
-        }
-        $currency = Currency::getCurrencyInstance(Configuration::get('PS_CURRENCY_DEFAULT'));
-        if (is_object($currency) && $currency->id)
-            $cookie->id_currency = (int) $currency->id;
-
-        return $currency;
-    }
-
-    /**
-     * Return price with currency sign for a given product
-     *
-     * @param float $price Product price
-     * @param object $currency Current currency (object, id_currency, NULL => context currency)
-     * @return string Price correctly formated (sign, decimal separator...)
-     */
-    public static function displayPrice($price, $currency = null, $no_utf8 = false, Context $context = null) {
-        if (!is_numeric($price))
-            return $price;
-        if (!$context)
-            $context = Context::getContext();
-        if ($currency === null)
-            $currency = $context->currency;
-        // if you modified this function, don't forget to modify the Javascript function formatCurrency (in tools.js)
-        elseif (is_int($currency))
-            $currency = Currency::getCurrencyInstance((int) $currency);
-
-        if (is_array($currency)) {
-            $c_char = $currency['sign'];
-            $c_format = $currency['format'];
-            $c_decimals = (int) $currency['decimals'] * _PS_PRICE_DISPLAY_PRECISION_;
-            $c_blank = $currency['blank'];
-        } elseif (is_object($currency)) {
-            $c_char = $currency->sign;
-            $c_format = $currency->format;
-            $c_decimals = (int) $currency->decimals * _PS_PRICE_DISPLAY_PRECISION_;
-            $c_blank = $currency->blank;
-        } else
-            return false;
-
-        $blank = ($c_blank ? ' ' : '');
-        $ret = 0;
-        if (($is_negative = ($price < 0)))
-            $price *= -1;
-        $price = Tools::ps_round($price, $c_decimals);
-        switch ($c_format) {
-            /* X 0,000.00 */
-            case 1:
-                $ret = $c_char . $blank . number_format($price, $c_decimals, '.', ',');
-                break;
-            /* 0 000,00 X */
-            case 2:
-                $ret = number_format($price, $c_decimals, ',', ' ') . $blank . $c_char;
-                break;
-            /* X 0.000,00 */
-            case 3:
-                $ret = $c_char . $blank . number_format($price, $c_decimals, ',', '.');
-                break;
-            /* 0,000.00 X */
-            case 4:
-                $ret = number_format($price, $c_decimals, '.', ',') . $blank . $c_char;
-                break;
-            /* 0 000.00 X  Added for the switzerland currency */
-            case 5:
-                $ret = number_format($price, $c_decimals, '.', ' ') . $blank . $c_char;
-                break;
-        }
-        if ($is_negative)
-            $ret = '-' . $ret;
-        if ($no_utf8)
-            return str_replace('€', chr(128), $ret);
-        return $ret;
-    }
-
-    public static function displayPriceSmarty($params, &$smarty) {
-        if (array_key_exists('currency', $params)) {
-            $currency = Currency::getCurrencyInstance((int) ($params['currency']));
-            if (Validate::isLoadedObject($currency))
-                return Tools::displayPrice($params['price'], $currency, false);
-        }
-        return Tools::displayPrice($params['price']);
-    }
-
-    /**
-     * Return price converted
-     *
-     * @param float $price Product price
-     * @param object $currency Current currency object
-     * @param boolean $to_currency convert to currency or from currency to default currency
-     */
-    public static function convertPrice($price, $currency = null, $to_currency = true, Context $context = null) {
-        static $default_currency = null;
-
-        if ($default_currency === null)
-            $default_currency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
-
-        if (!$context)
-            $context = Context::getContext();
-        if ($currency === null)
-            $currency = $context->currency;
-        elseif (is_numeric($currency))
-            $currency = Currency::getCurrencyInstance($currency);
-
-        $c_id = (is_array($currency) ? $currency['id_currency'] : $currency->id);
-        $c_rate = (is_array($currency) ? $currency['conversion_rate'] : $currency->conversion_rate);
-
-        if ($c_id != $default_currency) {
-            if ($to_currency)
-                $price *= $c_rate;
-            else
-                $price /= $c_rate;
-        }
-
-        return $price;
-    }
-
-    /**
-     *
-     * Convert amount from a currency to an other currency automatically
-     * @param float $amount
-     * @param Currency $currency_from if null we used the default currency
-     * @param Currency $currency_to if null we used the default currency
-     */
-    public static function convertPriceFull($amount, Currency $currency_from = null, Currency $currency_to = null) {
-        if ($currency_from === $currency_to)
-            return $amount;
-
-        if ($currency_from === null)
-            $currency_from = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-
-        if ($currency_to === null)
-            $currency_to = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-
-        if ($currency_from->id == Configuration::get('PS_CURRENCY_DEFAULT'))
-            $amount *= $currency_to->conversion_rate;
-        else {
-            $conversion_rate = ($currency_from->conversion_rate == 0 ? 1 : $currency_from->conversion_rate);
-            // Convert amount to default currency (using the old currency rate)
-            $amount = Tools::ps_round($amount / $conversion_rate, 2);
-            // Convert to new currency
-            $amount *= $currency_to->conversion_rate;
-        }
-        return Tools::ps_round($amount, 2);
-    }
-
-    /**
      * Display date regarding to language preferences
      *
      * @param array $params Date, format...
@@ -547,7 +377,7 @@ class Tools {
             return '';
 
         if (!Validate::isDate($date) || !Validate::isBool($full))
-            throw new PrestaShopException('Invalid date');
+            throw new Exception('Invalid date');
 
         $context = Context::getContext();
         $date_format = ($full ? $context->language->date_format_full : $context->language->date_format_lite);

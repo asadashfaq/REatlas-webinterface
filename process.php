@@ -132,7 +132,7 @@ class Process
    function procRegister(){
       global $session, $form;
       /* Convert username to all lowercase (by option) */
-      if(ALL_LOWERCASE){
+      if(Configurations::getConfiguration('ALL_LOWERCASE')){
          $_POST['username'] = strtolower($_POST['username']);
       }
       /* Registration attempt */
@@ -164,7 +164,7 @@ class Process
     function procMasterRegister(){
       global $session, $form;
       /* Convert username to all lowercase (by option) */
-      if(ALL_LOWERCASE){
+      if(Configurations::getConfiguration('ALL_LOWERCASE')){
          $_POST['username'] = strtolower($_POST['username']);
       }
       /* Registration attempt */
@@ -198,7 +198,7 @@ class Process
     function procMemberRegister(){
       global $session, $form;
       /* Convert username to all lowercase (by option) */
-      if(ALL_LOWERCASE){
+      if(Configurations::getConfiguration('ALL_LOWERCASE')){
          $_POST['username'] = strtolower($_POST['username']);
       }
       
@@ -235,7 +235,7 @@ class Process
     function procAgentRegister(){
       global $session, $form;
       /* Convert username to all lowercase (by option) */
-      if(ALL_LOWERCASE){
+      if(Configurations::getConfiguration('ALL_LOWERCASE')){
          $_POST['username'] = strtolower($_POST['username']);
       }
       /* Registration attempt */

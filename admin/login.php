@@ -41,7 +41,7 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
                         }
                         ?>
        
-<form name="loginform" id="loginform" action="<?php echo _SITE_DIRECTORY_; ?>process.php" method="post">
+<form name="loginform" id="loginform" action="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>process.php" method="post">
     <?php 
     if($action == "lostpassword")
     {
@@ -57,7 +57,7 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
     </p>
 	<p class="submit">
 		<input name="wp-submit" id="wp-submit" class="button button-primary button-large" value="Send" type="submit"/>
-		<input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>admin/login.php?action=lostpassword" type="hidden"/>
+		<input name="redirect_to" value="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>admin/login.php?action=lostpassword" type="hidden"/>
                 <input type="hidden" name="subforgot" value="1"/>
 	</p>
     <?php 
@@ -75,7 +75,7 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
 		<p class="forgetmenot"><label for="rememberme"><input name="remember" id="rememberme" value="forever" type="checkbox"/> Remember Me</label></p>
 	<p class="submit">
 		<input name="wp-submit" id="wp-submit" class="button button-primary button-large" value="Log In" type="submit"/>
-		<input name="redirect_to" value="<?php echo _SITE_DIRECTORY_; ?>admin/" type="hidden"/>
+		<input name="redirect_to" value="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>admin/" type="hidden"/>
                 <input type="hidden" name="sublogin" value="1"/>
 		<input name="testcookie" value="1" type="hidden"/>
 	</p>
@@ -90,11 +90,11 @@ $action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
     {
     ?>
     
-	<a href="<?php echo _SITE_DIRECTORY_; ?>admin/login.php?action=lostpassword" title="Password Lost and Found">Lost your password?</a>
+	<a href="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>admin/login.php?action=lostpassword" title="Password Lost and Found">Lost your password?</a>
         <?php 
     }else {
     ?>
-        <a href="<?php echo _SITE_DIRECTORY_; ?>admin/login.php" title="Login">Back to Login</a>
+        <a href="<?php echo Configurations::getConfiguration('SITE_DIRECTORY'); ?>admin/login.php" title="Login">Back to Login</a>
         <?php 
     }
  ?>

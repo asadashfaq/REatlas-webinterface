@@ -9,16 +9,17 @@ require_once("../init.php");
 
 $include_classes = array(
     'user'=>'classes/user.class.php',
-    'AdminFront'=>'classes/admin/AdminFront.class.php',
-    'AdminUsers'=>'classes/admin/AdminUsers.class.php',
+    'FrontController' => 'classes/FrontController.php',
+    'AdminFront'=>'controllers/AdminFrontController.php',
+    'AdminUsers'=>'controllers/AdminUsersController.php',
+    'AdminConfiguration'=>'controllers/AdminConfigurationController.php',
     'alias'=>'../config/alias.php'
     
 );
 
 $root_dir = dirname(__FILE__) . '/';
-
 foreach ($include_classes as $classname => $classpath) {
-    if (file_exists($root_dir . $classpath))
+    if (file_exists($root_dir . $classpath)) 
         require_once $root_dir . $classpath;
 }
 

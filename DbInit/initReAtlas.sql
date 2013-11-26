@@ -1,44 +1,3 @@
-/*CREATE DATABASE reatlas;*/
-/*
-CREATE USER 'sec_user'@'localhost' IDENTIFIED BY 'eKcGZr59zAa2BEWU';
-GRANT SELECT, INSERT, UPDATE, DELETE ON `secure_sessions`.* TO 'sec_user'@'localhost';
-
-
-CREATE TABLE `sessions` (
-  `id` char(128) NOT NULL,
-  `set_time` char(10) NOT NULL,
-  `data` text NOT NULL,
-  `session_key` char(128) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
-
-CREATE TABLE `members` (
-  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
-  `username` VARCHAR(30) NOT NULL, 
-  `email` VARCHAR(50) NOT NULL, 
-  `password` CHAR(128) NOT NULL, 
-  `salt` CHAR(128) NOT NULL
-) ENGINE = MyISAM;
-
-CREATE TABLE `login_attempts` (
-  `user_id` int(11) NOT NULL,
-  `time` VARCHAR(30) NOT NULL 
-) ENGINE=MyISAM;
-
-
-INSERT INTO `members` VALUES(1, 'manila', 'manila.nair@gmail.com', '00807432eae173f652f2064bdca1b61b290b52d40e429a7d295d76a71084aa96c0233b82f1feac45529e0726559645acaed6f3ae58a286b9f075916ebf66cacc', 'f9aab579fc1b41ed0c44fe4ecdbfcdb4cb99b9023abb241a6db833288f4eea3c02f76e0d35204a8695077dcf81932aa59006423976224be0390395bae152d4ef');
-*/
-/*
-MySQL Data Transfer
-Source Host: localhost
-Source Database: 3g
-Target Host: localhost
-Target Database: 3g
-Date: 10/8/2008 12:05:52 AM
-*/
-
 SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for active_guests
@@ -130,7 +89,7 @@ CREATE TABLE `users_profile` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for profile
+-- Table structure for user preference
 -- ----------------------------
 CREATE TABLE `user_configuration` (
     `config_id` int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -152,4 +111,14 @@ CREATE TABLE `jobs` (
     `data` varchar(2000) default NULL,
     `status` VARCHAR(10) default NULL,
     PRIMARY KEY  (`job_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for global preference
+-- ----------------------------
+CREATE TABLE `global_configuration` (
+    `config_id` int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `name` varchar(100) NOT NULL,
+    `value` varchar(2000) default NULL,
+    UNIQUE KEY  (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
