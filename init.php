@@ -22,6 +22,7 @@ $include_classes= array(
     'Configurations' => 'include/classes/Configurations.class.php',
     'Tools' => 'include/classes/Tools.class.php',
     'functions' => 'functions.php',
+    'user'=>'include/classes/user.class.php',
     'Profile'=>'include/classes/profile.class.php',
     'session'=>'include/classes/session.class.php',
     'alias'=>'config/alias.php',

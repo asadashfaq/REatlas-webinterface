@@ -28,7 +28,7 @@ $(document).ready(function() {
                     $('#cutoutSelGrpOwn').html('Loading...');
                     $('#cutoutSelGrpAll').html('No cutout found');
                       
-                    fetchCutoutList(defaultUser, 'cutoutSelGrpOwn');
+                    fetchCutoutList(currentUserID, 'cutoutSelGrpOwn');
                 } else if ($(this).val() == "all") {
                     $('#cutoutSelGrpDefault').css('display', 'none');
                     $('#cutoutSelGrpOwn').css('display', 'none');
@@ -38,7 +38,7 @@ $(document).ready(function() {
                     $('#cutoutSelGrpOwn').html('No cutout found');
                     $('#cutoutSelGrpAll').html('Loading...');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpAll');
-                    fetchCutoutList(defaultUser, 'cutoutSelGrpAll');
+                    fetchCutoutList(currentUserID, 'cutoutSelGrpAll');
                 } else if ($(this).val() == "new") {
                     $('#cutoutSelGrpDefault').css('display', 'none');
                     $('#cutoutSelGrpOwn').css('display', 'none');

@@ -4,6 +4,7 @@ include("init.php");
 if ($session->logged_in)
     $profile = new Profile($session->profileid);
 
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -34,7 +35,7 @@ if ($session->logged_in)
         var defaultUserGroup = '<?php echo Configurations::getConfiguration('PEPSI_DEFAULT_USER_GROUP'); ?>';
         var defaultUser = '<?php echo Configurations::getConfiguration('PEPSI_ADMIN_USER'); ?>';
         var currentUser = '<?php echo $_SESSION['aulogin']; ?>';
-        
+        var currentUserID ='<?php echo $session->userid;?>';
     
         </script>
         <script src="js/reatlas.js"></script>
@@ -114,7 +115,6 @@ if (!$session->logged_in)
                                     <br/>
                                     <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Rectangle">Rectangle</label><br/>
                                     <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Multipoint">Multipoint</label><br/>
-
                                     <br/>
                                     <button id="clear-graphics" class="clearall" value="clear-graphics">Clear All</button>
                                     <button id="submit-graphics" class="clearall" value="submit-graphics">Submit</button>

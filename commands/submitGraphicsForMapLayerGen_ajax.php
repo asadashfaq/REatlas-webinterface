@@ -9,6 +9,19 @@
         
 include_once('../init.php');
 
+if(!$session){
+    echo 'Error: Session expires.';
+    die();
+}
+
+$currentUser = new user($session->userid);
+
+if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
+    echo 'Error: Technical problem. Contact Administrator.';
+   die();
+}
+
+
 $cutoutName = $_REQUEST["cutoutName"];
 $geomatry_type = $_REQUEST["geomatry_type"];
 $geomatry_data = json_decode($_REQUEST["geomatry_data"]);

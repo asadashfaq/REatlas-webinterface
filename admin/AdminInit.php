@@ -8,7 +8,7 @@
 require_once("../init.php");
 
 $include_classes = array(
-    'user'=>'classes/user.class.php',
+   // 'user'=>'classes/user.class.php',
     'FrontController' => 'classes/FrontController.php',
     'AdminFront'=>'controllers/AdminFrontController.php',
     'AdminUsers'=>'controllers/AdminUsersController.php',

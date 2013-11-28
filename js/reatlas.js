@@ -48,7 +48,7 @@ function  initializeEvents(divID) {
                         url: "commands/cutoutDetails_ajax.php",
                         handleAs: "json",
                         timeout: 300000, // give up after 3 seconds
-                        content: {user: userName, cutout: cutoutName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+                        content: {currentUserID:currentUserID,user: userName, cutout: cutoutName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
                         load: function(data) {
                              
                             if (targetNode.innerHTML === "Loading..." ||
@@ -64,11 +64,11 @@ function  initializeEvents(divID) {
                                 targetNode.innerHTML = '<b>Name of the selected cutout:</b><br/>' + cutoutName + '<br/>';
                                 targetNode.innerHTML += '<b>Type of the selected cutout:</b><br/>' + data.cutout_type + '<br/>';
                                 if (data.cutout_type == "Rectangle") {
-                                    targetNode.innerHTML += '<b>Coordinates:</b><br/>(<br/>(' + data.min_latitude + ',' + data.min_longitude + '),(' + data.max_latitude + ',' + data.max_longitude + ')<br/>)<br/>';
+                                    targetNode.innerHTML += '<b>Coordinates:</b><br/>(<br/>(' + Number(data.min_latitude).toFixed(2) + ',' + Number(data.min_longitude).toFixed(2) + '),(' + Number(data.max_latitude).toFixed(2) + ',' + Number(data.max_longitude).toFixed(2) + ')<br/>)<br/>';
                                 } else if (data.cutout_type == "MultiPoint") {
                                     targetNode.innerHTML += '<b>Points:</b><br/>(<br/>'
                                     for (key in data.points) {
-                                        targetNode.innerHTML += '(' + data.points[key].latitude + ',' + data.points[key].longitude + ')';
+                                        targetNode.innerHTML += '(' + Number(data.points[key].latitude).toFixed(2) + ',' + Number(data.points[key].longitude).toFixed(2) + ')';
                                     }
                                     targetNode.innerHTML += '<br/>)<br/>';
                                 }
@@ -199,7 +199,7 @@ function fetchCutoutList(userName, divID) {
             url: "commands/cutoutlist_ajax.php",
             handleAs: "json",
             timeout: 3000, // give up after 3 seconds
-            content: {user: userName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+            content: {currentUserID:currentUserID,user: userName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
             load: function(data) {
                 if (targetNode.innerHTML === "Loading..." ||
                         targetNode.innerHTML === "No cutout found")
@@ -211,13 +211,14 @@ function fetchCutoutList(userName, divID) {
                 }
 
                 if ($(data).size() !== 0) {
-                   
+                      
                     for (var i in data) {
                         if (data[i].cutout !== userName)
                             $("#" + divID).append("<label><input type=\"radio\" class=\"radio\" name=\"cutoutSelGrpDefault\" value=\"" + userName + "/" + data[i].cutout + "\">" + data[i].cutout + "</label><br/>");
                     }
 
                     initializeEvents(divID);
+                   
                 }
             }
         });
@@ -291,7 +292,7 @@ require([
     // parser.parse();
 
     _map = new Map("mapDiv", {
-        center: [-85.772, 38.255],
+        center: [13.406091199999991000,52.519171000000000000],
         zoom: 3,
         basemap: "topo"
     });
@@ -382,7 +383,9 @@ require([
         ctxMenuForGraphics.addChild(new MenuItem({
             label: "Move",
             onClick: function() {
+              //   if (selected.style) selected.style.cursor="url('images/zoomin.cur'),crosshair";
                 editToolbar.activate(Edit.MOVE, selected);
+              
             }
         }));
 
@@ -498,13 +501,13 @@ require([
     geoLocate.startup();
 
     //add the basemap gallery, in this case we'll display maps from ArcGIS.com including bing maps
-    var basemapGallery = new BasemapGallery({
+    var basemapGallery = new esri.dijit.BasemapGallery({
         showArcGISBasemaps: true,
         map: _map
     }, "basemapGallery");
     basemapGallery.startup();
     basemapGallery.on("error", function(msg) {
-        console.log("basemap gallery error:  ", msg);
+       // console.log("basemap gallery error:  ", msg);
     });
 
     basemapGallery.on('load', function() {
