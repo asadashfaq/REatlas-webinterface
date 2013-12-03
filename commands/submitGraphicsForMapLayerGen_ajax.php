@@ -25,6 +25,11 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
 $cutoutName = $_REQUEST["cutoutName"];
 $geomatry_type = $_REQUEST["geomatry_type"];
 $geomatry_data = json_decode($_REQUEST["geomatry_data"]);
+$cutoutStartDate = $_REQUEST["cutoutStartDate"];
+$cutoutEndDate = $_REQUEST["cutoutEndDate"];
+
+$cutoutStartDateArr = explode('-', $cutoutStartDate);
+$cutoutEndDateArr = explode('-', $cutoutEndDate);
 
 /* cmd_create_CFSR_rectangular_cutout.py Pepsimax.imf.au.dk Denmark --username manila --password iet5hiuC
 cmd_create_CFSR_rectangular_cutout.py [-h] [-p [PORT]]
@@ -41,9 +46,13 @@ cmd_create_CFSR_rectangular_cutout.py [-h] [-p [PORT]]
                                              northeast_longitude
 */
 
-$param = Configurations::getConfiguration('PEPSI_SERVER')." ".$cutoutName." "
-        ." --username ".Configurations::getConfiguration('PEPSI_ADMIN_USER')
-        ." --password ".Configurations::getConfiguration('PEPSI_ADMIN_PASS')
+$param = " --username ".$currentUser->aulogin
+        ." --password ".$currentUser->aupass
+        ." -fy ".$cutoutStartDateArr[0]
+        ." -fm ".$cutoutStartDateArr[1]
+        ." -ly ".$cutoutEndDateArr[0]
+        ." -lm ".$cutoutEndDateArr[1]
+        ." ".Configurations::getConfiguration('PEPSI_SERVER')." ".$cutoutName." "
         ." ".$geomatry_data->southwest_latitude
         ." ".$geomatry_data->southwest_longitude
         ." ".$geomatry_data->northeast_latitude

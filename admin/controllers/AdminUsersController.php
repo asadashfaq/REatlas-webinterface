@@ -241,12 +241,18 @@ class AdminUsersController extends FrontController {
     }
     
     public function processActivation() {
+         global $database, $form, $mailer;  //The database, form and mailer object
+         
          $userId = isset($_REQUEST['id'])?$_REQUEST['id']:NULL;
         if(isset($_REQUEST['activate']) && $userId){
-            
+            $userObj = new user($userId);
+         
             $_query = "UPDATE users set `active` = NOT `active` where id='".$userId."'";
             $res = $this->_dbCon->execute($_query);
             if($res){
+                if(Configurations::getConfiguration('NOTIF_TO_USR_ACTIVE')){
+                   $mailer->sendActivated($userObj->username,$userObj->email,"");
+                }
                 header('Location: '.$_SERVER['PHP_SELF'].'?action=users'.(isset($_SESSION['limit'])?'&limit='.$_SESSION['limit']:'').(isset($_SESSION['page'])?'&page='.$_SESSION['page']:'').(isset($_SESSION['query'])?'&query='.$_SESSION['query']:''));
             }
             

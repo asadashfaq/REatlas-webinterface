@@ -19,7 +19,9 @@ if ($session->logged_in)
         <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css">
         <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
         <link rel="stylesheet" href="css/layout.css"/> 
-        
+        <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/grid/resources/claroGrid.css">
+        <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/widget/Calendar/Calendar.css">
+
         <script>var dojoConfig = {parseOnLoad: true};</script>
         <script src="http://js.arcgis.com/3.7/"></script>
         <script src="js/jquery/jquery-1.9.1.js"></script>
@@ -111,13 +113,17 @@ if (!$session->logged_in)
                                 <div id="cutoutSelGrpAll" style="display: none;">All group</div>
                                 <div id="cutoutSelGrpNew" style="display: none;">
                                     <label for="newcutoutname">Cutout name:</label>
-                                    <input type="text" id="newcutoutname" name="newcutoutname" />
+                                    <input type="text" id="newcutoutname" name="newcutoutname" data-dojo-type="dijit/form/TextBox"/>
                                     <br/>
-                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Rectangle">Rectangle</label><br/>
-                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Multipoint">Multipoint</label><br/>
+                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Rectangle" data-dojo-type="dijit/form/CheckBox">Rectangle</label><br/>
+                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Multipoint" data-dojo-type="dijit/form/CheckBox">Multipoint</label><br/>
+                                    <label>Start Month-Year:</label> <input type="text" name="cutoutStartDate" id="cutoutStartDate" value="11/2013" data-dojo-type="dojox/form/DateTextBox" data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" />
                                     <br/>
-                                    <button id="clear-graphics" class="clearall" value="clear-graphics">Clear All</button>
-                                    <button id="submit-graphics" class="clearall" value="submit-graphics">Submit</button>
+                                    <label>End Month-Year:</label> <input type="text" name="cutoutEndDate" id="cutoutEndDate" value="11/2013" data-dojo-type="dojox/form/DateTextBox" data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" />
+                                    <br/>
+                                    <br/>
+                                    <button id="clear-graphics" class="clearall" value="clear-graphics" data-dojo-type="dijit/form/Button">Clear All</button>
+                                    <button id="submit-graphics" class="clearall" value="submit-graphics" data-dojo-type="dijit/form/Button">Submit</button>
                                 </div>
                             </div>
                         </div>

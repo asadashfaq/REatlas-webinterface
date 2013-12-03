@@ -10,6 +10,8 @@ var lastCreatedGraphics;
 var contaxtMouseOver, contaxtMouseOut;
 var graphicsDataForMapLayer = {};
 
+dojo.require("dojox.widget.MonthAndYearlyCalendar");
+
 function activateContaxtMenuForGraphics(enable)
 {
     if (enable == true) {
@@ -232,6 +234,10 @@ if(!graphicsDataForMapLayer.hasOwnProperty('geomatry_data')) {
     alert("Please draw layer before submitting");
     return false;
 }
+graphicsDataForMapLayer.cutoutName =$("#newcutoutname").val();
+graphicsDataForMapLayer.cutoutStartDate =$("#cutoutStartDate").val();
+graphicsDataForMapLayer.cutoutEndDate =$("#cutoutEndDate").val();
+console.log(graphicsDataForMapLayer)
     require(["dojo/_base/xhr"], function(xhr) {
        
      //   {"cutoutName":"rrg","geomatry_type":"polygon","geomatry_data":{"southwest_latitude":-72.23684375000217,"southwest_longitude":31.259294953114185,"northeast_latitude":-108.44778124999252,"northeast_longitude":47.79802337889069}}
@@ -240,7 +246,7 @@ if(!graphicsDataForMapLayer.hasOwnProperty('geomatry_data')) {
             url: "commands/submitGraphicsForMapLayerGen_ajax.php",
             handleAs: "json",
             timeout: 300000, // give up after 3 seconds
-            content:{"cutoutName":graphicsDataForMapLayer.cutoutName,"geomatry_type":graphicsDataForMapLayer.geomatry_type,"geomatry_data":JSON.stringify(graphicsDataForMapLayer.geomatry_data)}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+            content:{"cutoutName":graphicsDataForMapLayer.cutoutName,"geomatry_type":graphicsDataForMapLayer.geomatry_type,"geomatry_data":JSON.stringify(graphicsDataForMapLayer.geomatry_data),"cutoutStartDate":graphicsDataForMapLayer.cutoutStartDate,"cutoutEndDate":graphicsDataForMapLayer.cutoutEndDate}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
             load: function(data) {
                
             }
@@ -546,7 +552,6 @@ require([
 
     }
 
-
     function initNewCutoutOptions() {
         tbForNew = new Draw(_map);
         tbForNew.on("draw-end", dojo.partial(addGraphic, tbForNew));
@@ -555,15 +560,22 @@ require([
         // event delegation so a click handler is not
         // needed for each individual button
         on(dom.byId("cutoutSelGrpNew"), "click", function(evt) {
-
-            if (evt.target.value === "undefined" ||
-                    evt.target.id == "newcutoutname") {
+            if ( evt.target.value === undefined ||
+                    evt.target.id === "newcutoutname" ||
+                    evt.target.id === "cutoutStartDate" ||
+                    evt.target.id === "cutoutEndDate") {
                 return;
-            } else if (evt.target.value === "clear-graphics") {
+            }  
+            
+            if (evt.target.value === "clear-graphics") {
                 _map.graphics.clear();
                 lastCreatedGraphics = null;
                 return;
             }else if (evt.target.value === "submit-graphics") {
+                if($("#newcutoutname").val() === "") {
+                    alert("Please provide cutout name");
+                    return false;
+                }
                 submitGraphicsForMapLayerGen();
                 return;
             }
