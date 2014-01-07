@@ -11,7 +11,7 @@ if (!$session->isAdmin())
    header("Location: ".Configurations::getConfiguration('SITE_DIRECTORY')."main.php");
 }
 
-$action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
+$action =Tools::getValue('action',NULL);
 
 $adminController = new AdminFrontController();
 $adminController->display();

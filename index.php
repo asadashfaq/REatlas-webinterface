@@ -1,6 +1,6 @@
 <?php
 include("init.php");
-$action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
+$action = Tools::getValue('action');
 ?>
 <!DOCTYPE html>
 <html>

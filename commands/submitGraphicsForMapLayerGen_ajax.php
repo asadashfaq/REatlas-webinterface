@@ -9,7 +9,7 @@
         
 include_once('../init.php');
 
-if(!$session){
+if(!$session->logged_in){
     echo 'Error: Session expires.';
     die();
 }
@@ -22,11 +22,11 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
 }
 
 
-$cutoutName = $_REQUEST["cutoutName"];
-$geomatry_type = $_REQUEST["geomatry_type"];
-$geomatry_data = json_decode($_REQUEST["geomatry_data"]);
-$cutoutStartDate = $_REQUEST["cutoutStartDate"];
-$cutoutEndDate = $_REQUEST["cutoutEndDate"];
+$cutoutName =  Tools::getValue("cutoutName");
+$geomatry_type =  Tools::getValue("geomatry_type");
+$geomatry_data = json_decode( Tools::getValue("geomatry_data"));
+$cutoutStartDate =  Tools::getValue("cutoutStartDate");
+$cutoutEndDate =  Tools::getValue("cutoutEndDate");
 
 $cutoutStartDateArr = explode('-', $cutoutStartDate);
 $cutoutEndDateArr = explode('-', $cutoutEndDate);
@@ -48,10 +48,10 @@ cmd_create_CFSR_rectangular_cutout.py [-h] [-p [PORT]]
 
 $param = " --username ".$currentUser->aulogin
         ." --password ".$currentUser->aupass
-        ." -fy ".$cutoutStartDateArr[0]
-        ." -fm ".$cutoutStartDateArr[1]
-        ." -ly ".$cutoutEndDateArr[0]
-        ." -lm ".$cutoutEndDateArr[1]
+        ." -fy ".$cutoutStartDateArr[1]
+        ." -fm ".$cutoutStartDateArr[0]
+        ." -ly ".$cutoutEndDateArr[1]
+        ." -lm ".$cutoutEndDateArr[0]
         ." ".Configurations::getConfiguration('PEPSI_SERVER')." ".$cutoutName." "
         ." ".$geomatry_data->southwest_latitude
         ." ".$geomatry_data->southwest_longitude
@@ -59,8 +59,8 @@ $param = " --username ".$currentUser->aulogin
         ." ".$geomatry_data->northeast_longitude;
 
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_create_CFSR_rectangular_cutout.py";
-$command .= " $param ";
-echo $command;
+$command .= " $param 2>&1";
+
 $pid = popen( $command,"r");
 $result = '';
 

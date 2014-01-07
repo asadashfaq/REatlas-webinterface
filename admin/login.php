@@ -4,7 +4,7 @@ include("AdminInit.php");
 if ($session->logged_in)
    header("Location: index.php");
 
-$action = isset($_REQUEST['action'])?$_REQUEST['action']:NULL;
+$action = Tools::getValue('action');
 
 ?>
 <!DOCTYPE html>

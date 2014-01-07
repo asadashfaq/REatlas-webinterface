@@ -238,6 +238,7 @@
     background-color: lightgrey;
     border-radius: 10px;
     padding: 10px;
+    font-size: 0.8em;
 }
 
 #selectorContentDiv input.radio {
@@ -251,7 +252,8 @@
 #selectorContentDiv label {
     margin:4px;
     border:1px solid #D0D0D0;
-    font-size:large;
+    /*font-size:large;*/
+    
 }
 
 
@@ -261,4 +263,39 @@
     height: 200px;
     border-radius: 10px;
     padding: 10px;
+    font-size: 0.8em;
+}
+.capacityInfoDiv {
+    margin-top: 20px;
+    background-color: lightsteelblue;
+    min-height: 200px;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+
+.listContentDiv {
+    clear: both;
+    background-color: lightgrey;
+    border-radius: 10px;
+    padding: 8px;
+    margin: 8px;
+    font-size: 0.8em;
+    max-height: 60%;
+    min-height: 30%;
+    overflow-x: no-display;
+    overflow-y: auto;
+}
+
+#graphView {
+    background-color: lightgrey;
+    border-radius: 10px;
+    height: 250px;
+    z-index: 1000;
+    position: absolute;
+   /* bottom: 0;-200px;*/ 
+}
+
+.hidden {
+    bottom:-251px;   
 }

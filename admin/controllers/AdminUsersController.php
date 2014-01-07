@@ -25,18 +25,18 @@ class AdminUsersController extends FrontController {
     }
     
     private function filterParams() {
-        if (isset($_REQUEST['limit'])) {
-            $_SESSION['limit'] = $_REQUEST['limit'];
+        if (Tools::getIsset('limit')) {
+            $_SESSION['limit'] =  Tools::getValue('limit');
         }else {
             unset($_SESSION['limit']);
         }
-        if (isset($_REQUEST['page'])) {
-            $_SESSION['page'] = $_REQUEST['page'];
+        if (Tools::getIsset('page')) {
+            $_SESSION['page'] =  Tools::getValue('page');
         }else {
             unset($_SESSION['page']);
         }
-        if (isset($_REQUEST['query'])) {
-            $_SESSION['query'] = $_REQUEST['query'];
+        if (Tools::getIsset('query')) {
+            $_SESSION['query'] =  Tools::getValue('query');
         }else {
             unset($_SESSION['query']);
         }
@@ -137,11 +137,11 @@ class AdminUsersController extends FrontController {
         return $localHtml;
     }
     public function userListHTML() {
-        $pageLimit = isset($_REQUEST['limit'])?$_REQUEST['limit']:10;
-        $currentPage = isset($_REQUEST['page'])?$_REQUEST['page']-1:0;
+        $pageLimit = Tools::getValue('limit',10);
+        $currentPage = Tools::getValue('page',1)-1;
         $pageOffset = $pageLimit*$currentPage;
         
-        $queryFilter = isset($_REQUEST['query'])?$_REQUEST['query']:'';
+        $queryFilter = Tools::getValue('query','');
         $where = '';
         if($queryFilter && $queryFilter !=''){
             $queryFilterArr = explode(';', $queryFilter);
@@ -196,10 +196,18 @@ class AdminUsersController extends FrontController {
                         . '<td>'.$row['email'].'</td>'
 /*                        . '<td>'.$row['parent_directory'].'</td>' */
                          . '<td>'.$row['aulogin'].'</td>'
-                        . '<td><a href="'.$_SERVER['PHP_SELF'].'?action=users&activate&id='.$row['id'].(isset($_REQUEST['limit'])?'&limit='.$_REQUEST['limit']:'').(isset($_REQUEST['page'])?'&page='.$_REQUEST['page']:'').(isset($_REQUEST['query'])?'&query='.$_REQUEST['query']:'').'">'
+                        . '<td><a href="'.$_SERVER['PHP_SELF'].'?action=users&activate&id='.$row['id']
+                            .(Tools::getIsset('limit')?'&limit='. Tools::getValue('limit'):'')
+                            .(Tools::getIsset('page')?'&page='. Tools::getValue('page'):'')
+                            .(Tools::getIsset('query')?'&query='. Tools::getValue('query'):'')
+                           .'">'
                         . '<img src="images/'.($row['active']==1?'check.png':'cross.png').'"/>'
                         . '</a></td>'
-                        . '<td><a href="'.$_SERVER['PHP_SELF'].'?action=users&block&id='.$row['id'].(isset($_REQUEST['limit'])?'&limit='.$_REQUEST['limit']:'').(isset($_REQUEST['page'])?'&page='.$_REQUEST['page']:'').(isset($_REQUEST['query'])?'&query='.$_REQUEST['query']:'').'">'
+                        . '<td><a href="'.$_SERVER['PHP_SELF'].'?action=users&block&id='.$row['id']
+                            .(Tools::getIsset('limit')?'&limit='. Tools::getValue('limit'):'')
+                            .(Tools::getIsset('page')?'&page='. Tools::getValue('page'):'')
+                            .(Tools::getIsset('query')?'&query='. Tools::getValue('query'):'')
+                        .'">'
                         . '<img src="images/'.($row['banned']==1?'check.png':'cross.png').'"/>'
                         . '</a></td>'
                         . '<td><a href="'.$_SERVER['PHP_SELF'].'?action=users&edit&id='.$row['id'].(isset($_SESSION['limit'])?'&limit='.$_SESSION['limit']:'').(isset($_SESSION['page'])?'&page='.$_SESSION['page']:'').(isset($_SESSION['query'])?'&query='.$_SESSION['query']:'').'">'
@@ -243,8 +251,8 @@ class AdminUsersController extends FrontController {
     public function processActivation() {
          global $database, $form, $mailer;  //The database, form and mailer object
          
-         $userId = isset($_REQUEST['id'])?$_REQUEST['id']:NULL;
-        if(isset($_REQUEST['activate']) && $userId){
+         $userId = Tools::getValue('id');
+        if(Tools::getIsset('activate') && $userId){
             $userObj = new user($userId);
          
             $_query = "UPDATE users set `active` = NOT `active` where id='".$userId."'";
@@ -260,10 +268,10 @@ class AdminUsersController extends FrontController {
         
     }
     public function processBlocking() {
-         $userId = isset($_REQUEST['id'])?$_REQUEST['id']:NULL;
+         $userId = Tools::getValue('id');
          $res = false;
          
-        if(isset($_REQUEST['block']) && $userId){
+        if(Tools::getIsset('block') && $userId){
             
             /* Calculate number of users at site */
             $q = "SELECT username, EXISTS(SELECT * FROM ".TBL_BANNED_USERS." WHERE `username` = u.`username`) as banned FROM ".TBL_USERS." u WHERE id='$userId'";
@@ -294,8 +302,8 @@ class AdminUsersController extends FrontController {
         }
     }
     public function editUser() {
-         $userId = isset($_REQUEST['id'])?$_REQUEST['id']:NULL;
-        if(isset($_REQUEST['edit']) && $userId){
+         $userId =  Tools::getValue('id');
+        if(Tools::getIsset('edit') && $userId){
             
             $_query = new DbQuery();
             $_query->from("users","u");
@@ -317,7 +325,7 @@ class AdminUsersController extends FrontController {
         
          $userId = Tools::getValue("id");
          
-        if(Tools::getValue("user_edit_save") && $userId){
+        if(Tools::getIsset("user_edit_save") && $userId){
             $_query="UPDATE users SET "
                     . "userlevel = '".Tools::getValue("userlevel")."'"
                     . ", email = '".Tools::getValue("email")."'"

@@ -82,9 +82,9 @@ class Process
       global $session, $form;
       /* Login attempt */
       $retval = $session->login($_POST['username'], $_POST['password'], isset($_POST['remember']));
-       $referer = isset($_REQUEST['ref'])?$_REQUEST['ref']:NULL;
+       $referer = Tools::getValue('ref');
       
-     if(isset($_REQUEST['redirect_to']))
+     if(Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
       
       /* Login successful */
@@ -110,9 +110,9 @@ class Process
     */
    function procLogout(){
       global $session;
-       $referer = isset($_REQUEST['ref'])?$_REQUEST['ref']:NULL;
+       $referer = Tools::getValue('ref');
        
-       if(isset($_REQUEST['redirect_to']))
+       if(Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
        
       $retval = $session->logout();
@@ -138,7 +138,7 @@ class Process
       /* Registration attempt */
       $retval = $session->register($_POST['username'], $_POST['password'], $_POST['email']);
       
-      if(isset($_REQUEST['redirect_to']))
+      if(Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
       
       /* Registration Successful */
@@ -170,7 +170,7 @@ class Process
       /* Registration attempt */
       $retval = $session->SessionMasterRegister($_POST['username'], $_POST['password'], $_POST['email']);
       
-      if(isset($_REQUEST['redirect_to']))
+      if(Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
       
       /* Registration Successful */
@@ -208,7 +208,7 @@ class Process
       /* Registration attempt */
       $retval = $session->SessionMemberRegister($_POST['username'], $_POST['password'], $_POST['email']);
       /*
-      if(isset($_REQUEST['redirect_to']))
+      if(Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
      */
       /* Registration Successful */
@@ -241,7 +241,7 @@ class Process
       /* Registration attempt */
       $retval = $session->SessionAgentRegister($_POST['username'], $_POST['password'], $_POST['email']);
       
-      if(isset($_REQUEST['redirect_to']))
+      if(Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
       
       /* Registration Successful */
@@ -312,7 +312,7 @@ class Process
          }
       }
       
-     if(isset($_REQUEST['redirect_to']))
+     if( Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
      
           header("Location: ".$session->referrer); 
@@ -333,7 +333,7 @@ class Process
         $retval = $session->editAccountEmail($_POST['email']);
       }
       
-      if(isset($_REQUEST['redirect_to']))
+      if(Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
       
       /* Account edit successful */
@@ -370,7 +370,7 @@ class Process
       
       $retval = $profile->save();
      
-      if(isset($_REQUEST['redirect_to']))
+      if( Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
       
       /* Registration Successful */
@@ -396,7 +396,7 @@ class Process
         global $session, $form;
        $retval = 0;
        
-       if(isset($_REQUEST['redirect_to']))
+       if( Tools::getIsset('redirect_to'))
           $session->referrer = $_POST['redirect_to'];
       
         /* Registration Successful */

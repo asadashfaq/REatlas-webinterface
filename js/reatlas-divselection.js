@@ -54,6 +54,15 @@ $(document).ready(function() {
         $(this).prop("checked", true);
     });
 
+    $("#SolarInfoDiv input:radio").click(function() {
+       if($('input:radio[name=capacitySolarOption]:checked').val() == "Fixed Orientation"){
+       $("#solarAngle1").show();
+        $("#solarAngle2").show();
+         
+        //$('#select-table > .roomNumber').attr('enabled',false);
+    }
+    });
+   
     var group = "input:radio[name='cutoutSelectorGroup']";
     $(group).prop("checked", false);
 
@@ -88,5 +97,42 @@ $(function() {
             $(this).datepicker('setDate', new Date(year, month, 1));
         }
     });
+});
+
+$(document).ready(function(){
+    var chartIsDisplayed;
+    
+    $('#mapDiv').append($('#graphView'));
+    $('#graphView').width($('#mapDiv').width());
+    
+    $('#slide').click(function(){
+   
+    $('#graphView').width($('#mapDiv').width());
+         
+    var hidden = $('.hidden');
+    if (hidden.hasClass('visible')){
+        hidden.animate({"bottom":"-251px"}, "slow").removeClass('visible');
+    } else {
+        hidden.animate({"bottom":"0px"}, "slow").addClass('visible');
+    }
+    });
+    
+     $('input[name="capacitySolarOption"]').click(function(){
+      
+        if(!$('input[name="capacitySolar"]').is(':checked'))
+            {
+                alert('Please select Solar capacity above');
+                return false;
+            }
+        var optionVal = $(this).val();
+        if(optionVal =="FixedOrientation")
+            {
+             $('#fixedOrientationGrp').show(100); 
+             $('#fixedOrientationGrp input[type="text"]').val('');
+            }else if(optionVal =="FullTracking")
+            {
+             $('#fixedOrientationGrp').hide(100);   
+            }
+     });
 });
 

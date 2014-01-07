@@ -22,7 +22,8 @@ $action=isset($_GET['action'])?$_GET['action']:"profile";
         <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css">
         <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
         <link rel="stylesheet" href="css/layout.css"/> 
-
+        <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/grid/resources/claroGrid.css">
+        
 
         <!--SCRIPTS-->
         <script>var dojoConfig = {parseOnLoad: true};</script>
@@ -32,8 +33,6 @@ $action=isset($_GET['action'])?$_GET['action']:"profile";
         <script type="text/javascript" src="js/passMeter.js"></script>
         <script src="js/jquery/form-validator/jquery.form-validator.js"></script>
        
-        <!--Slider-in icons-->
-
     </head>
     <body class="claro">
         <?php
@@ -65,10 +64,14 @@ $action=isset($_GET['action'])?$_GET['action']:"profile";
                     }
                 });
 
-                require(["dojo/parser", "dojo/ready", "dijit/form/Button", "dijit/layout/ContentPane", "dijit/layout/BorderContainer"],
-                        function(parser, ready) {
+                require([
+                    "dojo/ready", 
+                    "dijit/form/Button", 
+                    "dijit/layout/ContentPane", 
+                    "dijit/layout/BorderContainer"],
+                        function(ready) {
                             ready(function() {
-                                //parser.parse();
+                               
                             });
                         }
                 );

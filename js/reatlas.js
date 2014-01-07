@@ -9,8 +9,10 @@ var selected, currentLocation;
 var lastCreatedGraphics;
 var contaxtMouseOver, contaxtMouseOut;
 var graphicsDataForMapLayer = {};
+var capacityChart = null;
 
 dojo.require("dojox.widget.MonthAndYearlyCalendar");
+
 
 function activateContaxtMenuForGraphics(enable)
 {
@@ -84,7 +86,200 @@ function  initializeEvents(divID) {
 
             });
 }
+function  initializeCapacityEvents(divID) {
+            $("#" + divID + "List input:radio").change(
+            function() {
+           
+            var cfgName =$(this).val();
+            
+                require(["dojo/_base/xhr"], function(xhr) {
+             
+                    var targetNode = dojo.byId(divID+"InfoSubDiv");
+                    // get some data, convert to JSON
+                    xhr.post({
+                        url: "commands/capacityDetails_ajax.php",
+                        handleAs: "json",
+                        timeout: 300000, // give up after 3 seconds
+                        content: {capacityType: divID,cfgName: cfgName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+                        load: function(data) {
+                             
+                            if (targetNode.innerHTML === "Loading..." ||
+                                    targetNode.innerHTML === "No details found")
+                                targetNode.innerHTML = '';
 
+                            if ($(data).size() === 0 && targetNode.innerHTML === '') {
+                                targetNode.innerHTML = 'No details found';
+                                return;
+                            }
+
+                            if ($(data).size() !== 0) {
+                               if(divID == "Wind"){
+                                targetNode.innerHTML = '<b>Hub height of the selected turbine:</b><br/>' + data.HUB_HEIGHT + '<br/>';
+                               
+                                 $('#graphView').width($('#mapDiv').width());
+                                   
+                                 drawChart(data);
+                                 
+                                 var hidden = $('.hidden');
+                                 if (hidden.hasClass('visible')){
+                                     /*
+                                     hidden.animate({"bottom":"-251px"}, "slow").removeClass('visible');
+                                     hidden.animate({"bottom":"0px"}, "slow").addClass('visible');
+                                            */
+                                 } else {
+                                     hidden.animate({"bottom":"0px"}, "slow").addClass('visible');
+                                 }
+                                 
+                               }else if(divID == "Solar") {
+                                   $('input[name="capacitySolarOption"]').prop('checked', false);
+                                   $('#fixedOrientationGrp').hide(100);
+                                   
+                                 if ($('.hidden').hasClass('visible')){
+                                     hidden.animate({"bottom":"-251px"}, "slow").removeClass('visible');
+                                   } 
+                               }
+                            }
+                        }
+                    });
+                });
+
+            });
+}
+
+function drawChart(data)
+{
+   
+    require(["dojox/charting/Chart",
+        "dojox/charting/axis2d/Default",
+        "dojox/charting/plot2d/Lines",
+        "dojox/charting/Theme",
+        "dojo/ready",
+    "dojox/gfx/gradutils"], 
+    function(Chart,Default,Lines,Theme,ready) {
+ 
+        var gradient = Theme.generateGradient;
+     /* fill settings for gradation */
+    defaultFill = {type: "linear", space: "shape", x1: 0, y1: 0, x2: 0, y2: 100};
+ 
+     var chartVelocity = data.V.split(',');
+     var chartPower = data.POW.split(',');
+     var chartData = [];
+         for (var index=0; index<chartVelocity.length; index++)
+           {
+            var item = {};
+            item['x']= chartVelocity[index];
+            item['y']= chartPower[index];
+            chartData[index]=item;
+           }
+
+    makeCharts = function(){
+           /* var chartDataLocal = [   
+                {x:3, y:0},
+                {x:4, y:0},
+                {x:4, y:0.024},
+                {x:5, y:0.069},
+                {x:6, y:0.133},
+                {x:7, y:0.219},
+                {x:8, y:0.333},
+                {x:9, y:0.468},
+                {x:10, y:0.598},
+                {x:11, y:0.730},
+                {x:12, y:0.850},
+                {x:13, y:0.928},
+                {x:14, y:0.973},
+                {x:15, y:0.990},
+                {x:16, y:0.997},
+                {x:17, y:0.999},
+                {x:19, y:1.0},
+                {x:25, y:1.0},
+                {x:25, y:0.0}
+            ];*/
+        
+        var myTheme = new Theme({
+ 
+        /* customize the chart wrapper */
+        chart: {
+            fill: "#333",
+            stroke: { color: "#333" },
+            pageStyle: {
+                backgroundColor: "#000",
+                color: "#fff"
+            }
+        },
+ 
+        /* plotarea definition */
+        plotarea: { fill: "#000" },
+ 
+        /* axis definition */
+        axis:{
+            stroke: { // the axis itself
+                color: "#fff",
+                width: 1
+            },
+            tick: { // used as a foundation for all ticks
+                color: "#fff",
+                position: "center",
+                font: "normal normal normal 7pt Helvetica, Arial, sans-serif",  // labels on axis
+                fontColor: "#fff" // color of labels
+            }
+        },
+ 
+        /* series definition */
+        series: {
+            stroke: { width: 2.5, color: "#fff" },
+            outline: null,
+            font: "normal normal normal 8pt Helvetica, Arial, sans-serif",
+            fontColor: "#fff"
+        },
+ 
+        /* marker definition */
+        marker: {
+            stroke: { width: 1.25, color: "#fff" },
+            outline: { width: 1.25, color: "#fff" },
+            font: "normal normal normal 8pt Helvetica, Arial, sans-serif",
+            fontColor: "#fff"
+        },
+ 
+        /* series theme with gradations! */
+        //light => dark
+        //defaultFill object holds all of our gradation settings
+        seriesThemes: [
+            { fill: gradient(defaultFill, "#fff", "#f2f2f2") },
+            { fill: gradient(defaultFill, "#d5ecf3", "#bed3d9") },
+            { fill: gradient(defaultFill, "#9ff275", "#7fc25d") },
+            { fill: gradient(defaultFill, "#81ee3b", "#60b32b") },
+            { fill: gradient(defaultFill, "#4dcff4", "#277085") },
+            { fill: gradient(defaultFill, "#666", "#333") }
+        ],
+ 
+        /* marker theme */
+        markerThemes: [
+            {fill: "#bf9e0a", stroke: {color: "#ecc20c"}},
+            {fill: "#73b086", stroke: {color: "#95e5af"}},
+            {fill: "#216071", stroke: {color: "#277084"}},
+            {fill: "#c7212d", stroke: {color: "#ed2835"}},
+            {fill: "#87ab41", stroke: {color: "#b6e557"}}
+        ]
+    });
+            if(!capacityChart){
+                capacityChart = new Chart("capacityChart");
+                capacityChart.addPlot("default", {type: "Lines"});
+                capacityChart.addAxis("x",{  vertical: false, fixLower: "minor", fixUpper: "minor" });
+                capacityChart.addAxis("y", { vertical: true, fixLower: "major", fixUpper: "major" });
+                capacityChart.addSeries("Capacity",  chartData);
+            }else
+                {
+                    capacityChart.updateSeries("Capacity", chartData);
+                }
+            capacityChart.setTheme(myTheme);
+        
+            capacityChart.render();
+     
+        };
+    dojo.addOnLoad(makeCharts);
+     });                                
+    
+}
 function drawGraphicslayerOnMap(data)
 {
     require([
@@ -254,6 +449,45 @@ console.log(graphicsDataForMapLayer)
     });
 }
 
+     
+function fetchCapacityList(targetDiv) {
+
+    require(["dojo/_base/xhr"], function(xhr) {
+
+        var divID = targetDiv.id;
+        var targetNode = dojo.byId(divID+'SubList');
+        
+        console.log(targetNode.innerHTML);
+        
+        // get some data, convert to JSON
+        xhr.post({
+            url: "commands/listCapacity_ajax.php",
+            handleAs: "json",
+            timeout: 3000, // give up after 3 seconds
+            content: {capacityType:divID}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
+            load: function(data) {
+                console.log("loaded capacity");
+                if (targetNode.innerHTML === "Loading..." ||
+                        targetNode.innerHTML === "No item found")
+                    targetNode.innerHTML = '';
+
+                if ($(data).size() === 0 && targetNode.innerHTML === '') {
+                    targetNode.innerHTML = 'No item found';
+                    return;
+                }
+                if ($(data).size() !== 0) {
+                    targetNode.innerHTML = '';
+                    for (var i in data) {
+                            $("#" + targetNode.id).append("<label><input type=\"radio\" class=\"radio\" name=\"capacity"+divID+"\" value=\"" + data[i].id + "\">" + data[i].name + "</label><br/>");
+                            
+                    }
+                  
+                  initializeCapacityEvents(divID);
+                }
+            }
+        });
+    });
+}
 
 require([
     "esri/map",
@@ -602,6 +836,7 @@ require([
         });
 
     }
+
 
     function addGraphic(parentToolbar, evt) {
         //deactivate the toolbar and clear existing graphics 

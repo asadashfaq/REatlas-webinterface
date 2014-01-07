@@ -1,7 +1,7 @@
 <?php
 include_once('../init.php');
 
-if(!$session){
+if(!$session->logged_in){
     echo 'Error: Session expires.';
     die();
 }
@@ -13,8 +13,12 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
    die();
 }
 
-$filterUser = $_REQUEST["user"];
-$cutout = $_REQUEST["cutout"];
+$filterUser =  Tools::getValue("user");
+$cutout =  Tools::getValue("cutout");
+
+if(!$cutout)
+    die('Error: Cutout is not defined');
+
 // filename: data/auesg/meta_Denmark.npz
 // cmd_cutout_details.py Pepsimax.imf.au.dk Denmark data/auesg/meta_Denmark.npz --username manila --password iet5hiuC --cutoutuser auesg 
 $fileName = "data/".$filterUser."/meta_".$cutout.".npz";

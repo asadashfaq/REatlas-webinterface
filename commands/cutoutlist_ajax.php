@@ -1,7 +1,7 @@
 <?php
 include_once('../init.php');
 
-if(!$session){
+if(!$session->logged_in){
     echo 'Error: Session expires.';
     die();
 }
@@ -12,7 +12,8 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
     echo 'Error: Technical problem. Contact Administrator.';
     die();
 }
-$filterUser = $_REQUEST["user"];
+$filterUser =  Tools::getValue("user");
+
 $param = Configurations::getConfiguration('PEPSI_SERVER')." --username ".$currentUser->aulogin." --password ".$currentUser->aupass." --cutoutuser ".$filterUser." --output JSON";
         
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_list_cutouts.py";

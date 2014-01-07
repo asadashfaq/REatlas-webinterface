@@ -71,6 +71,7 @@ if (!$session->logged_in)
                     <a href="profile.php?ref=main">My Account</a>
                     <a href="process.php?ref=front">Logout</a>
                 <?php endif; ?>
+                  
                 </div>
             </div>
             <div id="mapDiv" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center', splitter:false" style="width: 100%;overflow:hidden;">
@@ -136,22 +137,75 @@ if (!$session->logged_in)
 
                 </div>
                 <div id="capacitymapContainer" data-dojo-type="dijit.layout.TabContainer" style="display:none;height:100%"><!-- tabPosition="left-h" tabStrip="false"-->
-                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Solar tech', selected:true" >
+                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Layout', selected:true" 
+                         onShow="fetchCapacityList(this)" id="Layout" >
+                        <div class="listContentDiv" id="LayoutList">
+                            <!-- Add here extra-->
+                            <div id="LayoutSubList">Loading...</div>
+                        </div>
+                        <div id="LayoutInfoDiv" class="capacityInfoDiv">
+                            <div id="LayoutInfoSubDiv">&nbsp;</div>
+                            
+                        </div>
                         
                     </div>
-
-                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Wind tech',showTitle:true" >
-                        
+                     
+                  
+                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Wind',showTitle:true" onShow="fetchCapacityList(this)" id="Wind" >
+                        <div class="listContentDiv" id="WindList">
+                            <!-- Add here extra-->
+                            <div id="WindSubList">Loading...</div>
+                        </div>
+                        <div id="WindInfoDiv" class="capacityInfoDiv">
+                            <div id="WindInfoSubDiv">
+                                &nbsp;
+                            </div>
+                            <br/>
+                         <button id="convertWind" class="clearall" value="convertWind" data-dojo-type="dijit/form/Button">Convert</button>
+                        </div>
                     </div>
-                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Color',showTitle:true" >
+                      
+                    
+                                   
+                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Solar',showTitle:true" onShow="fetchCapacityList(this)" id="Solar" >
+                         <div class="listContentDiv" id="SolarList"> 
+                             <!-- Add here extra-->
+                        <div id="SolarSubList">Loading...</div>
+                     </div>
+                         <div id="SolarInfoDiv" class="capacityInfoDiv">
+                             <div id="SolarInfoSubDiv">
+                                 &nbsp;
+                             </div>
+                            <label><input type="radio" class="radio" name="capacitySolarOption" value="FixedOrientation" >Fixed Orientation</label><br/>
+                            <div id="fixedOrientationGrp" style="display: none;">
+                            <label for="solarAngle1">Angle1</label>
+                            <input type="text" id="solarAngle1" class="hidden" name="enterAngle1" data-dojo-type="dijit/form/NumberTextBox"/>
+                                    <br/>
+                              <label for="solarAngle2">Angle2</label>
+                            <input type="text" id="solarAngle2" class="hidden" name="enterAngle2" data-dojo-type="dijit/form/NumberTextBox"/>
+                            </div>
+                            <br/>  
+                            
+                            <label><input type="radio" id="fullTracking" class="radio" name="capacitySolarOption" value="FullTracking" >Full tracking</label><br/>
+                             <br/>
+                            <button id="convertSolar" class="clearall" value="convertSolar" data-dojo-type="dijit/form/Button">Convert</button>
+                                 
+                        </div>
                        
-                    </div>
                 </div>
+              </div>
             </div>
             <div id="footer" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'bottom'">
                 © 2013-2014 Aarhus University - au.dk
             </div>
 
+        </div>
+        <div id="graphView" class="hidden">
+            <a href="#" id="slide" style="float: right; margin-right: 10px;clear: both;">Hide</a>
+              <div id="graphViewContent">
+                  POWER CURVE
+                  <div id="capacityChart" style="width: 450px; height: 200px; margin: 5px auto 0px auto;"></div>
+              </div>
         </div>
         <div class="info">VERSION:</div>
     </body>
