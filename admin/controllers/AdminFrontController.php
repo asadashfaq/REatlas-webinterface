@@ -148,9 +148,9 @@ class AdminFrontController extends FrontController {
             $adminUsers->display();
             
         }  else if ($this->action == "configurations") {
-            $adminUsers = new AdminConfigurationController();
-            $adminUsers->action = $this->action;
-            $adminUsers->display();
+            $adminConfig = new AdminConfigurationController();
+            $adminConfig->action = $this->action;
+            $adminConfig->display();
             
         }  else {
         

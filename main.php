@@ -204,7 +204,7 @@ if (!$session->logged_in)
             <a href="#" id="slide" style="float: right; margin-right: 10px;clear: both;">Hide</a>
               <div id="graphViewContent">
                   POWER CURVE
-                  <div id="capacityChart" style="width: 450px; height: 200px; margin: 5px auto 0px auto;"></div>
+                  <div id="capacityChart" style="width: 450px; height: 200px; "></div>
               </div>
         </div>
         <div class="info">VERSION:</div>
