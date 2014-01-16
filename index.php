@@ -1,6 +1,10 @@
 <?php
 include("init.php");
 $action = Tools::getValue('action');
+
+if ($session->logged_in)
+    header("Location: main.php");
+
 ?>
 <!DOCTYPE html>
 <html>

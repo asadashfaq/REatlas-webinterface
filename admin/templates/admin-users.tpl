@@ -1,5 +1,5 @@
 {$listPagination}
-<div id="content">
+<div id="content" >
     <table cellspacing="0">
     <tr>
         <th>ID</th>
