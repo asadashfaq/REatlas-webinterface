@@ -24,6 +24,7 @@ if ($session->logged_in)
 <!--Slider-in icons-->
 <script type="text/javascript">
 $(document).ready(function() {
+    
 	$(".username").focus(function() {
 		$(".user-icon").css("left","-48px");
 	});
@@ -37,6 +38,7 @@ $(document).ready(function() {
 	$(".password").blur(function() {
 		$(".pass-icon").css("left","0px");
 	});
+        
 });
 </script>
 
