@@ -14,6 +14,7 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
 }
 
 $filterUser =  Tools::getValue("user");
+//echo "filteruser is $filterUser";
 $cutout =  Tools::getValue("cutout");
 
 if(!$cutout)
@@ -25,7 +26,7 @@ $fileName = "data/".$filterUser."/meta_".$cutout.".npz";
 $param = Configurations::getConfiguration('PEPSI_SERVER')." ".$cutout." ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/".$fileName." --username ".$currentUser->aulogin." --password ".$currentUser->aupass." --cutoutuser ".$filterUser;
 
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_cutout_details.py";
-$command .= " $param 2>&1";
+$command .= " $param --output JSON 2>&1";
 
 $pid = popen( $command,"r");
 $result = '';

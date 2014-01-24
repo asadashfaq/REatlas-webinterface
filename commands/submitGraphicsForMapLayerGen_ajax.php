@@ -56,8 +56,9 @@ $param = " --username ".$currentUser->aulogin
         ." ".$geomatry_data->southwest_latitude
         ." ".$geomatry_data->southwest_longitude
         ." ".$geomatry_data->northeast_latitude
-        ." ".$geomatry_data->northeast_longitude;
-
+        ." ".$geomatry_data->northeast_longitude
+        ." --output JSON";
+        
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_create_CFSR_rectangular_cutout.py";
 $command .= " $param 2>&1";
 

@@ -110,33 +110,35 @@ class AdminFrontController extends FrontController {
         $param = Configurations::getConfiguration('PEPSI_SERVER') . " --username " . Configurations::getConfiguration('PEPSI_ADMIN_USER') . " --password " . Configurations::getConfiguration('PEPSI_ADMIN_PASS') . " --output JSON";
         $command = "python " . Configurations::getConfiguration('REATLAS_CLIENT_PATH') . "/cmd_job_list.py";
         $command .= " $param 2>&1";
-
-        $pid = popen($command, "r");
-        $result = '';
-
-        while (!feof($pid)) {
-            $result .= fread($pid, 256);
-        }
-        pclose($pid);
+         
+        ob_start();
+        passthru($command);
+        $result = ob_get_clean(); 
+        
         $resJson = json_decode($result);
 
         $res = ' <div class="portlet">
                 <div class="portlet-header">Running Jobs</div>';
-
-        if ($result && strpos($result, 'usage') === false) {
-            $res .="<h5>Total running jobs: " . $resJson[0]->total_jobs . " <=> Total ETA: " . $resJson[0]->total_ETA . "</h5>";
-            if ($resJson[0]->total_jobs > 0) {
+        
+         if($resJson->type =="Success") {
+            $res .="<h5>Total running jobs: " . $resJson->data[0]->total_jobs . " <=> Total ETA: " . $resJson->data[0]->total_ETA . "</h5>";
+            if ($resJson->data[0]->total_jobs > 0) {
                 $res .= "<div class=\"portlet-content\">"
                         . "<table><tr><th>Job ID</th><th>User</th><th>Job Name</th><th>ETA</th>";
-                $jobs = $resJson[1]->jobs;
+                $jobs = $resJson->data[1]->jobs;
                 foreach ($jobs as $job) {
                     $res .="<tr><td>$job->job_id</td><td>$job->user</td><td>$job->name</td><td>$job->time_estimate</td></tr>";
                 }
-                $res .="</table></div>";
+                
+                  $res .="</table></div>";
             }
+            
         }
-        else
-            $res.= "<div class=\"portlet-content\">No jobs running</div>";
+        else if($resJson->type =="Error") {
+            $res.= "<div class=\"portlet-content\"><h4>".$resJson->text."</h4><span>".$resJson->desc."</span></div>";
+        }else
+            $res.= "<div class=\"portlet-content\">No jobs running.</div>";
+        
         $res.= "</div>";
         return $res;
     }
@@ -161,8 +163,7 @@ class AdminFrontController extends FrontController {
                     'newUpdatesBlock' => $this->newUpdatesBlock(),
                     'serverStatusBlock' => $this->serverStatusBlock(),
                     'userUpdatesBlock' => $this->userUpdatesBlock(),
-                    'trackingBlock' => $this->trackingBlock(),
-                    'runningJobsBlock' => $this->runningJobsBlock(),));
+                    'trackingBlock' => $this->trackingBlock()));
             $this->smarty->display("admin-front.tpl");
         }
     }

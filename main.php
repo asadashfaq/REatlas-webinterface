@@ -16,12 +16,13 @@ if ($session->logged_in)
         <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"> 
         <title>REAtlas - Aarhus</title>
 
+        <link href="css/login.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css">
         <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
         <link rel="stylesheet" href="css/layout.css"/> 
         <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/grid/resources/claroGrid.css">
         <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/widget/Calendar/Calendar.css">
-
+        
         <script>var dojoConfig = {parseOnLoad: true};</script>
         <script src="http://js.arcgis.com/3.7/"></script>
         <script src="js/jquery/jquery-1.9.1.js"></script>
@@ -38,6 +39,7 @@ if ($session->logged_in)
         var defaultUser = '<?php echo Configurations::getConfiguration('PEPSI_ADMIN_USER'); ?>';
         var currentUser = '<?php echo $_SESSION['aulogin']; ?>';
         var currentUserID ='<?php echo $session->userid;?>';
+        var currentUserName = '<?php echo $_SESSION['username']; ?>';
     
         </script>
         <script src="js/reatlas.js"></script>
@@ -75,7 +77,7 @@ if (!$session->logged_in)
                 </div>
             </div>
             <div id="mapDiv" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region:'center', splitter:false" style="width: 100%;overflow:hidden;">
-                <div id="HomeButton"></div>
+                 <div id="HomeButton"></div>
                 <div id="LocateButton"></div>
                 <?php if (SELECTION_TOOLBAR) { ?>
                     <div id="header-tool" >
@@ -110,21 +112,32 @@ if (!$session->logged_in)
                                 <div id="cutoutSelGrpDefault" >
                                     No cutout found
                                        </div>
-                                <div id="cutoutSelGrpOwn" style="display: none;">Own group</div>
-                                <div id="cutoutSelGrpAll" style="display: none;">All group</div>
-                                <div id="cutoutSelGrpNew" style="display: none;">
+                                <div id="cutoutSelGrpOwn" style="display: none;" class="listContentSubDiv">Own group</div>
+                                <div id="cutoutSelGrpAll" style="display: none;" class="listContentSubDiv">All group</div>
+                                <div id="cutoutSelGrpNew" style="display: none;" >
+                                    <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
+                                         encType="multipart/form-data" action="" method="">
                                     <label for="newcutoutname">Cutout name:</label>
                                     <input type="text" id="newcutoutname" name="newcutoutname" data-dojo-type="dijit/form/TextBox"/>
                                     <br/>
-                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Rectangle" data-dojo-type="dijit/form/CheckBox">Rectangle</label><br/>
-                                    <label><input type="checkbox" class="radio" name="cutoutSelTool" value="Multipoint" data-dojo-type="dijit/form/CheckBox">Multipoint</label><br/>
-                                    <label>Start Month-Year:</label> <input type="text" name="cutoutStartDate" id="cutoutStartDate" value="11/2013" data-dojo-type="dojox/form/DateTextBox" data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" />
+                                    <label><input type="radio" class="radio" name="cutoutSelTool" value="Rectangle" data-dojo-type="dijit/form/RadioButton">Rectangle</label><br/>
+                                    <label><input type="radio" class="radio" name="cutoutSelTool" value="Multipoint" data-dojo-type="dijit/form/RadioButton">Multipoint</label><br/>
+                                    <label>Start Month-Year:</label> 
+                                    <input type="text" name="cutoutStartDate" id="cutoutStartDate" 
+                                           data-dojo-type="dijit/form/DateTextBox" 
+                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
+                                           onChange="if(arguments !=null)dijit.byId('cutoutEndDate').constraints.min =arguments[0];else dijit.byId('cutoutEndDate').constraints.min = -infinity;" />
                                     <br/>
-                                    <label>End Month-Year:</label> <input type="text" name="cutoutEndDate" id="cutoutEndDate" value="11/2013" data-dojo-type="dojox/form/DateTextBox" data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" />
+                                    <label>End Month-Year:</label> 
+                                    <input type="text" name="cutoutEndDate" id="cutoutEndDate"
+                                           data-dojo-type="dijit/form/DateTextBox" 
+                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
+                                           />
                                     <br/>
                                     <br/>
-                                    <button id="clear-graphics" class="clearall" value="clear-graphics" data-dojo-type="dijit/form/Button">Clear All</button>
+                                    <button type="reset" id="clear-graphics" class="clearall" value="clear-graphics" data-dojo-type="dijit/form/Button">Clear All</button>
                                     <button id="submit-graphics" class="clearall" value="submit-graphics" data-dojo-type="dijit/form/Button">Submit</button>
+                                  </div>
                                 </div>
                             </div>
                         </div>
@@ -160,7 +173,9 @@ if (!$session->logged_in)
                             <div id="WindInfoSubDiv">
                                 &nbsp;
                             </div>
+                             <input type="text" id="windhubheight" class="hidden" name="hubheight" data-dojo-type="dijit/form/NumberTextBox"/>
                             <br/>
+                        
                          <button id="convertWind" class="clearall" value="convertWind" data-dojo-type="dijit/form/Button">Convert</button>
                         </div>
                     </div>
@@ -204,7 +219,7 @@ if (!$session->logged_in)
             <a href="#" id="slide" style="float: right; margin-right: 10px;clear: both;">Hide</a>
               <div id="graphViewContent">
                   POWER CURVE
-                  <div id="capacityChart" style="width: 450px; height: 200px; "></div>
+                  <div id="capacityChart" style="width: 450px; height: 200px;left: 30%;position: absolute; "></div>
               </div>
         </div>
         <div class="info">VERSION:</div>

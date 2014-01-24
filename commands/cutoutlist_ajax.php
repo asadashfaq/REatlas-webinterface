@@ -13,12 +13,12 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
     die();
 }
 $filterUser =  Tools::getValue("user");
-
+//echo "filterUser is $filterUser";
 $param = Configurations::getConfiguration('PEPSI_SERVER')." --username ".$currentUser->aulogin." --password ".$currentUser->aupass." --cutoutuser ".$filterUser." --output JSON";
         
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_list_cutouts.py";
 $command .= " $param 2>&1";
-
+//echo "command is $command";
 $pid = popen( $command,"r");
 $result = '';
 

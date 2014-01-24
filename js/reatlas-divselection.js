@@ -8,7 +8,10 @@ $(document).ready(function() {
     // Handler for .ready() called.
     $('input[name="cutoutSelectorGroup"]:radio').change(
             function() {
-
+                // disable capacity button
+                $("#capacitymapBtn").attr('disabled', 'disabled');
+     
+                $("#cutoutInfoDiv").html("");
                 if ($(this).val() == "default") {
                     $('#cutoutSelGrpDefault').css('display', 'block');
                     $('#cutoutSelGrpOwn').css('display', 'none');
@@ -28,7 +31,7 @@ $(document).ready(function() {
                     $('#cutoutSelGrpOwn').html('Loading...');
                     $('#cutoutSelGrpAll').html('No cutout found');
                       
-                    fetchCutoutList(currentUserID, 'cutoutSelGrpOwn');
+                    fetchCutoutList(currentUserName, 'cutoutSelGrpOwn');
                 } else if ($(this).val() == "all") {
                     $('#cutoutSelGrpDefault').css('display', 'none');
                     $('#cutoutSelGrpOwn').css('display', 'none');
@@ -38,7 +41,7 @@ $(document).ready(function() {
                     $('#cutoutSelGrpOwn').html('No cutout found');
                     $('#cutoutSelGrpAll').html('Loading...');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpAll');
-                    fetchCutoutList(currentUserID, 'cutoutSelGrpAll');
+                    fetchCutoutList(currentUserName, 'cutoutSelGrpAll');
                 } else if ($(this).val() == "new") {
                     $('#cutoutSelGrpDefault').css('display', 'none');
                     $('#cutoutSelGrpOwn').css('display', 'none');
@@ -48,7 +51,7 @@ $(document).ready(function() {
             }
     );
 
-    $("#cutoutselectorContainer input:checkbox").click(function() {
+   $("#cutoutselectorContainer input:checkbox").click(function() {
         var group = "input:checkbox[name='" + $(this).prop("name") + "']";
         $(group).prop("checked", false);
         $(this).prop("checked", true);
@@ -134,5 +137,8 @@ $(document).ready(function(){
              $('#fixedOrientationGrp').hide(100);   
             }
      });
+     
+     // disable capacity button
+     $("#capacitymapBtn").attr('disabled', 'disabled');
 });
 

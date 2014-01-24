@@ -6,10 +6,6 @@ if(!$session->logged_in){
     die();
 }
 
-
-
-
-
 $cfgName =  Tools::getValue('cfgName');
 $capacityType = Tools::getValue('capacityType');
 $capacityTypeFolder = "";
@@ -53,6 +49,13 @@ if(is_file($parentDir."/".$cfgName))
    unlink($temp_file); 
 }
 //print_r($capacityDetailArray);
-echo json_encode($capacityDetailArray);
+
+$outArr=array();
+$outArr['type']="Success";
+$outArr['text']="Capacity detail";
+$outArr['desc']="Capacity detail for ".$cfgName;
+$outArr['traceback']= '';
+$outArr['data'] = $capacityDetailArray ;
+echo json_encode($outArr);
 }
 ?>

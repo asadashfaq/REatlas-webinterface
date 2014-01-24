@@ -55,6 +55,12 @@ foreach($filearray as $file)
 
 }
 
-echo json_encode($capacityArray);
+$outArr=array();
+$outArr['type']="Success";
+$outArr['text']="Capacity list";
+$outArr['desc']="List of available capacity";
+$outArr['traceback']= '';
+$outArr['data'] = $capacityArray ;
+echo json_encode($outArr);
 }
 ?>
