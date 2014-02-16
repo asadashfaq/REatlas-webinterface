@@ -6,51 +6,6 @@
 
 $(document).ready(function() {
     // Handler for .ready() called.
-    $('input[name="cutoutSelectorGroup"]:radio').change(
-            function() {
-                // disable capacity button
-                $("#capacitymapBtn").attr('disabled', 'disabled');
-     
-                $("#cutoutInfoDiv").html("");
-                if ($(this).val() == "default") {
-                    $('#cutoutSelGrpDefault').css('display', 'block');
-                    $('#cutoutSelGrpOwn').css('display', 'none');
-                    $('#cutoutSelGrpAll').css('display', 'none');
-                    $('#cutoutSelGrpNew').css('display', 'none');
-                    $('#cutoutSelGrpDefault').html('Loading...');
-                     $('#cutoutSelGrpOwn').html('No cutout found');
-                      $('#cutoutSelGrpAll').html('No cutout found');
-                    fetchCutoutList(defaultUserGroup, 'cutoutSelGrpDefault');
-                    
-                } else if ($(this).val() == "own") {
-                    $('#cutoutSelGrpDefault').css('display', 'none');
-                    $('#cutoutSelGrpOwn').css('display', 'block');
-                    $('#cutoutSelGrpAll').css('display', 'none');
-                    $('#cutoutSelGrpNew').css('display', 'none');
-                    $('#cutoutSelGrpDefault').html('No cutout found');
-                    $('#cutoutSelGrpOwn').html('Loading...');
-                    $('#cutoutSelGrpAll').html('No cutout found');
-                      
-                    fetchCutoutList(currentUserName, 'cutoutSelGrpOwn');
-                } else if ($(this).val() == "all") {
-                    $('#cutoutSelGrpDefault').css('display', 'none');
-                    $('#cutoutSelGrpOwn').css('display', 'none');
-                    $('#cutoutSelGrpAll').css('display', 'block');
-                    $('#cutoutSelGrpNew').css('display', 'none');
-                    $('#cutoutSelGrpDefault').html('No cutout found');
-                    $('#cutoutSelGrpOwn').html('No cutout found');
-                    $('#cutoutSelGrpAll').html('Loading...');
-                    fetchCutoutList(defaultUserGroup, 'cutoutSelGrpAll');
-                    fetchCutoutList(currentUserName, 'cutoutSelGrpAll');
-                } else if ($(this).val() == "new") {
-                    $('#cutoutSelGrpDefault').css('display', 'none');
-                    $('#cutoutSelGrpOwn').css('display', 'none');
-                    $('#cutoutSelGrpAll').css('display', 'none');
-                    $('#cutoutSelGrpNew').css('display', 'block');
-                }
-            }
-    );
-
    $("#cutoutselectorContainer input:checkbox").click(function() {
         var group = "input:checkbox[name='" + $(this).prop("name") + "']";
         $(group).prop("checked", false);
@@ -112,12 +67,7 @@ $(document).ready(function(){
    
     $('#graphView').width($('#mapDiv').width());
          
-    var hidden = $('.hidden');
-    if (hidden.hasClass('visible')){
-        hidden.animate({"bottom":"-251px"}, "slow").removeClass('visible');
-    } else {
-        hidden.animate({"bottom":"0px"}, "slow").addClass('visible');
-    }
+    toggleGraphView(true);
     });
     
      $('input[name="capacitySolarOption"]').click(function(){
@@ -132,13 +82,48 @@ $(document).ready(function(){
             {
              $('#fixedOrientationGrp').show(100); 
              $('#fixedOrientationGrp input[type="text"]').val('');
-            }else if(optionVal =="FullTracking")
+            }else if(optionVal =="VerticalTracking")
             {
-             $('#fixedOrientationGrp').hide(100);   
+             $('#verticaltrackingGrp').show(100);
+             $('#fixedOrientationGrp').hide(100);
+             $('#verticaltrackingGrp input[type="text"]').val('');
+            }
+            else if(optionVal =="HorizontalTracking")
+            {
+             $('#horizontaltrackingGrp').show(100);
+             $('#fixedOrientationGrp').hide(100);
+             $('#verticaltrackingGrp').hide(100);
+             $('#horizontaltrackingGrp input[type="text"]').val('');
+            }
+            else
+            {
+                 $('#fixedOrientationGrp').hide(100);
+                 $('#verticaltrackingGrp').hide(100);
+                 $('#horizontaltrackingGrp').hide(100);
             }
      });
      
      // disable capacity button
      $("#capacitymapBtn").attr('disabled', 'disabled');
+    
+    // Top menu click event handler
+     $(document).on("click", ".disabled-detector", function (e) {
+        var chk = $(this).parent().children('button').get(0);
+        if(chk && chk != "undefined")
+        {
+            if($(chk).is(":disabled"))
+                topmenuButtonClickHandler.call(chk, e);
+            else
+                $(chk).click();
+        }
+    });
+    
+    function topmenuButtonClickHandler(evt) {
+        if(this.id =="capacitymapBtn"){
+             alert('Please select a cutout first');
+        }
+    }
+     
+     
 });
 

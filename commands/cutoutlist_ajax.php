@@ -18,7 +18,10 @@ $param = Configurations::getConfiguration('PEPSI_SERVER')." --username ".$curren
         
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_list_cutouts.py";
 $command .= " $param 2>&1";
-//echo "command is $command";
+
+//echo "command is: $command";
+
+
 $pid = popen( $command,"r");
 $result = '';
 
@@ -27,12 +30,7 @@ while( !feof( $pid ) )
 $result .= fread($pid, 256);
 }
 pclose($pid);
- 
 
-if(strpos($result,"Invalid username")!==false) {
-    //echo 'Error: Technical problem. Contact Administrator.';
-}
-else {
-     echo $result;    
-}
+
+echo $result;   
 die();

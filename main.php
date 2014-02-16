@@ -24,7 +24,7 @@ if ($session->logged_in)
         <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/widget/Calendar/Calendar.css">
         
         <script>var dojoConfig = {parseOnLoad: true};</script>
-        <script src="http://js.arcgis.com/3.7/"></script>
+        <script src="http://js.arcgis.com/3.8/"></script>
         <script src="js/jquery/jquery-1.9.1.js"></script>
         <script src="js/jquery/ui/jquery-ui.js"></script>
         
@@ -42,6 +42,7 @@ if ($session->logged_in)
         var currentUserName = '<?php echo $_SESSION['username']; ?>';
     
         </script>
+        <script src="js/reatlas.functions.js"></script>
         <script src="js/reatlas.js"></script>
         <script src="js/reatlas-divselection.js"></script>
     </head>
@@ -65,8 +66,15 @@ if (!$session->logged_in)
                     <div id="subheader">Aarhus University,Aarhus Denmark</div>
                 </div>
                 <div id="top-tool" >
-                    <button id="cutoutselectorBtn" class="down">Cutout Selector</button>
-                    <button id="capacitymapBtn">Capacity Map</button>
+                    <span>
+                        <button id="cutoutselectorBtn" class="down">Cutout Selector</button>
+                        <span class="disabled-detector"></span>
+                    </span>
+                    <span>
+                        <button id="capacitymapBtn">Capacity Map</button>
+                        <span class="disabled-detector"></span>
+                    </span>
+                    
                 </div>
                 <div id="headerRight"><?php if ($session->logged_in): ?>
                     Welcome, <?php echo $profile->fullname;?><br/>
@@ -98,8 +106,10 @@ if (!$session->logged_in)
                 <?php } ?>
             </div>
             <div data-dojo-type="dijit.layout.ContentPane" id="rightPane" data-dojo-props="region:'right', splitter:false" style="width: 300px;overflow:hidden;">
-                <div id="cutoutselectorContainer" data-dojo-type="dijit.layout.TabContainer" style="display:block;height:100%"><!-- tabPosition="left-h" tabStrip="false"-->
-                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Cutouts', selected:true" >
+                <div id="cutoutselectorContainer" data-dojo-type="dijit.layout.TabContainer" style="display:block;height:100%"
+                     ><!-- tabPosition="left-h" tabStrip="false"-->
+                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Cutouts', selected:true" 
+                         >
 
                         <div id="selectorDiv">
                             <div id="selectorTopDiv">
@@ -125,13 +135,13 @@ if (!$session->logged_in)
                                     <label>Start Month-Year:</label> 
                                     <input type="text" name="cutoutStartDate" id="cutoutStartDate" 
                                            data-dojo-type="dijit/form/DateTextBox" 
-                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
+                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy',min:(new Date(1979, 1, 1)),max:(new Date(2010, 11, 31))}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
                                            onChange="if(arguments !=null)dijit.byId('cutoutEndDate').constraints.min =arguments[0];else dijit.byId('cutoutEndDate').constraints.min = -infinity;" />
                                     <br/>
                                     <label>End Month-Year:</label> 
                                     <input type="text" name="cutoutEndDate" id="cutoutEndDate"
                                            data-dojo-type="dijit/form/DateTextBox" 
-                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy'}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
+                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy',min:(new Date(1979, 1, 1)),max:(new Date(2010, 11, 31))}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
                                            />
                                     <br/>
                                     <br/>
@@ -153,7 +163,12 @@ if (!$session->logged_in)
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Layout', selected:true" 
                          onShow="fetchCapacityList(this)" id="Layout" >
                         <div class="listContentDiv" id="LayoutList">
-                            <!-- Add here extra-->
+                            <div id="capacityLayoutTopDiv">
+                                <label class="blue"><input type="radio" name="cutoutSelectorGroup" value="default" checked="checked"><span>Old</span></label>
+                                <label class="green"><input type="radio" name="cutoutSelectorGroup" value="own"><span>New</span></label>
+                                <label class="yellow"><input type="radio" name="cutoutSelectorGroup" value="all"><span>Save</span></label>
+                                
+                            </div>
                             <div id="LayoutSubList">Loading...</div>
                         </div>
                         <div id="LayoutInfoDiv" class="capacityInfoDiv">
@@ -166,7 +181,12 @@ if (!$session->logged_in)
                   
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Wind',showTitle:true" onShow="fetchCapacityList(this)" id="Wind" >
                         <div class="listContentDiv" id="WindList">
-                            <!-- Add here extra-->
+                            <div id="capacityWindTopDiv">
+                                <label class="blue"><input type="radio" name="capacitySelectorGroup" value="default" checked="checked"><span>Onshore</span></label>
+                                <label class="green"><input type="radio" name="capacitySelectorGroup" value="own"><span>Offshore</span></label>
+                                                
+                            </div>
+                             <br/>
                             <div id="WindSubList">Loading...</div>
                         </div>
                         <div id="WindInfoDiv" class="capacityInfoDiv">
@@ -193,14 +213,25 @@ if (!$session->logged_in)
                              </div>
                             <label><input type="radio" class="radio" name="capacitySolarOption" value="FixedOrientation" >Fixed Orientation</label><br/>
                             <div id="fixedOrientationGrp" style="display: none;">
-                            <label for="solarAngle1">Angle1</label>
+                            <label for="solarAngle1">Slope</label>
                             <input type="text" id="solarAngle1" class="hidden" name="enterAngle1" data-dojo-type="dijit/form/NumberTextBox"/>
                                     <br/>
-                              <label for="solarAngle2">Angle2</label>
+                              <label for="solarAngle2">Azimuth</label>
                             <input type="text" id="solarAngle2" class="hidden" name="enterAngle2" data-dojo-type="dijit/form/NumberTextBox"/>
                             </div>
-                            <br/>  
-                            
+                            <br/> 
+                            <label><input type="radio" class="radio" name="capacitySolarOption" value="VerticalTracking" >Vertical Tracking</label><br/>
+                            <div id="verticaltrackingGrp" style="display: none;">
+                               <label for="solarang">Azimuth</label>
+                            <input type="text" id="solarang" class="hidden" name="enterAng2" data-dojo-type="dijit/form/NumberTextBox"/>
+                            </div>
+                             <br/> 
+                            <label><input type="radio" class="radio" name="capacitySolarOption" value="HorizontalTracking" >Horizontal Tracking</label><br/>
+                            <div id="horizontaltrackingGrp" style="display: none;">
+                               <label for="solarang">Slope</label>
+                            <input type="text" id="solarAng" class="hidden" name="enterAng2" data-dojo-type="dijit/form/NumberTextBox"/>
+                            </div>
+                             <br/>
                             <label><input type="radio" id="fullTracking" class="radio" name="capacitySolarOption" value="FullTracking" >Full tracking</label><br/>
                              <br/>
                             <button id="convertSolar" class="clearall" value="convertSolar" data-dojo-type="dijit/form/Button">Convert</button>

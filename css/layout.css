@@ -234,6 +234,120 @@
     color:#333;
 }
 
+#capacityWindTopDiv {
+    margin:4px;
+   width: 100%;
+    float:left;
+}
+
+#capacityWindTopDiv label {
+    float:left;
+    width:68px;
+    margin:2px;
+    border:1px solid #D0D0D0;
+    overflow:auto;
+    cursor: pointer;   
+}
+
+
+#capacityWindTopDiv label span {
+    text-align:center;
+    font-size: 15px;
+    padding:10px 0px;
+    display:block;
+}
+
+#capacityWindTopDiv label input {
+    position:absolute;
+    top:-20px;
+}
+
+#capacityWindTopDiv input:checked + span {
+    background-color:#404040;
+    color:#F7F7F7;
+}
+
+#capacityWindTopDiv .yellow {
+    background-color:#FFCC00;
+    color:#333;
+}
+
+#capacityWindTopDiv .blue {
+    background-color:#00BFFF;
+    color:#333;
+}
+
+#capacityWindTopDiv .pink {
+    background-color:#FF99FF;
+    color:#333;
+}
+
+#capacityWindTopDiv .green {
+    background-color:#A3D900;
+    color:#333;
+}
+#capacityWindTopDiv .purple {
+    background-color:#B399FF;
+    color:#333;
+}
+
+#capacityLayoutTopDiv {
+    margin:4px;
+   
+    float:left;
+}
+
+#capacityLayoutTopDiv label {
+    float:left;
+    width:68px;
+    margin:2px;
+    border:1px solid #D0D0D0;
+    overflow:auto;
+    cursor: pointer;   
+}
+
+
+#capacityLayoutTopDiv label span {
+    text-align:center;
+    font-size: 15px;
+    padding:10px 0px;
+    display:block;
+}
+
+#capacityLayoutTopDiv label input {
+    position:absolute;
+    top:-20px;
+}
+
+#capacityLayoutTopDiv input:checked + span {
+    background-color:#404040;
+    color:#F7F7F7;
+}
+
+#capacityLayoutTopDiv .yellow {
+    background-color:#FFCC00;
+    color:#333;
+}
+
+#capacityLayoutTopDiv .blue {
+    background-color:#00BFFF;
+    color:#333;
+}
+
+#capacityLayoutTopDiv .pink {
+    background-color:#FF99FF;
+    color:#333;
+}
+
+#capacityLayoutTopDiv .green {
+    background-color:#A3D900;
+    color:#333;
+}
+#capacityLayoutTopDiv .purple {
+    background-color:#B399FF;
+    color:#333;
+}
+
 #selectorContentDiv {
     clear: both;
     background-color: lightgrey;
@@ -272,6 +386,7 @@
     min-height: 200px;
     border-radius: 10px;
     padding: 10px;
+    font-size: 0.8em;
 }
 
 
@@ -307,4 +422,25 @@
 
 .hidden {
     bottom:-251px;   
+}
+
+span {
+    position: relative;
+}
+
+span.disabled-detector {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0;
+}
+
+input+span.disabled-detector {
+    display: none;
+}
+
+input[disabled]+span.disabled-detector {
+    display: inline;
 }

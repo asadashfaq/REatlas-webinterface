@@ -16,7 +16,7 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
 $filterUser =  Tools::getValue("user");
 //echo "filteruser is $filterUser";
 $cutout =  Tools::getValue("cutout");
-
+$withdata = Tools::getValue("withdata");
 if(!$cutout)
     die('Error: Cutout is not defined');
 
@@ -24,6 +24,8 @@ if(!$cutout)
 // cmd_cutout_details.py Pepsimax.imf.au.dk Denmark data/auesg/meta_Denmark.npz --username manila --password iet5hiuC --cutoutuser auesg 
 $fileName = "data/".$filterUser."/meta_".$cutout.".npz";
 $param = Configurations::getConfiguration('PEPSI_SERVER')." ".$cutout." ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/".$fileName." --username ".$currentUser->aulogin." --password ".$currentUser->aupass." --cutoutuser ".$filterUser;
+if($withdata)
+    $param .= " --withdata ";
 
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_cutout_details.py";
 $command .= " $param --output JSON 2>&1";
