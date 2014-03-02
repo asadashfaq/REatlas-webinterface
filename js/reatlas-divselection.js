@@ -12,17 +12,14 @@ $(document).ready(function() {
         $(this).prop("checked", true);
     });
 
-    $("#SolarInfoDiv input:radio").click(function() {
-       if($('input:radio[name=capacitySolarOption]:checked').val() == "Fixed Orientation"){
-       $("#solarAngle1").show();
-        $("#solarAngle2").show();
-         
-        //$('#select-table > .roomNumber').attr('enabled',false);
-    }
-    });
+   
    
     var group = "input:radio[name='cutoutSelectorGroup']";
     $(group).prop("checked", false);
+    
+    var group = "input:radio[name='layoutSelectorGroup']";
+    $(group).prop("checked", false);
+
 
     var group = "input:checkbox[name='cutoutSelTool']";
     $(group).prop("checked", false);
@@ -70,6 +67,8 @@ $(document).ready(function(){
     toggleGraphView(true);
     });
     
+     
+     
      $('input[name="capacitySolarOption"]').click(function(){
       
         if(!$('input[name="capacitySolar"]').is(':checked'))
@@ -77,30 +76,32 @@ $(document).ready(function(){
                 alert('Please select Solar capacity above');
                 return false;
             }
+         $('input[name="capacitySolarOption"]').each(function(){
+             
+             $('#'+$(this).val()+'Grp').hide();
+         });
         var optionVal = $(this).val();
+        convertOptionsSel.orientation = optionVal;
         if(optionVal =="FixedOrientation")
             {
-             $('#fixedOrientationGrp').show(100); 
-             $('#fixedOrientationGrp input[type="text"]').val('');
+             $('#FixedOrientationGrp').show(100); 
+             $('#FixedOrientationGrp input[type="text"]').val('');
+             convertOptionsSel.FixedOrientationSlope = $("#FixedOrientationSlope").val();
+             convertOptionsSel.FixedOrientationAzimuth = $("#FixedOrientationAzimuth").val();
             }else if(optionVal =="VerticalTracking")
             {
-             $('#verticaltrackingGrp').show(100);
-             $('#fixedOrientationGrp').hide(100);
-             $('#verticaltrackingGrp input[type="text"]').val('');
+             $('#VerticalTrackingGrp').show(100);
+             $('#VerticalTrackingGrp input[type="text"]').val('');
+             convertOptionsSel.VerticalTrackingAzimuth = $("#VerticalTrackingAzimuth").val();
             }
             else if(optionVal =="HorizontalTracking")
             {
-             $('#horizontaltrackingGrp').show(100);
-             $('#fixedOrientationGrp').hide(100);
-             $('#verticaltrackingGrp').hide(100);
-             $('#horizontaltrackingGrp input[type="text"]').val('');
-            }
-            else
-            {
-                 $('#fixedOrientationGrp').hide(100);
-                 $('#verticaltrackingGrp').hide(100);
-                 $('#horizontaltrackingGrp').hide(100);
-            }
+             $('#HorizontalTrackingGrp').show(100);
+             $('#HorizontalTrackingGrp input[type="text"]').val('');
+             convertOptionsSel.HorizontalTrackingSlope = $("#HorizontalTrackingSlope").val();
+            }else {
+                convertOptionsSel.FullTracking = $("#FullTracking").val();
+            }           
      });
      
      // disable capacity button
@@ -124,6 +125,31 @@ $(document).ready(function(){
         }
     }
      
+     
+       $('input[name="capacityWindType"]:radio').change(
+            function() {
+                $("#WindSubList input:radio").attr("checked", false);
+                 toggleGraphView(true);
+                 
+                 convertOptionsSel.type =$(this).val();
+                 
+                 $("#WindSubList input:radio").filter('[value="'+convertOptionsSel[convertOptionsSel.type+"WindVal"]+'"]').prop('checked', true);
+             
+                /* Scroll to the selected radio */  
+                if(convertOptionsSel[convertOptionsSel.type+"WindId"])
+                 $('#WindSubList').scrollTo('#'+convertOptionsSel[convertOptionsSel.type+"WindId"]);
+                
+                if ($(this).val() == "onshore") {
+                    $('#capacityWindOnshore').css('display', 'block');
+                    $('#capacityWindOnshore').html('Loading...');
+                    
+                } else if ($(this).val() == "offshore") {
+                    $('#capacityWindOffshore').css('display', 'block');
+                    $('#capacityWindOffshore').html('Loading...');
+                                       
+                } 
+            }
+    );
      
 });
 

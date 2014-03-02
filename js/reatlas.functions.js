@@ -11,6 +11,12 @@ var contaxtMouseOver, contaxtMouseOut;
 var graphicsDataForMapLayer = {};
 var capacityChart = null;
 var selectedCutoutID = null;
+var currentExtentHaldle = null;
+var xhr_post_loading = null;
+var selectorMode = "cutout";
+var convertOptionsSel = new Object();
+var currentCapacityData = [];
+var originalCapacityData = null;
 
 dojo.require("dojox.widget.MonthAndYearlyCalendar");
 dojo.require("dojox.form.DateTextBox");
@@ -60,25 +66,28 @@ function activateContaxtMenuForGraphics(enable)
 function  initializeEvents(divID) {
     $("#" + divID + " input[name^='cutoutSelGrp']:radio").change(
             function() {
-
+                
+                xhr_post_loading = null;
+                
+                openProcessing();
+                
                 // Enable capacity button
                 $("#capacitymapBtn").removeAttr("disabled");
                 selectedCutoutID = $(this).val();
                 var data = $(this).val().split('/');
 
-                require(["dojo/_base/xhr"], function(xhr) {
+                require(["dojo/request"], function(request) {
                     var cutoutName = data[1];
                     var userName = data[0];
 
                     var targetNode = dojo.byId("cutoutInfoDiv");
                     targetNode.innerHTML = "Loading...";
                     // get some data, convert to JSON
-                    xhr.post({
-                        url: "commands/cutoutDetails_ajax.php",
+                    request.post("commands/cutoutDetails_ajax.php",{
                         handleAs: "json",
                         timeout: 300000, // give up after 3 seconds
-                        content: {currentUserID: currentUserID, user: userName, cutout: cutoutName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
-                        load: function(dataJson) {
+                        data: {currentUserID: currentUserID, user: userName, cutout: cutoutName}
+                    }).then(function(dataJson) {
 
                             if (targetNode.innerHTML === "Loading..." ||
                                     targetNode.innerHTML === "No details found")
@@ -86,9 +95,11 @@ function  initializeEvents(divID) {
 
                             if ($(dataJson).size() === 0 && targetNode.innerHTML === '') {
                                 targetNode.innerHTML = 'No details found';
+                                closeProcessing();
                                 return;
                             }
 
+                           
                             if ($(dataJson).size() !== 0) {
                                 if (dataJson.type == "Success") {
                                     var data = dataJson.summary;
@@ -108,31 +119,40 @@ function  initializeEvents(divID) {
                                 } else if (dataJson.type == "Error") {
                                     targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
                                 }
+                                
                             }
-                        }
+                            closeProcessing();
                     });
                 });
 
             });
 }
 function  initializeCapacityEvents(divID) {
-    $("#" + divID + "List input:radio").change(
+
+    $("#" + divID + "SubList input:radio").change(
             function() {
-
+                /* Save Values needed for Convert operation */
+            if(convertOptionsSel.type){
+                convertOptionsSel[convertOptionsSel.type+divID+"Id"] =$(this).attr('id');
+                convertOptionsSel[convertOptionsSel.type+divID+"Val"] =$(this).val();
+                convertOptionsSel[convertOptionsSel.type+divID+"Name"] =$(this).next('label:first').html();
+              }
+                xhr_post_loading = null;
+                
                 var cfgName = $(this).val();
-
-                require(["dojo/_base/xhr"], function(xhr) {
+                
+                openProcessing();
+                
+                require(["dojo/request"], function(request) {
 
                     var targetNode = dojo.byId(divID + "InfoSubDiv");
-                    var targetNode1 = dojo.byId(divID + "InfoSubDiv" + "hubHeight");
                     targetNode.innerHTML = "Loading...";
                     // get some data, convert to JSON
-                    xhr.post({
-                        url: "commands/capacityDetails_ajax.php",
+                    request.post("commands/capacityDetails_ajax.php", {
                         handleAs: "json",
                         timeout: 300000, // give up after 3 seconds
-                        content: {capacityType: divID, cfgName: cfgName, targetNode: targetNode}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
-                        load: function(dataJSON) {
+                        data: {capacityType: divID, cfgName: cfgName, targetNode: targetNode}
+                    }).then(function(dataJSON) {
 
                             if (targetNode.innerHTML === "Loading..." ||
                                     targetNode.innerHTML === "No details found")
@@ -140,6 +160,7 @@ function  initializeCapacityEvents(divID) {
 
                             if ($(dataJSON).size() === 0 && targetNode.innerHTML === '') {
                                 targetNode.innerHTML = 'No details found';
+                                closeProcessing();
                                 return;
                             }
 
@@ -147,10 +168,35 @@ function  initializeCapacityEvents(divID) {
                                 if (dataJSON.type == "Success") {
                                     var data = dataJSON.data;
                                     if (divID == "Wind") {
-                                        targetNode.innerHTML = '<b>Hub height of the selected turbine:</b><br/>';
-                                        $("#windhubheight").val(parseInt(data.HUB_HEIGHT));
-
-                                        //    $("#" + targetNode.id).append("<label>height<input type=\"text\" class=\"text\" name=\"capacity"+divID+"\" value=\""+data.HUB_HEIGHT" + "</label><br/>");
+                                        
+                                         /* Save Values needed for Convert operation */
+                                            if(convertOptionsSel.type){
+                                                convertOptionsSel[convertOptionsSel.type+divID+"Hubheight"] =data.HUB_HEIGHT;
+                                              }
+                                          /* Display conver option selected data */
+                                        var covertOperationHtml ='<div class="bold">Selected option for convert operation:</div> <br/>';
+                                        if(convertOptionsSel.onshoreWindName)
+                                            covertOperationHtml +='<div class="roundcorner withborder"><span class="bold">OnShore:</span> '+convertOptionsSel.onshoreWindName+'<br/>';
+                                         if(convertOptionsSel.onshoreWindHubheight)
+                                            covertOperationHtml +='<span class="bold">Hub height:</span> '+convertOptionsSel.onshoreWindHubheight+'<br/>';
+                                        if(convertOptionsSel.onshoreWindName)
+                                            covertOperationHtml +='</div>';
+                                        if(convertOptionsSel.offshoreWindName)
+                                            covertOperationHtml +='<div class="roundcorner withborder"><span class="bold">OffShore:</span> '+convertOptionsSel.offshoreWindName+'<br/>';
+                                        if(convertOptionsSel.offshoreWindHubheight)
+                                            covertOperationHtml +='<span class="bold">Hub height:</span> '+convertOptionsSel.offshoreWindHubheight+'<br/>';                                            
+                                        if(convertOptionsSel.offshoreWindName)
+                                            covertOperationHtml +='</div>';  
+                                        
+                                        targetNode.innerHTML = covertOperationHtml;
+                                        
+                                        /* Enable disable convert button */
+                                        if(convertOptionsSel.onshoreWindName && convertOptionsSel.offshoreWindName)
+                                             dijit.byId("convertWind").setAttribute('disabled', false);
+                                        else
+                                            dijit.byId("convertWind").setAttribute('disabled', true);
+                                        
+                                        //$("#windhubheight").val(parseInt(data.HUB_HEIGHT));
                                         $('#graphView').width($('#mapDiv').width());
 
                                         drawChart(data);
@@ -171,7 +217,7 @@ function  initializeCapacityEvents(divID) {
                                     targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
                                 }
                             }
-                        }
+                            closeProcessing();
                     });
                 });
 
@@ -406,32 +452,37 @@ function drawGraphicslayerOnMap(data)
 
 
 function zoomTo(lat, lon) {
+    
+    //Set default zoom level
+    _map.setLevel(defaultZoomLevel);
+      
     var point = new esri.geometry.Point(lon, lat, {
         wkid: "4326"
     });
     var wmpoint = esri.geometry.geographicToWebMercator(point);
     _map.centerAt(wmpoint);
+   
 }
 
 function fetchCutoutList(userName, divID) {
 
-    require(["dojo/_base/xhr"], function(xhr) {
-
+    openProcessing();
+    require(["dojo/request"], function(request) {
         var targetNode = dojo.byId(divID);
         targetNode.innerHTML = "Loading...";
         // get some data, convert to JSON
-        xhr.post({
-            url: "commands/cutoutlist_ajax.php",
+        request.post("commands/cutoutlist_ajax.php",{
             handleAs: "json",
             timeout: 3000, // give up after 3 seconds
-            content: {currentUserID: currentUserID, user: userName}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
-            load: function(dataJSON) {
+            data: {currentUserID: currentUserID, user: userName}
+            }).then(function(dataJSON) {
                 if (targetNode.innerHTML === "Loading..." ||
                         targetNode.innerHTML === "No cutout found")
                     targetNode.innerHTML = '';
 
                 if ($(dataJSON).size() === 0 && targetNode.innerHTML === '') {
                     targetNode.innerHTML = 'No cutout found';
+                    closeProcessing();
                     return;
                 }
                 if ($(dataJSON).size() !== 0) {
@@ -447,8 +498,10 @@ function fetchCutoutList(userName, divID) {
                         targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
                     }
                 }
+                
+                closeProcessing();
             }
-        });
+        );
     });
 }
 
@@ -462,17 +515,18 @@ function submitGraphicsForMapLayerGen() {
     graphicsDataForMapLayer.cutoutName = $("#newcutoutname").val();
     graphicsDataForMapLayer.cutoutStartDate = $("#cutoutStartDate").val();
     graphicsDataForMapLayer.cutoutEndDate = $("#cutoutEndDate").val();
-    console.log(graphicsDataForMapLayer)
-    require(["dojo/_base/xhr"], function(xhr) {
+    
+    openProcessing();
+    require(["dojo/request"], 
+            function(request) {
 
         //   {"cutoutName":"rrg","geomatry_type":"polygon","geomatry_data":{"southwest_latitude":-72.23684375000217,"southwest_longitude":31.259294953114185,"northeast_latitude":-108.44778124999252,"northeast_longitude":47.79802337889069}}
         // get some data, convert to JSON
-        xhr.post({
-            url: "commands/submitGraphicsForMapLayerGen_ajax.php",
+        request.post("commands/submitGraphicsForMapLayerGen_ajax.php", {
             handleAs: "json",
             timeout: 300000, // give up after 3 seconds
-            content: {"cutoutName": graphicsDataForMapLayer.cutoutName, "geomatry_type": graphicsDataForMapLayer.geomatry_type, "geomatry_data": JSON.stringify(graphicsDataForMapLayer.geomatry_data), "cutoutStartDate": graphicsDataForMapLayer.cutoutStartDate, "cutoutEndDate": graphicsDataForMapLayer.cutoutEndDate}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
-            load: function(data) {
+            data: {"cutoutName": graphicsDataForMapLayer.cutoutName, "geomatry_type": graphicsDataForMapLayer.geomatry_type, "geomatry_data": JSON.stringify(graphicsDataForMapLayer.geomatry_data), "cutoutStartDate": graphicsDataForMapLayer.cutoutStartDate, "cutoutEndDate": graphicsDataForMapLayer.cutoutEndDate}
+        }).then(function(data) {
                 if (data.type == "Error")
                 {
                     $("#cutoutInfoDiv").append("<div  class=\"form-error alert alert-danger\"><h4>" + data.text + "</h4><span>" + data.desc + "</span></div>");
@@ -480,7 +534,7 @@ function submitGraphicsForMapLayerGen() {
                 {
                     $("#cutoutInfoDiv").append("<div><h4>" + data.text + "</h4><span>" + data.desc + "</span></div>");
                 }
-            }
+                closeProcessing();
         });
     });
 }
@@ -490,19 +544,18 @@ function fetchCapacityList(targetDiv) {
 
 // Hide chart div
     toggleGraphView(true);
-
-    require(["dojo/_base/xhr"], function(xhr) {
+    openProcessing();
+    require(["dojo/request"], function(request) {
 
         var divID = targetDiv.id;
         var targetNode = dojo.byId(divID + 'SubList');
         targetNode.innerHTML = "Loading...";
         // get some data, convert to JSON
-        xhr.post({
-            url: "commands/listCapacity_ajax.php",
+        request.post("commands/listCapacity_ajax.php",{
             handleAs: "json",
             timeout: 3000, // give up after 3 seconds
-            content: {capacityType: divID}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
-            load: function(dataJSON) {
+            data: {capacityType: divID}
+            }).then(function(dataJSON) {
 
                 if (targetNode.innerHTML === "Loading..." ||
                         targetNode.innerHTML === "No item found")
@@ -510,6 +563,7 @@ function fetchCapacityList(targetDiv) {
 
                 if ($(dataJSON).size() === 0 && targetNode.innerHTML === '') {
                     targetNode.innerHTML = 'No item found';
+                    closeProcessing();
                     return;
                 }
                 if ($(dataJSON).size() !== 0) {
@@ -517,37 +571,72 @@ function fetchCapacityList(targetDiv) {
                     if (dataJSON.type == "Success") {
                         var data = dataJSON.data;
                         for (var i in data) {
-                            $("#" + targetNode.id).append("<label><input type=\"radio\" class=\"radio\" name=\"capacity" + divID + "\" value=\"" + data[i].id + "\">" + data[i].name + "</label><br/>");
+                            $("#" + targetNode.id).append("<input type=\"radio\" class=\"radio\" name=\"capacity" + divID + "\" id=\"capacity" + divID +"_"+i+ "\" value=\"" + data[i].id + "\"><label for=\"capacity" + divID +"_"+i+ "\">" + data[i].name + "</label><br/>");
 
                         }
-                        initializeCapacityEvents(divID);
+                        if(divID == "Solar"){
+                            $('input[name="capacitySolar"]:radio').click(function(){
+                                convertOptionsSel.panelconf = $(this).val();
+                                convertOptionsSel.panelName =$(this).next('label:first').html();
+                          
+                            });
+                        }else {
+                            initializeCapacityEvents(divID);
+                        }
+                        
                     } else if (dataJSON.type == "Error") {
                                     targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
                                 }
                 }
-            }
+                closeProcessing();
         });
     });
 }
 
 function  fetchGridData(cutoutID) {
-
+    
+    //Set a zoom level in order to avoid 
+    
     var data = cutoutID.split('/');
+    
+   
 
-    require(["dojo/_base/xhr"], function(xhr) {
+    require(["esri/geometry/webMercatorUtils",
+             "dojo/request"], 
+         function(webMercatorUtils,request) {
         var cutoutName = data[1];
         var userName = data[0];
 
-        var targetNode = dojo.byId("LayoutInfoDiv");
+        var targetNode = dojo.byId("LayoutInfoSubDiv");
         targetNode.innerHTML = "Loading...";
-        // get some data, convert to JSON
-        xhr.post({
-            url: "commands/cutoutDetails_ajax.php",
+        
+        // get current display area extent latitudes and logitudes
+        // To void browser hang, we are going to fetch only data in this area. 
+        // Data will be fetched again when map is dragged
+        var limitLongLat = webMercatorUtils.webMercatorToGeographic(_map.extent);
+        var extentArr = {};
+            extentArr["xmin"] = limitLongLat.xmin;
+            extentArr["ymin"] = limitLongLat.ymin;
+            extentArr["xmax"] = limitLongLat.xmax;
+            extentArr["ymax"] = limitLongLat.ymax;
+        
+        if(xhr_post_loading) {
+            
+            closeProcessing();
+            xhr_post_loading.cancel();
+            
+            //return;
+        }else {
+            _map.setLevel(8);
+        }
+        
+         openProcessing();
+           xhr_post_loading=request.post("commands/cutoutDetails_ajax.php",{
             handleAs: "json",
             timeout: 300000, // give up after 3 seconds
-            content: {currentUserID: currentUserID, user: userName, cutout: cutoutName,withdata:true}, // creates ?part=one&another=part with GET, Sent as POST data when using xhrPost
-            load: function(dataJson) {
-                console.log(dataJson);
+            data: {currentUserID: currentUserID, user: userName, cutout: cutoutName,withdata:true,limit:JSON.stringify(extentArr)}
+            }).then(function(dataJson) {
+               
                 if (targetNode.innerHTML === "Loading..." ||
                         targetNode.innerHTML === "No details found")
                     targetNode.innerHTML = '';
@@ -557,6 +646,7 @@ function  fetchGridData(cutoutID) {
                     return;
                 }
 
+               
                 if ($(dataJson).size() !== 0) {
                     if (dataJson.type == "Success") {
                         var data = dataJson.data;
@@ -571,13 +661,15 @@ function  fetchGridData(cutoutID) {
                             }
                             targetNode.innerHTML += '<br/>)<br/>';
                         }
-
+                        
+                       originalCapacityData = data;
+                        
                         drawGridPointsOnMap(data);
                     } else if (dataJson.type == "Error") {
                         targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
                     }
                 }
-            }
+                closeProcessing();
         });
     });
 }
@@ -590,12 +682,13 @@ function drawGridPointsOnMap(points)
         "esri/symbols/SimpleFillSymbol",
         "esri/symbols/SimpleLineSymbol",
         "esri/symbols/SimpleMarkerSymbol",
+        "esri/symbols/PictureMarkerSymbol",
         "esri/geometry/webMercatorUtils",
         "esri/InfoTemplate",
         "dojo/domReady!"
     ], function(
             Point, 
-            Graphic, Color,SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol,
+            Graphic, Color,SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol,PictureMarkerSymbol,
             webMercatorUtils,InfoTemplate
 
             ) {
@@ -618,29 +711,385 @@ function drawGridPointsOnMap(points)
         var tmp_pt, webMercator_pt;
         for (rowpoints in points) {
             for (key in points[rowpoints]) {
-                var symbol = new SimpleMarkerSymbol().setStyle("circle").setSize(7);
+               // var symbol = new SimpleMarkerSymbol().setStyle("circle").setSize(10);
+                var picSymbol =  new PictureMarkerSymbol({
+                                "url":"images/windmill-icon.png",
+                                "height":30,
+                                "width":20,
+                                "type":"esriPMS",
+                                "angle": -30
+                              });
                 tmp_pt = new Point(parseFloat(points[rowpoints][key].longitude), 
                         parseFloat(points[rowpoints][key].latitude), 
                         _map.spatialReference);
                 webMercator_pt = webMercatorUtils.geographicToWebMercator(tmp_pt);
+                
                 if(points[rowpoints][key].onshore == 1){
-                    console.log("Setting red");
-                    symbol.setColor("red");
+                    //symbol.setColor("red");
+                    picSymbol.setUrl("images/windmill-icon-red.png");
                 }else {
-                     symbol.setColor("blue");
+                     //symbol.setColor("blue");
+                     picSymbol.setUrl("images/windmill-icon-blue.png");
                 }
-                    
-               var graphic = new Graphic(webMercator_pt, symbol);
+                   
+           
+            var wind_capacity = points[rowpoints][key].capacity;
+            if(typeof currentCapacityData[rowpoints] != "undefined")
+                if(typeof currentCapacityData[rowpoints][key] != "undefined")
+                   /* if(typeof currentCapacityData[rowpoints][key].capacity_wind != "undefined")*/
+                        wind_capacity = currentCapacityData[rowpoints][key];                      
+              
+               var graphic = new Graphic(webMercator_pt, picSymbol);
+               
                 graphic.setInfoTemplate(new InfoTemplate("Coordinates",
               "<span>LATITUDE:</span> " + points[rowpoints][key].latitude.toFixed(4) + "<br>" + 
               "<span>LONGITUDE:</span> " + points[rowpoints][key].longitude.toFixed(4) + "<br>" + 
               "<span>ONSHORE:</span> " + points[rowpoints][key].onshore + "<br>" + 
               "<span>HEIGHT:</span> " + points[rowpoints][key].height.toFixed() + "<br>" + 
+              "<span>WIND CAPACITY:</span>"+
+              "<input type=\"text\" id=\"capacity_wind_"+rowpoints+"_"+key+"\" class=\"capacityInputNum\" "+
+              " value=\"" +parseFloat(wind_capacity).toFixed()+ "\">"+
+              "<a href=\"javascript:changeCapacity('wind',"+rowpoints+","+key+");\">Save</a><br>" + 
               "<div id='latlong'></div>"));
+            
               if(graphic)
                 _map.graphics.add(graphic);
+            
             }
         }
+        
+       currentExtentHaldle= dojo.connect(_map, "onExtentChange", showExtent);
+       // _map.setLevel(defaultZoomLevel);
 
+        closeProcessing();
+    });
+}
+   /*_map.on("extent-change", function(){console.log(_map.getLevel());})*/
+   var zoomlevelWarningDisplayed = false; 
+    function showExtent(extent) {
+    /*    var s = "";
+        s = "XMin: "+ extent.xmin.toFixed(2) 
+           +"YMin: " + extent.ymin.toFixed(2)
+           +"XMax: " + extent.xmax.toFixed(2)
+           +"YMax: " + extent.ymax.toFixed(2);
+         console.log(s);
+         */
+        if(selectorMode == "cutout")
+            return;
+        
+        if(_map.getLevel()<(defaultZoomLevel-2)){
+            if(!zoomlevelWarningDisplayed) {
+                alert("Zooming out may not display your grid points");
+                zoomlevelWarningDisplayed = true;
+            }
+        }else {
+            zoomlevelWarningDisplayed = false; 
+         fetchGridData(selectedCutoutID);
+        }
+        /*
+        require(["esri/geometry/webMercatorUtils"], 
+         function(webMercatorUtils) {
+           var longLat= webMercatorUtils.webMercatorToGeographic(extent);
+            var s = "";
+            s = "XMin: "+ longLat.xmin.toFixed(2) 
+               +"YMin: " + longLat.ymin.toFixed(2)
+               +"XMax: " + longLat.xmax.toFixed(2)
+               +"YMax: " + longLat.ymax.toFixed(2);
+          //   console.log(s);
+        
+        });
+        */
+      }
+function changeCapacity(type,row,col) {
+    
+    if(typeof currentCapacityData[row] == "undefined")
+        currentCapacityData[row]=[];
+    /*
+    if(typeof currentCapacityData[row][col] == "undefined")
+        currentCapacityData[row][col]={};
+    */
+    currentCapacityData[row][col] = $("#capacity_"+type+"_"+row+"_"+col).val();
+    
+    _map.infoWindow.hide();
+    
+    drawGridPointsOnMap(originalCapacityData);
+}
+
+function  saveCapacityData() {
+    
+    if(currentCapacityData.length <=0) {
+        alert("Please make some changes in grid capacity");
+        return;
+    }
+    
+    //Set a zoom level in order to avoid 
+    
+    var data = selectedCutoutID.split('/');
+    
+    require(["dojo/request"], 
+         function(request) {
+        var cutoutName = data[1];
+        var userName = data[0];
+
+        var targetNode = dojo.byId("LayoutInfoSubDiv");
+        targetNode.innerHTML = "Loading...";
+        
+        if(xhr_post_loading) {
+            
+            closeProcessing();
+            xhr_post_loading.cancel();
+            
+            //return;
+        }else {
+            _map.setLevel(defaultZoomLevel);
+        }
+        
+         openProcessing();
+           xhr_post_loading=request.post("commands/save_layout_ajax.php",{
+            handleAs: "json",
+            timeout: 300000, // give up after 3 seconds
+            data: {currentUserID: currentUserID, user: userName, cutout: cutoutName,layoutdata:JSON.stringify(currentCapacityData)}
+            }).then(function(dataJson) {
+               
+                if (targetNode.innerHTML === "Loading..." ||
+                        targetNode.innerHTML === "No details found")
+                    targetNode.innerHTML = '';
+
+                if ($(dataJson).size() === 0 && targetNode.innerHTML === '') {
+                    targetNode.innerHTML = 'No details found';
+                    return;
+                }
+       
+                if ($(dataJson).size() !== 0) {
+                    if (dataJson.type == "Success") {
+                        fetchLayoutList(selectedCutoutID);
+                    } else if (dataJson.type == "Error") {
+                        targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
+                    }
+                }
+                closeProcessing();
+        });
+    });
+}
+
+
+function fetchLayoutList(layoutID) {
+    var data = layoutID.split('/');
+    var cutoutName = data[1];
+    var userName = data[0];
+    var divID = "layoutSelGrpOld";
+    openProcessing();
+    require(["dojo/request"], function(request) {
+        var targetNode = dojo.byId(divID);
+        targetNode.innerHTML = "Loading...";
+        // get some data, convert to JSON
+        request.post("commands/layoutlist_ajax.php",{
+            handleAs: "json",
+            timeout: 3000, // give up after 3 seconds
+            data: {currentUserID: currentUserID,cutout:cutoutName, user: userName}
+            }).then(function(dataJSON) {
+                if (targetNode.innerHTML === "Loading..." ||
+                        targetNode.innerHTML === "No layout found")
+                    targetNode.innerHTML = '';
+
+                if ($(dataJSON).size() === 0 && targetNode.innerHTML === '') {
+                    targetNode.innerHTML = 'No layout found';
+                    closeProcessing();
+                    return;
+                }
+                if ($(dataJSON).size() !== 0) {
+                    if (dataJSON.type == "Success") {
+                        var data = dataJSON.data;
+                        for (var i in data) {
+                            if (data[i].layout !== userName)
+                                $("#" + divID).append("<label><input type=\"radio\" class=\"radio\" name=\"layoutSelGrpOld\" value=\"" + data[i].layout + "\">" + data[i].layout + "</label><br/>");
+                        }
+
+                       $("#"+divID).show();
+                       initializelayoutSelectEvents();
+                    } else if (dataJSON.type == "Error") {
+                        targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
+                    }
+                }
+                
+                closeProcessing();
+            }
+        );
+    });
+}
+function  initializelayoutSelectEvents() {
+    $("#layoutSelGrpOld input[name^='layoutSelGrpOld']:radio").change(
+            function() {
+                
+                xhr_post_loading = null;
+                
+                openProcessing();
+                
+                var data = selectedCutoutID.split('/');
+                var cfgName = $(this).val();
+                
+                convertOptionsSel.selectedlayout = $(this).val();
+                
+                require(["dojo/request"], function(request) {
+                    var cutoutName = data[1];
+                    var userName = data[0];
+
+                    var targetNode = dojo.byId("cutoutInfoDiv");
+                    targetNode.innerHTML = "Loading...";
+                    // get some data, convert to JSON
+                    request.post("commands/layoutDetails_ajax.php",{
+                        handleAs: "json",
+                        timeout: 300000, // give up after 3 seconds
+                        data: {currentUserID: currentUserID, user: userName, cutout: cutoutName,cfgName:cfgName}
+                    }).then(function(dataJson) {
+
+                            if (targetNode.innerHTML === "Loading..." ||
+                                    targetNode.innerHTML === "No details found")
+                                targetNode.innerHTML = '';
+
+                            if ($(dataJson).size() === 0 && targetNode.innerHTML === '') {
+                                targetNode.innerHTML = 'No details found';
+                                closeProcessing();
+                                return;
+                            }
+
+                           
+                            if ($(dataJson).size() !== 0) {
+                                if (dataJson.type == "Success") {
+                                    currentCapacityData = JSON.parse(dataJson.data);
+                                    _map.infoWindow.hide();
+                                    drawGridPointsOnMap(originalCapacityData);
+                                   // currentCapacityData = [];
+                                } else if (dataJson.type == "Error") {
+                                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
+                                }
+                                
+                            }
+                            closeProcessing();
+                    });
+                });
+
+            });
+}
+
+
+function  convertSolar() {
+    
+    if(!convertOptionsSel.panelconf 
+        || !convertOptionsSel.orientation)        
+    {
+        alert("Please select Panel / Orientation config");
+        return;
+    }
+    
+    if(!convertOptionsSel.selectedlayout)
+    {
+        alert("Please select a layout for conversion");
+        return;
+    }
+    var slope,azimuth;
+    var orientationVal = convertOptionsSel.orientation;
+    if(orientationVal =="FixedOrientation")
+        {
+         slope = $("#FixedOrientationSlope").val();
+         azimuth = $("#FixedOrientationAzimuth").val();
+        }else if(orientationVal =="VerticalTracking")
+        {
+         azimuth = $("#VerticalTrackingAzimuth").val();
+        }
+        else if(orientationVal =="HorizontalTracking")
+        {
+         slope = $("#HorizontalTrackingSlope").val();
+        }   
+   
+    var data = selectedCutoutID.split('/');
+    
+    require(["dojo/request"], 
+         function(request) {
+        var cutoutName = data[1];
+        var userName = data[0];
+
+        var targetNode= $('#convertSolarStatus');
+         openProcessing();
+         
+           xhr_post_loading=request.post("commands/convert_and_aggregate_PV.php",{
+            handleAs: "json",
+            timeout: 300000, // give up after 3 seconds
+            data: {currentUserID: currentUserID, 
+                    user: userName, 
+                    cutout: cutoutName,
+                    panelconf:convertOptionsSel.panelconf,
+                    orientation:orientationVal,
+                    capacitylayout:convertOptionsSel.selectedlayout,
+                    slope:slope,
+                    azimuth:azimuth
+                }
+            }).then(function(dataJson) {
+               
+                if ($(dataJson).size() !== 0) {
+                    if (dataJson.type == "Success") {
+                        targetNode.html(dataJson.text+"<br/>"+dataJson.desc+"<br/>"+dataJson.data);
+                    } else if (dataJson.type == "Error") {
+                        targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>");
+                    }
+                }else {
+                     targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>Error:</h4><span>Technical error</span></div>");
+                }
+
+            closeProcessing();
+        });
+    });
+}
+
+
+function  convertWind() {
+    
+    if(!convertOptionsSel.onshoreWindName 
+        || !convertOptionsSel.offshoreWindName)        
+    {
+        alert("Please select OnShore/OffShore Wind config");
+        return;
+    }
+    
+    if(!convertOptionsSel.selectedlayout)
+    {
+        alert("Please select a layout for conversion");
+        return;
+    }
+    
+    var data = selectedCutoutID.split('/');
+    
+    require(["dojo/request"], 
+         function(request) {
+        var cutoutName = data[1];
+        var userName = data[0];
+
+        var targetNode= $('#convertWindStatus');
+         openProcessing();
+         
+           xhr_post_loading=request.post("commands/convert_and_aggregate_wind.php",{
+            handleAs: "json",
+            timeout: 300000, // give up after 3 seconds
+            data: {currentUserID: currentUserID, 
+                    user: userName, 
+                    cutout: cutoutName,
+                    offshoreconfig:convertOptionsSel.offshoreWindVal,
+                    onshoreconfig:convertOptionsSel.onshoreWindVal,
+                    capacitylayout:convertOptionsSel.selectedlayout
+                }
+            }).then(function(dataJson) {
+               
+                if ($(dataJson).size() !== 0) {
+                    if (dataJson.type == "Success") {
+                        targetNode.html(dataJson.text+"<br/>"+dataJson.desc+"<br/>"+dataJson.data);
+                    } else if (dataJson.type == "Error") {
+                        targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>");
+                    }
+                }else {
+                     targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>Error:</h4><span>Technical error</span></div>");
+                }
+
+            closeProcessing();
+        });
     });
 }

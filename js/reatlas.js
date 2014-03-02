@@ -46,6 +46,9 @@ require([
         zoom: 3,
         basemap: "topo"
     });
+     
+    
+   
     /*
      var basemapUrl = "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
      var dynamicUrl = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyHazardsandRisks/MapServer";
@@ -149,6 +152,7 @@ require([
                 }
             }
         }));
+        
         /*
          ctxMenuForGraphics.addChild(new MenuItem({ 
          label: "Style",
@@ -207,6 +211,10 @@ require([
             dijit.byId("cutoutselectorContainer").domNode.style.display = 'block';
             dijit.byId("cutoutselectorContainer").resize();
             $(evt.target).toggleClass("down");
+            // Restore previous graphics on map
+            if(lastDrawnGraphics)
+                 _map.graphics.add(lastDrawnGraphics);
+             selectorMode = "cutout";
         } else if (evt.target.id === "capacitymapBtn") {
             _map.graphics.clear();
             toggleGraphView(true);
@@ -216,7 +224,8 @@ require([
             dijit.byId("capacitymapContainer").domNode.style.display = 'block';
             dijit.byId("capacitymapContainer").resize();
             $(evt.target).toggleClass("down");
-         
+            selectorMode = "capacity";
+            fetchLayoutList(selectedCutoutID);
         }
 
     });
@@ -441,8 +450,9 @@ function refreshCutoutData(parentToolbar, evt)
             editToolbar.on("vertex-move-stop", dojo.partial(refreshCutoutData, editToolbar));
             
         }else{
-            editToolbar.activate(Edit.MOVE |Edit.ROTATE | Edit.SCALE, lastDrawnGraphics);
-            editToolbar.on("rotate-stop", dojo.partial(refreshCutoutData, editToolbar));
+            //editToolbar.activate(Edit.MOVE |Edit.ROTATE | Edit.SCALE, lastDrawnGraphics);
+            editToolbar.activate(Edit.MOVE | Edit.SCALE, lastDrawnGraphics);
+            //editToolbar.on("rotate-stop", dojo.partial(refreshCutoutData, editToolbar));
             editToolbar.on("scale-stop", dojo.partial(refreshCutoutData, editToolbar));
             editToolbar.on("graphic-move-stop", dojo.partial(refreshCutoutData, editToolbar));
        
@@ -478,45 +488,51 @@ function refreshCutoutData(parentToolbar, evt)
                 $("#capacitymapBtn").attr('disabled', 'disabled');
      
                 $("#cutoutInfoDiv").html("");
+                
+                $("[id^=cutoutSelGrp]").each(function(){
+                    $(this).css('display', 'none');
+                    $(this).html('No cutout found');
+                });
                 if ($(this).val() == "default") {
                     $('#cutoutSelGrpDefault').css('display', 'block');
-                    $('#cutoutSelGrpOwn').css('display', 'none');
-                    $('#cutoutSelGrpAll').css('display', 'none');
-                    $('#cutoutSelGrpNew').css('display', 'none');
                     $('#cutoutSelGrpDefault').html('Loading...');
-                    $('#cutoutSelGrpOwn').html('No cutout found');
-                    $('#cutoutSelGrpAll').html('No cutout found');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpDefault');
                     
                 } else if ($(this).val() == "own") {
-                    $('#cutoutSelGrpDefault').css('display', 'none');
                     $('#cutoutSelGrpOwn').css('display', 'block');
-                    $('#cutoutSelGrpAll').css('display', 'none');
-                    $('#cutoutSelGrpNew').css('display', 'none');
-                    $('#cutoutSelGrpDefault').html('No cutout found');
                     $('#cutoutSelGrpOwn').html('Loading...');
-                    $('#cutoutSelGrpAll').html('No cutout found');
-                      
                     fetchCutoutList(currentUserName, 'cutoutSelGrpOwn');
                 } else if ($(this).val() == "all") {
-                    $('#cutoutSelGrpDefault').css('display', 'none');
-                    $('#cutoutSelGrpOwn').css('display', 'none');
                     $('#cutoutSelGrpAll').css('display', 'block');
-                    $('#cutoutSelGrpNew').css('display', 'none');
-                    $('#cutoutSelGrpDefault').html('No cutout found');
-                    $('#cutoutSelGrpOwn').html('No cutout found');
                     $('#cutoutSelGrpAll').html('Loading...');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpAll');
                     fetchCutoutList(currentUserName, 'cutoutSelGrpAll');
                 } else if ($(this).val() == "new") {
                     initNewCutoutOptions();
-                    $('#cutoutSelGrpDefault').css('display', 'none');
-                    $('#cutoutSelGrpOwn').css('display', 'none');
-                    $('#cutoutSelGrpAll').css('display', 'none');
                     $('#cutoutSelGrpNew').css('display', 'block');
                 }
             }
     );
+    
+    $('input[name="layoutSelectorGroup"]:radio').change(
+            function() {
+               
+                if ($(this).val() == "old") {
+                    $('#layoutSelGrpOld').html('Loading...');
+                    fetchLayoutList(selectedCutoutID);
+                } else if ($(this).val() == "new") {
+                    /* Remove all changed data in cache then redraw*/
+                    currentCapacityData = [];
+                    drawGridPointsOnMap(originalCapacityData);
+                    var $radios = $('input[name="layoutSelectorGroup"]:radio');
+                    if($radios.is(':checked') === false) {
+                     
+                        $radios.filter('[value=new]').prop('checked', true);
+                    }           
+                } 
+            }
+    );
+    
 });
 
 dojo.ready(function() {

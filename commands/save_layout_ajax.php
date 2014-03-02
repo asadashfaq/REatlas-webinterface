@@ -16,31 +16,30 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
 $filterUser =  Tools::getValue("user");
 //echo "filteruser is $filterUser";
 $cutout =  Tools::getValue("cutout");
-$withdata = Tools::getValue("withdata");
-$limit = Tools::getValue("limit");
+$layoutdata = Tools::getValue("layoutdata");
 
 if(!$cutout)
     die('Error: Cutout is not defined');
 
+$tmpfname = tempnam(sys_get_temp_dir(), $cutout);
+
+$handle = fopen($tmpfname, "rw+");
+fwrite($handle, $layoutdata);
+fclose($handle);
+chmod($tmpfname, 0777);
+
 // filename: data/auesg/meta_Denmark.npz
-// cmd_cutout_details.py Pepsimax.imf.au.dk Denmark data/auesg/meta_Denmark.npz --username manila --password iet5hiuC --cutoutuser auesg 
+// python /development/AU/REatlas-client/cmd_save_layout.py Pepsimax.imf.au.dk Denmark /tmp/layoutTmp.npy --metadata /development/AU/REatlas-client/data/auesg/meta_Denmark.npz --username manila --password iet5hiuC --cutoutuser auesg
+
 $fileName = "data/".$filterUser."/meta_".$cutout.".npz";
 $param = Configurations::getConfiguration('PEPSI_SERVER')." ".$cutout." "
-        .Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/".$fileName
+        .$tmpfname." "
+        ." --metadata ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/".$fileName
         ." --username ".$currentUser->aulogin
         ." --password ".$currentUser->aupass
         ." --cutoutuser ".$filterUser;
 
-if($withdata){
-    
-   if($limit)
-     $param .= " --limitextent '".$limit."'";
-   
-   $param .= " --withdata ";
- 
-}
-
-$command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_cutout_details.py";
+$command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_save_layout.py";
 $command .= " $param --output JSON 2>&1";
 /*
 $myFile = "command_tst.txt";
@@ -57,5 +56,7 @@ $result .= fread($pid, 256);
 }
 pclose($pid);
 
+
+//unlink($tmpfname);
 
 echo $result;   

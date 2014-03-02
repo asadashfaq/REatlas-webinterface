@@ -17,17 +17,18 @@ if ($session->logged_in)
         <title>REAtlas - Aarhus</title>
 
         <link href="css/login.css" rel="stylesheet" type="text/css" />
-        <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css">
+        <link rel="stylesheet" href="http://js.arcgis.com/3.8/js/dojo/dijit/themes/claro/claro.css">
         <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
         <link rel="stylesheet" href="css/layout.css"/> 
-        <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/grid/resources/claroGrid.css">
-        <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/widget/Calendar/Calendar.css">
+        <link rel="stylesheet" href="http://js.arcgis.com/3.8/js/dojo/dojox/grid/resources/claroGrid.css">
+        <link rel="stylesheet" href="http://js.arcgis.com/3.8/js/dojo/dojox/widget/Calendar/Calendar.css">
         
         <script>var dojoConfig = {parseOnLoad: true};</script>
         <script src="http://js.arcgis.com/3.8/"></script>
-        <script src="js/jquery/jquery-1.9.1.js"></script>
+        <script src="js/jquery/jquery-1.10.2.min.js"></script>
         <script src="js/jquery/ui/jquery-ui.js"></script>
-        
+        <script src="js/jquery/jquery-scrollto.js"></script>
+      
         <script>
 
 <?php if (SELECTION_TOOLBAR) { ?>
@@ -37,14 +38,21 @@ if ($session->logged_in)
   <?php } ?>  
         var defaultUserGroup = '<?php echo Configurations::getConfiguration('PEPSI_DEFAULT_USER_GROUP'); ?>';
         var defaultUser = '<?php echo Configurations::getConfiguration('PEPSI_ADMIN_USER'); ?>';
-        var currentUser = '<?php echo $_SESSION['aulogin']; ?>';
+        var currentUser = '<?php echo $session->aulogin; ?>';
         var currentUserID ='<?php echo $session->userid;?>';
-        var currentUserName = '<?php echo $_SESSION['username']; ?>';
+        var currentUserName = '<?php echo $session->username; ?>';
+        var defaultZoomLevel = '<?php echo Configurations::getConfiguration('DEFAULT_ZOOM_LEVEL'); ?>'; 
     
-        </script>
+        </script>  
+        
+        <link rel="stylesheet" href="css/processing.css"/> 
+        <script src="js/processing.js"></script>
+        
         <script src="js/reatlas.functions.js"></script>
         <script src="js/reatlas.js"></script>
         <script src="js/reatlas-divselection.js"></script>
+        
+      
     </head>
 
     <body class="claro">
@@ -54,6 +62,14 @@ if (!$session->logged_in)
     include 'login.php';
 
 ?>
+
+ <div id="processing-inAbox" class="processing">
+    <!--<div class="toolbar"><a class="close" href="#"><span>x</span> close</a></div>-->
+    <div class="wrapper">
+        <img src="images/Earth_Rotate.gif" width="100px"/>
+    </div>
+ </div>
+        
         <div id="mainWindow" 
              data-dojo-type="dijit.layout.BorderContainer" 
              data-dojo-props="design:'headline', gutters:false" 
@@ -161,42 +177,59 @@ if (!$session->logged_in)
                 </div>
                 <div id="capacitymapContainer" data-dojo-type="dijit.layout.TabContainer" style="display:none;height:100%"><!-- tabPosition="left-h" tabStrip="false"-->
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Layout', selected:true" 
-                         onShow="fetchCapacityList(this)" id="Layout" >
-                        <div class="listContentDiv" id="LayoutList">
-                            <div id="capacityLayoutTopDiv">
-                                <label class="blue"><input type="radio" name="cutoutSelectorGroup" value="default" checked="checked"><span>Old</span></label>
-                                <label class="green"><input type="radio" name="cutoutSelectorGroup" value="own"><span>New</span></label>
-                                <label class="yellow"><input type="radio" name="cutoutSelectorGroup" value="all"><span>Save</span></label>
-                                
+                         >
+                         <!--onShow="fetchCapacityList(this)" id="Layout" -->
+                         <div id="layoutDiv">
+                            <div id="layoutTopDiv">
+                                <label class="blue"><input type="radio" name="layoutSelectorGroup" value="old" checked="checked"><span>Old</span></label>
+                                <label class="green"><input type="radio" name="layoutSelectorGroup" value="new"><span>New</span></label>
                             </div>
-                            <div id="LayoutSubList">Loading...</div>
+                             <div id="layoutContentDiv" >
+                                <div id="layoutSelGrpOld" style="display: none;" class="layoutContentSubDiv">Old group</div>
+                                <div id="layoutSelGrpNew" style="display: none;" class="layoutContentSubDiv">New group</div>
+                               </div>
+                         <div class="colorLayoutDiv" id="colorLayoutList">
+                            <div id="capacityLayoutTopDiv">
+                                <label><input type="radio" class="radio" name="colorSelect" value="Onshore" checked="checked" data-dojo-type="dijit/form/RadioButton">Onshore/Offshore</label><br/>
+                                <label><input type="radio" class="radio" name="colorSelect" value="Wind" data-dojo-type="dijit/form/RadioButton">Wind</label><br/>
+                                <label><input type="radio" class="radio" name="colorSelect" value="Solar" data-dojo-type="dijit/form/RadioButton">Solar</label><br/>
+                            
+                            </div>
+                            <!--<div id="LayoutSubList">Loading...</div>-->
                         </div>
                         <div id="LayoutInfoDiv" class="capacityInfoDiv">
                             <div id="LayoutInfoSubDiv">&nbsp;</div>
-                            
+                            <br/>
+                            <button id="saveCapacity" value="saveCapacity" data-dojo-type="dijit/form/Button" onclick="saveCapacityData()">Save</button>
                         </div>
                         
                     </div>
+                    </div>     
                      
                   
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Wind',showTitle:true" onShow="fetchCapacityList(this)" id="Wind" >
-                        <div class="listContentDiv" id="WindList">
+                        <div id="WindList" style="height: 68%">
                             <div id="capacityWindTopDiv">
-                                <label class="blue"><input type="radio" name="capacitySelectorGroup" value="default" checked="checked"><span>Onshore</span></label>
-                                <label class="green"><input type="radio" name="capacitySelectorGroup" value="own"><span>Offshore</span></label>
-                                                
+                                <label class="blue"><input type="radio" name="capacityWindType" value="onshore" ><span>Onshore</span></label>
+                                <label class="green"><input type="radio" name="capacityWindType" value="offshore"><span>Offshore</span></label>
+                                   
                             </div>
+                            <div id="capacityWindContentDiv" >
+                             </div>   
                              <br/>
-                            <div id="WindSubList">Loading...</div>
+                            <div class="listContentDiv"  id="WindSubList">Loading...</div>
                         </div>
                         <div id="WindInfoDiv" class="capacityInfoDiv">
                             <div id="WindInfoSubDiv">
                                 &nbsp;
                             </div>
+                            <!--
                              <input type="text" id="windhubheight" class="hidden" name="hubheight" data-dojo-type="dijit/form/NumberTextBox"/>
+                            -->
                             <br/>
                         
-                         <button id="convertWind" class="clearall" value="convertWind" data-dojo-type="dijit/form/Button">Convert</button>
+                            <button id="convertWind" value="convertWind" data-dojo-type="dijit/form/Button" disabled="disabled" onclick="convertWind();">Convert</button>
+                            <div id="convertWindStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;"></div>
                         </div>
                     </div>
                       
@@ -212,30 +245,30 @@ if (!$session->logged_in)
                                  &nbsp;
                              </div>
                             <label><input type="radio" class="radio" name="capacitySolarOption" value="FixedOrientation" >Fixed Orientation</label><br/>
-                            <div id="fixedOrientationGrp" style="display: none;">
-                            <label for="solarAngle1">Slope</label>
-                            <input type="text" id="solarAngle1" class="hidden" name="enterAngle1" data-dojo-type="dijit/form/NumberTextBox"/>
-                                    <br/>
-                              <label for="solarAngle2">Azimuth</label>
-                            <input type="text" id="solarAngle2" class="hidden" name="enterAngle2" data-dojo-type="dijit/form/NumberTextBox"/>
+                            <div id="FixedOrientationGrp" style="display: none;">
+                                <label for="FixedOrientationSlope" style="text-align: right;">Slope</label>
+                                <input type="text" id="FixedOrientationSlope" name="FixedOrientationSlope" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
+                              <br/><br/>
+                                <label for="FixedOrientationAzimuth" style="text-align: right;">Azimuth</label>
+                                <input type="text" id="FixedOrientationAzimuth" name="FixedOrientationAzimuth" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
                             </div>
                             <br/> 
                             <label><input type="radio" class="radio" name="capacitySolarOption" value="VerticalTracking" >Vertical Tracking</label><br/>
-                            <div id="verticaltrackingGrp" style="display: none;">
-                               <label for="solarang">Azimuth</label>
-                            <input type="text" id="solarang" class="hidden" name="enterAng2" data-dojo-type="dijit/form/NumberTextBox"/>
+                            <div id="VerticalTrackingGrp" style="display: none;">
+                             <label for="VerticalTrackingAzimuth" style="text-align: right;">Azimuth</label>
+                            <input type="text" id="VerticalTrackingAzimuth" name="VerticalTrackingAzimuth" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
                             </div>
                              <br/> 
                             <label><input type="radio" class="radio" name="capacitySolarOption" value="HorizontalTracking" >Horizontal Tracking</label><br/>
-                            <div id="horizontaltrackingGrp" style="display: none;">
-                               <label for="solarang">Slope</label>
-                            <input type="text" id="solarAng" class="hidden" name="enterAng2" data-dojo-type="dijit/form/NumberTextBox"/>
+                            <div id="HorizontalTrackingGrp" style="display: none;">
+                               <label for="HorizontalTrackingSlope" style="text-align: right;">Slope</label>
+                               <input type="text" id="HorizontalTrackingSlope" name="HorizontalTrackingSlope" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
                             </div>
                              <br/>
                             <label><input type="radio" id="fullTracking" class="radio" name="capacitySolarOption" value="FullTracking" >Full tracking</label><br/>
                              <br/>
-                            <button id="convertSolar" class="clearall" value="convertSolar" data-dojo-type="dijit/form/Button">Convert</button>
-                                 
+                            <button id="convertSolar" class="clearall" value="convertSolar" data-dojo-type="dijit/form/Button" onclick="convertSolar();">Convert</button>
+                            <div id="convertSolarStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;"></div>
                         </div>
                        
                 </div>

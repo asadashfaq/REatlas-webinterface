@@ -234,6 +234,63 @@
     color:#333;
 }
 
+#layoutTopDiv {
+    margin:4px;
+   
+    float:left;
+}
+
+#layoutTopDiv label {
+    float:left;
+    width:60px;
+    margin:2px;
+    border:1px solid #D0D0D0;
+    overflow:auto;
+    cursor: pointer;   
+}
+
+
+#layoutTopDiv label span {
+    text-align:center;
+    font-size: 15px;
+    padding:10px 0px;
+    display:block;
+}
+
+#layoutTopDiv label input {
+    position:absolute;
+    top:-20px;
+}
+
+#layoutTopDiv input:checked + span {
+    background-color:#404040;
+    color:#F7F7F7;
+}
+
+#layoutTopDiv .yellow {
+    background-color:#FFCC00;
+    color:#333;
+}
+
+#layoutTopDiv .blue {
+    background-color:#00BFFF;
+    color:#333;
+}
+
+#layoutTopDiv .pink {
+    background-color:#FF99FF;
+    color:#333;
+}
+
+#layoutTopDiv .green {
+    background-color:#A3D900;
+    color:#333;
+}
+#layoutTopDiv .purple {
+    background-color:#B399FF;
+    color:#333;
+}
+
 #capacityWindTopDiv {
     margin:4px;
    width: 100%;
@@ -298,11 +355,8 @@
 }
 
 #capacityLayoutTopDiv label {
-    float:left;
-    width:68px;
     margin:2px;
     border:1px solid #D0D0D0;
-    overflow:auto;
     cursor: pointer;   
 }
 
@@ -372,6 +426,31 @@
 }
 
 
+#layoutContentDiv {
+    clear: both;
+    background-color: lightgrey;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.8em;
+    height:200px;
+}
+
+#layoutContentDiv input.radio {
+    
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    padding: 5px;
+}
+
+#layoutContentDiv label {
+    margin:4px;
+    border:1px solid #D0D0D0;
+    /*font-size:large;*/
+    
+}
+
+
 #cutoutInfoDiv {
     margin-top: 20px;
     background-color: lightsteelblue;
@@ -381,9 +460,9 @@
     font-size: 0.8em;
 }
 .capacityInfoDiv {
-    margin-top: 20px;
+    margin-top: 15px;
     background-color: lightsteelblue;
-    min-height: 200px;
+    min-height: 100px;
     border-radius: 10px;
     padding: 10px;
     font-size: 0.8em;
@@ -397,7 +476,19 @@
     padding: 8px;
     margin: 8px;
     font-size: 0.8em;
-    max-height: 60%;
+    max-height: 80%;
+    min-height: 30%;
+    overflow-x: no-display;
+    overflow-y: auto;
+}
+.colorLayoutDiv {
+    clear: both;
+    background-color: lightgrey;
+    border-radius: 10px;
+    padding: 8px;
+    margin: 8px;
+    font-size: 0.8em;
+    max-height: 70%;
     min-height: 30%;
     overflow-x: no-display;
     overflow-y: auto;
@@ -411,6 +502,16 @@
     overflow-x: no-display;
     overflow-y: auto;
 }
+
+.layoutContentSubDiv {
+    clear: both;
+    font-size: 0.8em;
+    max-height: 100%;
+    min-height: 30%;
+    overflow-x: no-display;
+    overflow-y: auto;
+}
+
 #graphView {
     background-color: lightgrey;
     border-radius: 10px;
@@ -443,4 +544,35 @@ input+span.disabled-detector {
 
 input[disabled]+span.disabled-detector {
     display: inline;
+}
+
+
+ .bold {
+ font-weight: bold !important;       
+    }
+.roundcorner
+{
+ border-radius: 5px;
+ padding: 5px;
+} 
+.withborder
+{
+  border:1px solid;
+} 
+
+.capacityInputNum {
+    padding-left: 10px;
+    width: 85px;
+}
+
+.esriPopup .actionsPane .zoomTo {
+     display: none;
+}
+.esriPopup .titleButton.maximize {
+     display: none;
+}
+.solarInput {
+    left: 62px;
+    margin-bottom: 5px;
+    position: absolute;
 }

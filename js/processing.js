@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-$(document).ready(function() {
-
-function openProcessing(olEl) {
-        $oLay = $(olEl);
+function openProcessing() {
+        $oLay = $('#processing-inAbox');
         
-        if ($('#overlay-shade').length == 0)
-            $('body').prepend('<div id="overlay-shade"></div>');
+        if ($('#processing-shade').length == 0)
+            $('body').prepend('<div id="processing-shade"></div>');
 
-        $('#overlay-shade').fadeTo(300, 0.6, function() {
+        $('#processing-shade').fadeTo(300, 0.6, function() {
             var props = {
                 oLayWidth       : $oLay.width(),
                 scrTop          : $(window).scrollTop(),
@@ -35,29 +33,28 @@ function openProcessing(olEl) {
     }
 
     function closeProcessing() {
-        $('.overlay').animate({
+        $('.processing').animate({
             top : '-=100',
             opacity : 0
         }, 400, function() {
-            $('#overlay-shade').fadeOut(300);
+            $('#processing-shade').fadeOut(300);
             $(this).css('display','none');
         });
     }
    
-   // add "#overlay-shade, " next to '.overlay a' if you want to close popup on click backside
+   // add "#processing-shade, " next to '.processing a' if you want to close popup on click backside
    
-    $('body').on('click','.overlay a', function(e) { 
+    $('body').on('click','.processing a', function(e) { 
         closeProcessing();
         if ($(this).attr('href') == '#') e.preventDefault();
     });
     
     
     // Usage
-    $('#overlaylaunch-inAbox').click(function(e) {
-       openProcessing('#overlay-inAbox');
+    $('#processinglaunch-inAbox').click(function(e) {
+       openProcessing();
        e.preventDefault();
     });
     
-    openProcessing('#overlay-inAbox');
+  //  openProcessing();
     
-    });

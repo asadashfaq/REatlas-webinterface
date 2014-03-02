@@ -95,14 +95,14 @@ $.fn.passwordMatch = function( options ){
 		
 		that.div = $(that.opts.targetDiv);
                 that.srcDiv = $(that.opts.sourceDiv);
-                 console.log(that.srcDiv);
+                 
                 v = $(this)
 		.keyup(function(){
 			if( typeof el == "undefined" )
 				this.el = $(this);
                             
 			var pass = $(that.srcDiv).val();
-                        console.log("pass:"+pass);
+                        
 			if(pass == this.value) {
                             //    $(that.div).text("valid"); 
                                 that.div
