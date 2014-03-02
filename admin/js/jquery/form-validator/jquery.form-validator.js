@@ -245,7 +245,7 @@
         $form.find('input,textarea,select').filter(':not([type="submit"],[type="button"])').each(function() {
             var $element = $(this);
             var elementType = $element.attr('type');
-            console.log(elementType);
+           
             if (!ignoreInput($element.attr('name'), elementType)) {
 
                 var validation = $.formUtils.validateInput(
