@@ -68,8 +68,10 @@ if(!$layout_file)
 //layout1.shp layout2.csv
 
 $param = Configurations::getConfiguration('PEPSI_SERVER')." ".$cutout
-        ." ".Configurations::getConfiguration('REATLAS_WINDTURBINE_CONFIG_PATH')."/".$offshoreconfig
-        ." ".Configurations::getConfiguration('REATLAS_WINDTURBINE_CONFIG_PATH')."/".$onshoreconfig
+        ." ".Configurations::getConfiguration('REATLAS_CLIENT_PATH').'/'
+        .Configurations::getConfiguration('REATLAS_WINDTURBINE_CONFIG_PATH')."/".$offshoreconfig
+        ." ".Configurations::getConfiguration('REATLAS_CLIENT_PATH').'/'
+        .Configurations::getConfiguration('REATLAS_WINDTURBINE_CONFIG_PATH')."/".$onshoreconfig
         ." ".$layout_file
         ." --username ".$currentUser->aulogin
         ." --password ".$currentUser->aupass

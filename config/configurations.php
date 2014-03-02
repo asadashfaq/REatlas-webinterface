@@ -125,7 +125,7 @@ define("REATLAS_CLIENT_PATH", "/development/AU/REatlas-client");
 define("PEPSI_SERVER","Pepsimax.imf.au.dk");
 define("PEPSI_ADMIN_USER","manila");
 define("PEPSI_ADMIN_PASS","iet5hiuC");
-define("REATLAS_WINDTURBINE_CONFIG_PATH","/development/AU/REatlas-client/TurbineConfig");
+define("REATLAS_WINDTURBINE_CONFIG_PATH","TurbineConfig");
 
 
 if (!defined('_MAGIC_QUOTES_GPC_'))
