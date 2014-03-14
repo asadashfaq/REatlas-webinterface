@@ -213,6 +213,7 @@
 #selectorTopDiv .yellow {
     background-color:#FFCC00;
     color:#333;
+    width:60px;
 }
 
 #selectorTopDiv .blue {
@@ -237,9 +238,23 @@
 #layoutTopDiv {
     margin:4px;
    
-    float:left;
+    float:right;
 }
-
+#layoutDelete {
+    background-image: url(../images/Blue-trash-can.png);
+    display:inline-block;
+    width:20px;
+    height:20px;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    -webkit-background-size: 20px 20px; /*  Safari  */
+    -khtml-background-size: 20px 20px; /*  Konqueror  */
+    -moz-background-size: 20px 20px; /*  Firefox  */
+    cursor: pointer;
+}
+#layoutDelete.inactive {
+    background-image: url(../images/Blue-inactive-trash-can.png);
+}
 #layoutTopDiv label {
     float:left;
     width:60px;
@@ -550,6 +565,10 @@ input[disabled]+span.disabled-detector {
  .bold {
  font-weight: bold !important;       
     }
+    .bold-red {
+ font-weight: bold !important; 
+ color: red;
+    }
 .roundcorner
 {
  border-radius: 5px;
@@ -572,7 +591,19 @@ input[disabled]+span.disabled-detector {
      display: none;
 }
 .solarInput {
-    left: 62px;
     margin-bottom: 5px;
-    position: absolute;
+   float: right;
+}
+
+.refresh {
+    background-image: url(../images/refresh-icon.png);
+    display:inline-block;
+    width:20px;
+    height:20px;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    -webkit-background-size: 20px 20px; /*  Safari  */
+    -khtml-background-size: 20px 20px; /*  Konqueror  */
+    -moz-background-size: 20px 20px; /*  Firefox  */
+    cursor: pointer;
 }

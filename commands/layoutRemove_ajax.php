@@ -12,6 +12,7 @@ function errorReturn($message) {
     die();
 }
 
+
 if(!$session->logged_in){
     errorReturn('Error: Session expires.');
 }
@@ -22,7 +23,7 @@ if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
     errorReturn('Error: Technical problem. Contact Administrator.');
 }
 
-$cfgName =  Tools::getValue('cfgName');
+$layoutName =  Tools::getValue('layoutName');
 $filterUser =  Tools::getValue("user");
 $cutout =  Tools::getValue("cutout");
 
@@ -32,12 +33,21 @@ if(is_dir($parentDir))
 {
     
 $result = '';  
-if(is_file($parentDir."/layout_".$currentUser->aulogin."_".$cutout."_".$cfgName.".npy"))
+$layout_file = "layout_".$currentUser->aulogin."_".$cutout."_".$layoutName.".npy";
+  
+if(is_file($parentDir."/".$layout_file))
 {
-   $layout_file = $parentDir."/layout_".$currentUser->aulogin."_".$cutout."_".$cfgName.".npy";
+   @unlink($parentDir."/".$layout_file);
+}
 
-$command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_layout_details.py";
-$command .= " $layout_file 2>&1";
+$param = Configurations::getConfiguration('PEPSI_SERVER')
+        ." --username ".$currentUser->aulogin
+        ." --password ".$currentUser->aupass
+        ." ".$layout_file
+        ." --output JSON";
+
+$command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_file_remove.py";
+$command .= " $param 2>&1";
 /*
 $myFile = "command_tst.txt";
 $fh = fopen($myFile, 'a') or die("can't open file");
@@ -52,14 +62,9 @@ while( !feof( $pid ) )
 $result .= fread($pid, 256);
 }
 pclose($pid);
-}
 
-$outArr=array();
-$outArr['type']="Success";
-$outArr['text']="Layout detail";
-$outArr['desc']="Layout detail for ".$cfgName;
-$outArr['traceback']= '';
-$outArr['data'] = $result ;
-echo json_encode($outArr);
-}
+echo $result ;
+
+}else
+    errorReturn("Technical Error.");
 ?>

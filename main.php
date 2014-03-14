@@ -137,13 +137,13 @@ if (!$session->logged_in)
                             <div id="selectorContentDiv" >
                                 <div id="cutoutSelGrpDefault" >
                                     No cutout found
-                                       </div>
+                                </div>
                                 <div id="cutoutSelGrpOwn" style="display: none;" class="listContentSubDiv">Own group</div>
                                 <div id="cutoutSelGrpAll" style="display: none;" class="listContentSubDiv">All group</div>
                                 <div id="cutoutSelGrpNew" style="display: none;" >
                                     <div data-dojo-type="dijit/form/Form" id="myForm" data-dojo-id="myForm"
                                          encType="multipart/form-data" action="" method="">
-                                    <label for="newcutoutname">Cutout name:</label>
+                                    <label for="newcutoutname">Cutout name:</label><br/>
                                     <input type="text" id="newcutoutname" name="newcutoutname" data-dojo-type="dijit/form/TextBox"/>
                                     <br/>
                                     <label><input type="radio" class="radio" name="cutoutSelTool" value="Rectangle" data-dojo-type="dijit/form/RadioButton">Rectangle</label><br/>
@@ -151,13 +151,13 @@ if (!$session->logged_in)
                                     <label>Start Month-Year:</label> 
                                     <input type="text" name="cutoutStartDate" id="cutoutStartDate" 
                                            data-dojo-type="dijit/form/DateTextBox" 
-                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy',min:(new Date(1979, 1, 1)),max:(new Date(2010, 11, 31))}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
+                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy',min:(new Date(1979, 1, 1)),max:(new Date(2013, 11, 31))}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
                                            onChange="if(arguments !=null)dijit.byId('cutoutEndDate').constraints.min =arguments[0];else dijit.byId('cutoutEndDate').constraints.min = -infinity;" />
                                     <br/>
                                     <label>End Month-Year:</label> 
                                     <input type="text" name="cutoutEndDate" id="cutoutEndDate"
                                            data-dojo-type="dijit/form/DateTextBox" 
-                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy',min:(new Date(1979, 1, 1)),max:(new Date(2010, 11, 31))}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
+                                           data-dojo-props="constraints:{datePattern: 'MM-yyyy',min:(new Date(1979, 1, 1)),max:(new Date(2013, 11, 31))}, popupClass:'dojox.widget.MonthAndYearlyCalendar'" 
                                            />
                                     <br/>
                                     <br/>
@@ -181,27 +181,37 @@ if (!$session->logged_in)
                          <!--onShow="fetchCapacityList(this)" id="Layout" -->
                          <div id="layoutDiv">
                             <div id="layoutTopDiv">
-                                <label class="blue"><input type="radio" name="layoutSelectorGroup" value="old" checked="checked"><span>Old</span></label>
-                                <label class="green"><input type="radio" name="layoutSelectorGroup" value="new"><span>New</span></label>
+                                <span id="layoutDelete" class="inactive" onclick="deleteLayout()"></span>
+                                <span class="refresh" onclick="fetchLayoutList(selectedCutoutID)"></span>
                             </div>
                              <div id="layoutContentDiv" >
                                 <div id="layoutSelGrpOld" style="display: none;" class="layoutContentSubDiv">Old group</div>
                                 <div id="layoutSelGrpNew" style="display: none;" class="layoutContentSubDiv">New group</div>
                                </div>
-                         <div class="colorLayoutDiv" id="colorLayoutList">
+                         <div class="colorLayoutDiv" id="capacityLayoutTypeList">
                             <div id="capacityLayoutTopDiv">
-                                <label><input type="radio" class="radio" name="colorSelect" value="Onshore" checked="checked" data-dojo-type="dijit/form/RadioButton">Onshore/Offshore</label><br/>
-                                <label><input type="radio" class="radio" name="colorSelect" value="Wind" data-dojo-type="dijit/form/RadioButton">Wind</label><br/>
-                                <label><input type="radio" class="radio" name="colorSelect" value="Solar" data-dojo-type="dijit/form/RadioButton">Solar</label><br/>
-                            
+                                <label><input type="radio" class="radio" name="layoutTypeSelect" value="OnOffshore" checked="checked" data-dojo-type="dijit/form/RadioButton">Onshore/Offshore</label><br/>
+                                <label><input type="radio" class="radio" name="layoutTypeSelect" value="InstalledCapacity" data-dojo-type="dijit/form/RadioButton">Installed Capacity</label><br/>
+                                 
                             </div>
                             <!--<div id="LayoutSubList">Loading...</div>-->
                         </div>
+                        <div class="colorLayoutDiv" id="colorLayoutList">
+                            <div id="capacityLayoutTopDiv">
+                                <label>Capacity layout Name:</label>
+                                <input type="text" name="layout_name" id="layout_name">
+                               
+                                 <br/>
+                                <button id="reset" value="reset" data-dojo-type="dijit/form/Button" onclick="resetCapacityData()">Reset</button>
+                                <button id="saveCapacity" value="saveCapacity" data-dojo-type="dijit/form/Button" onclick="saveCapacityData()">Save</button>
+                           
+                            </div>
+                            <!--<div id="LayoutSubList">Loading...</div>-->
+                        </div>
+                            
                         <div id="LayoutInfoDiv" class="capacityInfoDiv">
                             <div id="LayoutInfoSubDiv">&nbsp;</div>
-                            <br/>
-                            <button id="saveCapacity" value="saveCapacity" data-dojo-type="dijit/form/Button" onclick="saveCapacityData()">Save</button>
-                        </div>
+                            </div>
                         
                     </div>
                     </div>     
@@ -229,7 +239,7 @@ if (!$session->logged_in)
                             <br/>
                         
                             <button id="convertWind" value="convertWind" data-dojo-type="dijit/form/Button" disabled="disabled" onclick="convertWind();">Convert</button>
-                            <div id="convertWindStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;"></div>
+                            <div id="convertWindStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;display:none;"></div>
                         </div>
                     </div>
                       
@@ -268,7 +278,7 @@ if (!$session->logged_in)
                             <label><input type="radio" id="fullTracking" class="radio" name="capacitySolarOption" value="FullTracking" >Full tracking</label><br/>
                              <br/>
                             <button id="convertSolar" class="clearall" value="convertSolar" data-dojo-type="dijit/form/Button" onclick="convertSolar();">Convert</button>
-                            <div id="convertSolarStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;"></div>
+                            <div id="convertSolarStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;display:none;"></div>
                         </div>
                        
                 </div>

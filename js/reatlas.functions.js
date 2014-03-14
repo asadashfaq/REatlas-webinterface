@@ -17,6 +17,9 @@ var selectorMode = "cutout";
 var convertOptionsSel = new Object();
 var currentCapacityData = [];
 var originalCapacityData = null;
+var selectedLayout = null;
+var loadedLayoutList = null;
+var selectedCapacityType;
 
 dojo.require("dojox.widget.MonthAndYearlyCalendar");
 dojo.require("dojox.form.DateTextBox");
@@ -73,6 +76,7 @@ function  initializeEvents(divID) {
                 
                 // Enable capacity button
                 $("#capacitymapBtn").removeAttr("disabled");
+                $("#layout_name").val('');
                 selectedCutoutID = $(this).val();
                 var data = $(this).val().split('/');
 
@@ -127,10 +131,40 @@ function  initializeEvents(divID) {
 
             });
 }
+
+function generateConvertOptionHTML()
+{
+    /* Display conver option selected data */
+    var covertOperationHtml ='<div class="bold">Selected option for convert operation:</div> <br/>';
+    if(convertOptionsSel.selectedlayout)
+        covertOperationHtml +='<span class="bold">Layout:</span> '+convertOptionsSel.selectedlayout+'<br/>'; 
+     else
+        covertOperationHtml +='<span class="bold-red">Please select a layout from Layout tab.</span> '+'<br/>'; 
+    if(convertOptionsSel.onshoreWindName)
+        covertOperationHtml +='<div class="roundcorner withborder"><span class="bold">OnShore:</span> '+convertOptionsSel.onshoreWindName+'<br/>';
+     if(convertOptionsSel.onshoreWindHubheight)
+        covertOperationHtml +='<span class="bold">Hub height:</span> '+convertOptionsSel.onshoreWindHubheight+'<br/>';
+      if(convertOptionsSel.onshoreWindName)
+        covertOperationHtml +='</div>';
+    if(convertOptionsSel.offshoreWindName)
+        covertOperationHtml +='<div class="roundcorner withborder"><span class="bold">OffShore:</span> '+convertOptionsSel.offshoreWindName+'<br/>';
+    if(convertOptionsSel.offshoreWindHubheight)
+        covertOperationHtml +='<span class="bold">Hub height:</span> '+convertOptionsSel.offshoreWindHubheight+'<br/>';                                            
+    if(convertOptionsSel.offshoreWindName)
+        covertOperationHtml +='</div>';  
+    
+    return covertOperationHtml;
+}
 function  initializeCapacityEvents(divID) {
 
     $("#" + divID + "SubList input:radio").change(
             function() {
+            
+            if(typeof convertOptionsSel.type === 'undefined')
+            {
+                alert("Please selet turbine type OnShore/OffShore");
+                return;                
+            }
                 /* Save Values needed for Convert operation */
             if(convertOptionsSel.type){
                 convertOptionsSel[convertOptionsSel.type+divID+"Id"] =$(this).attr('id');
@@ -173,23 +207,9 @@ function  initializeCapacityEvents(divID) {
                                             if(convertOptionsSel.type){
                                                 convertOptionsSel[convertOptionsSel.type+divID+"Hubheight"] =data.HUB_HEIGHT;
                                               }
-                                          /* Display conver option selected data */
-                                        var covertOperationHtml ='<div class="bold">Selected option for convert operation:</div> <br/>';
-                                        if(convertOptionsSel.onshoreWindName)
-                                            covertOperationHtml +='<div class="roundcorner withborder"><span class="bold">OnShore:</span> '+convertOptionsSel.onshoreWindName+'<br/>';
-                                         if(convertOptionsSel.onshoreWindHubheight)
-                                            covertOperationHtml +='<span class="bold">Hub height:</span> '+convertOptionsSel.onshoreWindHubheight+'<br/>';
-                                        if(convertOptionsSel.onshoreWindName)
-                                            covertOperationHtml +='</div>';
-                                        if(convertOptionsSel.offshoreWindName)
-                                            covertOperationHtml +='<div class="roundcorner withborder"><span class="bold">OffShore:</span> '+convertOptionsSel.offshoreWindName+'<br/>';
-                                        if(convertOptionsSel.offshoreWindHubheight)
-                                            covertOperationHtml +='<span class="bold">Hub height:</span> '+convertOptionsSel.offshoreWindHubheight+'<br/>';                                            
-                                        if(convertOptionsSel.offshoreWindName)
-                                            covertOperationHtml +='</div>';  
-                                        
-                                        targetNode.innerHTML = covertOperationHtml;
-                                        
+                                     
+                                        targetNode.innerHTML = generateConvertOptionHTML();
+                                       
                                         /* Enable disable convert button */
                                         if(convertOptionsSel.onshoreWindName && convertOptionsSel.offshoreWindName)
                                              dijit.byId("convertWind").setAttribute('disabled', false);
@@ -216,13 +236,14 @@ function  initializeCapacityEvents(divID) {
                                 } else if (dataJSON.type == "Error") {
                                     targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
                                 }
+                                
                             }
                             closeProcessing();
                     });
-                });
+                });    
+            }); 
+} 
 
-            });
-}
 
 function drawChart(data)
 {
@@ -546,8 +567,15 @@ function fetchCapacityList(targetDiv) {
     toggleGraphView(true);
     openProcessing();
     require(["dojo/request"], function(request) {
-
-        var divID = targetDiv.id;
+        var divID = null;
+        if (typeof targetDiv == 'string' || targetDiv instanceof String)
+            divID = targetDiv;
+        else
+            divID = targetDiv.id;
+        
+        if(divID == null)
+            return;
+        
         var targetNode = dojo.byId(divID + 'SubList');
         targetNode.innerHTML = "Loading...";
         // get some data, convert to JSON
@@ -598,7 +626,6 @@ function  fetchGridData(cutoutID) {
     //Set a zoom level in order to avoid 
     
     var data = cutoutID.split('/');
-    
    
 
     require(["esri/geometry/webMercatorUtils",
@@ -629,7 +656,7 @@ function  fetchGridData(cutoutID) {
         }else {
             _map.setLevel(8);
         }
-        
+           $("#layout_name").val('');
          openProcessing();
            xhr_post_loading=request.post("commands/cutoutDetails_ajax.php",{
             handleAs: "json",
@@ -673,8 +700,12 @@ function  fetchGridData(cutoutID) {
         });
     });
 }
-function drawGridPointsOnMap(points)
+function drawGridPointsOnMap(points,capacityType)
 {
+    // initilize default value
+    capacityType = typeof capacityType !== 'undefined' ? capacityType : 
+            (typeof selectedCapacityType !== 'undefined'?selectedCapacityType: "OnOffshore");
+   
     require([
         "esri/geometry/Point",
         "esri/graphic",
@@ -711,42 +742,57 @@ function drawGridPointsOnMap(points)
         var tmp_pt, webMercator_pt;
         for (rowpoints in points) {
             for (key in points[rowpoints]) {
-               // var symbol = new SimpleMarkerSymbol().setStyle("circle").setSize(10);
-                var picSymbol =  new PictureMarkerSymbol({
+              var symbol = new SimpleMarkerSymbol().setStyle("circle").setSize(10);
+              /*  var picSymbol =  new PictureMarkerSymbol({
                                 "url":"images/windmill-icon.png",
                                 "height":30,
                                 "width":20,
                                 "type":"esriPMS",
                                 "angle": -30
-                              });
+                              });*/
                 tmp_pt = new Point(parseFloat(points[rowpoints][key].longitude), 
                         parseFloat(points[rowpoints][key].latitude), 
                         _map.spatialReference);
                 webMercator_pt = webMercatorUtils.geographicToWebMercator(tmp_pt);
                 
-                if(points[rowpoints][key].onshore == 1){
-                    //symbol.setColor("red");
-                    picSymbol.setUrl("images/windmill-icon-red.png");
-                }else {
-                     //symbol.setColor("blue");
-                     picSymbol.setUrl("images/windmill-icon-blue.png");
+                if(capacityType =="OnOffshore"){
+                    if(points[rowpoints][key].onshore == 1){
+                        symbol.setColor("red");
+                   // picSymbol.setUrl("images/windmill-icon-red.png");
+                    }else {
+                         symbol.setColor("blue");
+                         //picSymbol.setUrl("images/windmill-icon-blue.png");
+                    }
+                }else if(capacityType =="InstalledCapacity"){
+                    if(points[rowpoints][key].capacity == 1){
+                        symbol.setColor("red");
+                   // picSymbol.setUrl("images/windmill-icon-red.png");
+                    }else {
+                         symbol.setColor("blue");
+                         //picSymbol.setUrl("images/windmill-icon-blue.png");
+                    }
                 }
-                   
-           
+            
             var wind_capacity = points[rowpoints][key].capacity;
             if(typeof currentCapacityData[rowpoints] != "undefined")
                 if(typeof currentCapacityData[rowpoints][key] != "undefined")
                    /* if(typeof currentCapacityData[rowpoints][key].capacity_wind != "undefined")*/
                         wind_capacity = currentCapacityData[rowpoints][key];                      
-              
-               var graphic = new Graphic(webMercator_pt, picSymbol);
+              /*if(points[rowpoints][key].wind_capacity == 0){
+                    symbol.setColor("green");
+                   // picSymbol.setUrl("images/windmill-icon-red.png");
+                }else {
+                     symbol.setColor("purple");
+                     //picSymbol.setUrl("images/windmill-icon-blue.png");
+                }*/
+               var graphic = new Graphic(webMercator_pt, symbol);
                
                 graphic.setInfoTemplate(new InfoTemplate("Coordinates",
               "<span>LATITUDE:</span> " + points[rowpoints][key].latitude.toFixed(4) + "<br>" + 
               "<span>LONGITUDE:</span> " + points[rowpoints][key].longitude.toFixed(4) + "<br>" + 
               "<span>ONSHORE:</span> " + points[rowpoints][key].onshore + "<br>" + 
               "<span>HEIGHT:</span> " + points[rowpoints][key].height.toFixed() + "<br>" + 
-              "<span>WIND CAPACITY:</span>"+
+              "<span>INSTALLED CAPACITY:</span>"+
               "<input type=\"text\" id=\"capacity_wind_"+rowpoints+"_"+key+"\" class=\"capacityInputNum\" "+
               " value=\"" +parseFloat(wind_capacity).toFixed()+ "\">"+
               "<a href=\"javascript:changeCapacity('wind',"+rowpoints+","+key+");\">Save</a><br>" + 
@@ -814,14 +860,32 @@ function changeCapacity(type,row,col) {
     
     drawGridPointsOnMap(originalCapacityData);
 }
-
+function checkLayoutNameExists(layout_name){
+    if(loadedLayoutList == null)
+        return false;
+    
+    for (var i = 0; i < loadedLayoutList.length; i++) { 
+        if(layout_name == loadedLayoutList[i].layout)
+            return true;
+    }
+    return false;
+}
 function  saveCapacityData() {
     
     if(currentCapacityData.length <=0) {
         alert("Please make some changes in grid capacity");
         return;
     }
-    
+    if($("#layout_name").val() == ""){
+        alert("Please provide your layout name");
+        return;
+    }
+    if(selectedLayout ==  $("#layout_name").val() || checkLayoutNameExists($("#layout_name").val()))
+    {
+        if (!confirm("Saving layout with existing name \nwill overwrite existing layout.\nDo you want to continue?")) {
+            return; 
+        }
+    }
     //Set a zoom level in order to avoid 
     
     var data = selectedCutoutID.split('/');
@@ -840,15 +904,13 @@ function  saveCapacityData() {
             xhr_post_loading.cancel();
             
             //return;
-        }else {
-            _map.setLevel(defaultZoomLevel);
         }
-        
-         openProcessing();
-           xhr_post_loading=request.post("commands/save_layout_ajax.php",{
+            openProcessing();
+            
+           request.post("commands/save_layout_ajax.php",{
             handleAs: "json",
             timeout: 300000, // give up after 3 seconds
-            data: {currentUserID: currentUserID, user: userName, cutout: cutoutName,layoutdata:JSON.stringify(currentCapacityData)}
+            data: {currentUserID: currentUserID, user: userName, cutout: cutoutName,layoutName:$("#layout_name").val(),layoutdata:JSON.stringify(currentCapacityData)}
             }).then(function(dataJson) {
                
                 if (targetNode.innerHTML === "Loading..." ||
@@ -863,6 +925,7 @@ function  saveCapacityData() {
                 if ($(dataJson).size() !== 0) {
                     if (dataJson.type == "Success") {
                         fetchLayoutList(selectedCutoutID);
+                        
                     } else if (dataJson.type == "Error") {
                         targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
                     }
@@ -878,6 +941,8 @@ function fetchLayoutList(layoutID) {
     var cutoutName = data[1];
     var userName = data[0];
     var divID = "layoutSelGrpOld";
+     $("#layoutDelete").addClass("inactive");
+     $("#layout_name").val('');
     openProcessing();
     require(["dojo/request"], function(request) {
         var targetNode = dojo.byId(divID);
@@ -900,6 +965,7 @@ function fetchLayoutList(layoutID) {
                 if ($(dataJSON).size() !== 0) {
                     if (dataJSON.type == "Success") {
                         var data = dataJSON.data;
+                        loadedLayoutList = data;
                         for (var i in data) {
                             if (data[i].layout !== userName)
                                 $("#" + divID).append("<label><input type=\"radio\" class=\"radio\" name=\"layoutSelGrpOld\" value=\"" + data[i].layout + "\">" + data[i].layout + "</label><br/>");
@@ -910,6 +976,9 @@ function fetchLayoutList(layoutID) {
                     } else if (dataJSON.type == "Error") {
                         targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
                     }
+                }else
+                {
+                    targetNode.innerHTML = "No layout found";
                 }
                 
                 closeProcessing();
@@ -921,6 +990,7 @@ function  initializelayoutSelectEvents() {
     $("#layoutSelGrpOld input[name^='layoutSelGrpOld']:radio").change(
             function() {
                 
+                $("#layoutDelete").removeClass("inactive");
                 xhr_post_loading = null;
                 
                 openProcessing();
@@ -956,6 +1026,8 @@ function  initializelayoutSelectEvents() {
                            
                             if ($(dataJson).size() !== 0) {
                                 if (dataJson.type == "Success") {
+                                    selectedLayout = cfgName;
+                                    $("#layout_name").val(cfgName);
                                     currentCapacityData = JSON.parse(dataJson.data);
                                     _map.infoWindow.hide();
                                     drawGridPointsOnMap(originalCapacityData);
@@ -970,6 +1042,12 @@ function  initializelayoutSelectEvents() {
                 });
 
             });
+            
+    $('#capacityLayoutTypeList input[name^=layoutTypeSelect]:radio').change(
+      function() {
+         selectedCapacityType = $(this).val();
+         drawGridPointsOnMap(originalCapacityData,$(this).val());
+      });
 }
 
 
@@ -1010,6 +1088,7 @@ function  convertSolar() {
         var userName = data[0];
 
         var targetNode= $('#convertSolarStatus');
+        $(targetNode).hide();
          openProcessing();
          
            xhr_post_loading=request.post("commands/convert_and_aggregate_PV.php",{
@@ -1035,7 +1114,7 @@ function  convertSolar() {
                 }else {
                      targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>Error:</h4><span>Technical error</span></div>");
                 }
-
+                $(targetNode).show();
             closeProcessing();
         });
     });
@@ -1065,6 +1144,7 @@ function  convertWind() {
         var userName = data[0];
 
         var targetNode= $('#convertWindStatus');
+        $(targetNode).hide();
          openProcessing();
          
            xhr_post_loading=request.post("commands/convert_and_aggregate_wind.php",{
@@ -1088,8 +1168,63 @@ function  convertWind() {
                 }else {
                      targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>Error:</h4><span>Technical error</span></div>");
                 }
-
+                $(targetNode).show();
             closeProcessing();
         });
     });
+}
+
+function resetCapacityData()
+{
+    if (confirm('Are you sure you want to reset all local changes?')) {
+     /* Remove all changed data in cache then redraw*/
+        currentCapacityData = [];
+        drawGridPointsOnMap(originalCapacityData);
+        fetchLayoutList(selectedCutoutID);
+    } else {
+        // Do nothing!
+    }
+   
+}
+function deleteLayout()
+{
+    if(selectedLayout == null){
+        alert("Please select a layout to delete.");
+        return;
+    }else {
+        if (confirm('Are you sure you want to delete selected layout?')) {
+            var data = selectedCutoutID.split('/');
+            require(["dojo/request"], 
+                 function(request) {
+                var cutoutName = data[1];
+                var userName = data[0];
+
+                 $("#layout_name").val('');
+                 openProcessing();
+                   xhr_post_loading=request.post("commands/layoutRemove_ajax.php",{
+                    handleAs: "json",
+                    timeout: 300000, // give up after 3 seconds
+                    data: {user: userName, cutout: cutoutName,layoutName:selectedLayout}
+                    }).then(function(dataJson) {
+
+                        if ($(dataJson).size() === 0 && targetNode.innerHTML === '') {
+                            targetNode.innerHTML = 'No details found';
+                            return;
+                        }
+
+                        if ($(dataJson).size() !== 0) {
+                            if (dataJson.type == "Success") {
+                                fetchLayoutList(selectedCutoutID);    
+                                alert("layout deleted");
+                            } else if (dataJson.type == "Error") {
+                                alert(dataJson.text + "\n" + dataJson.desc);
+                            }
+                        }
+                        closeProcessing();
+                });
+            });
+        } else {
+            // Do nothing!
+        }
+    }    
 }

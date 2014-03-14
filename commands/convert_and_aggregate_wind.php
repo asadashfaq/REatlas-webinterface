@@ -1,18 +1,6 @@
 <?php
 include_once('../init.php');
 
-if(!$session->logged_in){
-    echo 'Error: Session expires.';
-    die();
-}
-
-$currentUser = new user($session->userid);
-
-if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
-    echo 'Error: Technical problem. Contact Administrator.';
-   die();
-}
-
 function errorReturn($message) {
     $outArr=array();
     $outArr['type']="Error";
@@ -23,6 +11,17 @@ function errorReturn($message) {
     echo json_encode($outArr);
     die();
 }
+
+if(!$session->logged_in){
+    errorReturn('Error: Session expires.');
+}
+
+$currentUser = new user($session->userid);
+
+if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
+    errorReturn('Error: Technical problem. Contact Administrator.');
+}
+
 //cutoutuser
 $filterUser =  Tools::getValue("user");
 //echo "filteruser is $filterUser";
@@ -36,12 +35,12 @@ $offshoreconfig =  Tools::getValue("offshoreconfig");
 $onshoreconfig =  Tools::getValue("onshoreconfig");
 //capacitylayout
 $capacitylayout =  Tools::getValue("capacitylayout");
-$parentDir = Configurations::getConfiguration('REATLAS_CLIENT_PATH').'/data/'.$filterUser;
+$parentDir = Configurations::getConfiguration('REATLAS_CLIENT_PATH').'/data/'.$currentUser->aulogin;
 $layout_file = null;
 
 if(is_dir($parentDir))
-    if(is_file($parentDir."/".$filterUser."_".$cutout."_layout_".$capacitylayout.".npy"))
-        $layout_file = $parentDir."/".$filterUser."_".$cutout."_layout_".$capacitylayout.".npy";
+    if(is_file($parentDir."/layout_".$currentUser->aulogin."_".$cutout."_".$capacitylayout.".npy"))
+        $layout_file = $parentDir."/layout_".$currentUser->aulogin."_".$cutout."_".$capacitylayout.".npy";
 
  
 if(!$cutout)

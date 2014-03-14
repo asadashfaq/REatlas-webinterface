@@ -37,7 +37,7 @@ $(document).ready(function() {
             });
             return false;
         });
-
+        
 });
 
 $(function() {
@@ -142,14 +142,27 @@ $(document).ready(function(){
                 if ($(this).val() == "onshore") {
                     $('#capacityWindOnshore').css('display', 'block');
                     $('#capacityWindOnshore').html('Loading...');
+                   /*var covertOperationHtml ='<div class="bold">Selected option for convert operation:</div> <br/>';
+                    covertOperationHtml +='<div class="roundcorner withborder"><span class="bold-red">OnShore: Please select turbine name</span><br/>';
+                    var targetNode = WindInfoDiv;
+                    targetNode.innerHTML = covertOperationHtml;*/
                     
                 } else if ($(this).val() == "offshore") {
                     $('#capacityWindOffshore').css('display', 'block');
                     $('#capacityWindOffshore').html('Loading...');
+                    /*var covertOperationHtml ='<div class="bold">Selected option for convert operation:</div> <br/>';
+                    covertOperationHtml +='<div class="roundcorner withborder"><span class="bold-red">OffShore: Please select turbine name</span><br/>';
+                    var targetNode = WindInfoDiv;
+                    targetNode.innerHTML = covertOperationHtml;*/
+                    
                                        
                 } 
             }
     );
+    
+  $('input[name="capacityWindType"]:radio').filter('[value="onshore"]').attr('checked', true);
+  $('input[name="capacityWindType"]:radio').filter('[value="onshore"]').trigger('change');
+
      
 });
 

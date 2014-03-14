@@ -9,16 +9,25 @@
         
 include_once('../init.php');
 
-if(!$session->logged_in){
-    echo 'Error: Session expires.';
+function errorReturn($message) {
+    $outArr=array();
+    $outArr['type']="Error";
+    $outArr['text']="Error occured";
+    $outArr['desc']=$message;
+    $outArr['traceback']= '';
+    $outArr['data'] = '' ;
+    echo json_encode($outArr);
     die();
+}
+
+if(!$session->logged_in){
+    errorReturn('Error: Session expires.');
 }
 
 $currentUser = new user($session->userid);
 
 if($currentUser->aulogin =="" ||$currentUser->aulogin == null){
-    echo 'Error: Technical problem. Contact Administrator.';
-   die();
+    errorReturn('Error: Technical problem. Contact Administrator.');
 }
 
 

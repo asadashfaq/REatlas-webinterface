@@ -313,7 +313,7 @@ require([
     }
 
     function initNewCutoutOptions() {
-        
+        console.log("initNewCutoutOptions");
         if (lastDrawnGraphics) {
             _map.graphics.clear();
              lastDrawnGraphics= null;
@@ -484,6 +484,7 @@ function refreshCutoutData(parentToolbar, evt)
     
      $('input[name="cutoutSelectorGroup"]:radio').change(
             function() {
+             
                 // disable capacity button
                 $("#capacitymapBtn").attr('disabled', 'disabled');
      
@@ -491,7 +492,8 @@ function refreshCutoutData(parentToolbar, evt)
                 
                 $("[id^=cutoutSelGrp]").each(function(){
                     $(this).css('display', 'none');
-                    $(this).html('No cutout found');
+                    if ($(this).prop("id") != "cutoutSelGrpNew")
+                        $(this).html('No CutOut found');
                 });
                 if ($(this).val() == "default") {
                     $('#cutoutSelGrpDefault').css('display', 'block');
