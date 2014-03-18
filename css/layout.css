@@ -195,8 +195,8 @@
 
 #selectorTopDiv label span {
     text-align:center;
-    font-size: 15px;
-    padding:10px 0px;
+    font-size: 13px;
+    padding:5px 0px;
     display:block;
 }
 
@@ -240,7 +240,7 @@
    
     float:right;
 }
-#layoutDelete {
+.delete {
     background-image: url(../images/Blue-trash-can.png);
     display:inline-block;
     width:20px;
@@ -252,7 +252,7 @@
     -moz-background-size: 20px 20px; /*  Firefox  */
     cursor: pointer;
 }
-#layoutDelete.inactive {
+.delete.inactive {
     background-image: url(../images/Blue-inactive-trash-can.png);
 }
 #layoutTopDiv label {
@@ -606,4 +606,7 @@ input[disabled]+span.disabled-detector {
     -khtml-background-size: 20px 20px; /*  Konqueror  */
     -moz-background-size: 20px 20px; /*  Firefox  */
     cursor: pointer;
+}
+#selectorOptionDiv {
+    float: right;
 }

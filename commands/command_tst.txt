@@ -1,0 +1,4 @@
+python /development/AU/REatlas-client/cmd_cutout_details.py Pepsimax.imf.au.dk Europe /development/AU/REatlas-client/data/auesg/meta_Europe.npz --username manila --password iet5hiuC --cutoutuser auesg --output JSON 2>&1
+python /development/AU/REatlas-client/cmd_save_layout.py Pepsimax.imf.au.dk Denmark /tmp/DenmarkdPrJ6y  --metadata /development/AU/REatlas-client/data/auesg/meta_Denmark.npz --username manila --password iet5hiuC --cutoutuser auesg --output JSON
+
+python /development/AU/REatlas-client/cmd_list_layout.py Pepsimax.imf.au.dk --username manila --password iet5hiuC --layoutuser auesg --output JSON

@@ -56,6 +56,7 @@ $myFile = "command_tst.txt";
 $fh = fopen($myFile, 'a') or die("can't open file");
 fwrite($fh, $command."\n");
 */
+//echo $command;
 
 $pid = popen( $command,"r");
 $result = '';

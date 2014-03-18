@@ -36,19 +36,21 @@ require([
         Draw, Edit,
         SimpleMarkerSymbol, SimpleLineSymbol,
         PictureFillSymbol, CartographicLineSymbol,
-        Graphic, 
-        Color,  dom, on,Event, Menu, MenuItem, MenuSeparator,
+        Graphic,
+        Color, dom, on, Event, Menu, MenuItem, MenuSeparator,
         HomeButton, LocateButton, BasemapGallery
         ) {
-   
+
+    var reatlasFunctions = dojo.getObject('reatlasFunctions', true);
+            
     _map = new Map("mapDiv", {
         center: [13.406091199999991000, 52.519171000000000000],
         zoom: 3,
         basemap: "topo"
     });
-     
-    
-   
+
+
+
     /*
      var basemapUrl = "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
      var dynamicUrl = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyHazardsandRisks/MapServer";
@@ -68,8 +70,8 @@ require([
     if (showToolbar) {
         _map.on("load", initToolbar);
     }
-   // _map.on("load", createToolbarAndContextMenu);
-   // _map.on("load", initNewCutoutOptions);
+    // _map.on("load", createToolbarAndContextMenu);
+    // _map.on("load", initNewCutoutOptions);
 
     function createToolbarAndContextMenu() {
         // Add some graphics to the _map
@@ -84,7 +86,7 @@ require([
 
         createMapMenu();
         createGraphicsMenu();
-     }
+    }
 
     function createMapMenu() {
         // Creates right-click context menu for _map
@@ -152,7 +154,7 @@ require([
                 }
             }
         }));
-        
+
         /*
          ctxMenuForGraphics.addChild(new MenuItem({ 
          label: "Style",
@@ -165,7 +167,7 @@ require([
         ctxMenuForGraphics.addChild(new MenuItem({
             label: "Delete",
             onClick: function() {
-                  lastDrawnGraphics= null;
+                lastDrawnGraphics = null;
                 _map.graphics.remove(selected);
             }
         }));
@@ -200,7 +202,7 @@ require([
         $("#top-tool").find(".down").each(function() {
             $(this).removeClass("down");
         });
-        
+
         if (evt.target.id === "top-tool") {
             return;
         } else if (evt.target.id === "cutoutselectorBtn") {
@@ -212,15 +214,15 @@ require([
             dijit.byId("cutoutselectorContainer").resize();
             $(evt.target).toggleClass("down");
             // Restore previous graphics on map
-            if(lastDrawnGraphics)
-                 _map.graphics.add(lastDrawnGraphics);
-             selectorMode = "cutout";
+            if (lastDrawnGraphics)
+                _map.graphics.add(lastDrawnGraphics);
+            selectorMode = "cutout";
         } else if (evt.target.id === "capacitymapBtn") {
             _map.graphics.clear();
             toggleGraphView(true);
             $(evt.target).show();
             $("#cutoutselectorContainer").hide();
-            fetchGridData(selectedCutoutID);
+            fetchGridDataSync(selectedCutoutID);
             dijit.byId("capacitymapContainer").domNode.style.display = 'block';
             dijit.byId("capacitymapContainer").resize();
             $(evt.target).toggleClass("down");
@@ -313,15 +315,15 @@ require([
     }
 
     function initNewCutoutOptions() {
-        console.log("initNewCutoutOptions");
+       
         if (lastDrawnGraphics) {
             _map.graphics.clear();
-             lastDrawnGraphics= null;
+            lastDrawnGraphics = null;
         }
-        
+
         tbForNew = new Draw(_map);
         tbForNew.on("draw-end", dojo.partial(addGraphic, tbForNew));
-        
+
         // 
         // event delegation so a click handler is not
         // needed for each individual button
@@ -332,24 +334,24 @@ require([
                     evt.target.id === "cutoutEndDate") {
                 return;
             }
-         
+
             if (evt.target.value === "clear-graphics") {
                 if (lastDrawnGraphics) {
-                var didConfirm = confirm("Clear will remove previous drawing.\nAre you sure for new selection?\n\n(You can edit existing selection using right click on selection.)");
+                    var didConfirm = confirm("Clear will remove previous drawing.\nAre you sure for new selection?\n\n(You can edit existing selection using right click on selection.)");
                     if (didConfirm == true) {
                         $("#cutoutInfoDiv").html(""); // clear new cutout details
                         $("#cutoutStartDate").val("");
                         _map.graphics.clear();
-                         lastDrawnGraphics= null;
-                   }else {
-                       Event.stop(evt);
-                       return false;
-                   }
-                }else {
+                        lastDrawnGraphics = null;
+                    } else {
+                        Event.stop(evt);
+                        return false;
+                    }
+                } else {
                     $("#cutoutInfoDiv").html(""); // clear new cutout details
                     $("#cutoutStartDate").val("");
                     _map.graphics.clear();
-                     lastDrawnGraphics= null;
+                    lastDrawnGraphics = null;
                 }
                 return;
             } else if (evt.target.value === "submit-graphics") {
@@ -365,7 +367,7 @@ require([
                 var didConfirm = confirm("Redraw will remove previous drawing.\nAre you sure for new selection?\n\n(You can edit existing selection using right click on selection.)");
                 if (didConfirm == true) {
                     _map.graphics.clear();
-                     lastDrawnGraphics= null;
+                    lastDrawnGraphics = null;
 
                 } else {
                     var group = "input:checkbox[name='cutoutSelTool']";
@@ -374,7 +376,7 @@ require([
                 }
 
             }
-            
+
             _map.graphics.clear();
             selectedTool = evt.target;
             var tool = evt.target.value.toLowerCase();
@@ -388,14 +390,14 @@ require([
     function newCutoutDetails(cutoutData)
     {
         var cutout_type = $("input:radio[name='cutoutSelTool']:checked").val();
-       var infoDetails = "<div>";
-        infoDetails = '<h4>Name of the selected cutout:</h4>' +cutoutData.cutoutName + '<br/>';
-        infoDetails += '<h4>Type of the selected cutout:</h4>' + cutout_type+ '<br/>';
+        var infoDetails = "<div>";
+        infoDetails = '<h4>Name of the selected cutout:</h4>' + cutoutData.cutoutName + '<br/>';
+        infoDetails += '<h4>Type of the selected cutout:</h4>' + cutout_type + '<br/>';
         if (cutout_type == "Rectangle") {
-            infoDetails += '<h4>Coordinates:</h4>(<br/>(' 
-                    + Number(cutoutData.geomatry_data['southwest_latitude']).toFixed(2) + ',' 
-                    + Number(cutoutData.geomatry_data['southwest_longitude']).toFixed(2) + '),(' 
-                    + Number(cutoutData.geomatry_data['northeast_latitude']).toFixed(2) + ',' 
+            infoDetails += '<h4>Coordinates:</h4>(<br/>('
+                    + Number(cutoutData.geomatry_data['southwest_latitude']).toFixed(2) + ','
+                    + Number(cutoutData.geomatry_data['southwest_longitude']).toFixed(2) + '),('
+                    + Number(cutoutData.geomatry_data['northeast_latitude']).toFixed(2) + ','
                     + Number(cutoutData.geomatry_data['northeast_longitude']).toFixed(2) + ')<br/>)<br/>';
         } else if (cutout_type == "Multipoint") {
             infoDetails += '<h4>Points:</h4>(<br/>'
@@ -404,18 +406,18 @@ require([
         }
         infoDetails += "</div>";
         $("#cutoutInfoDiv").html(infoDetails);
-}
+    }
 
-function refreshCutoutData(parentToolbar, evt)
-{
-   
-    /* collect data for server request*/
+    function refreshCutoutData(parentToolbar, evt)
+    {
+
+        /* collect data for server request*/
         graphicsDataForMapLayer.cutoutName = $("#newcutoutname").val();
         graphicsDataForMapLayer.geomatry_type = evt.graphic.geometry.type;
         var coordinates = evt.graphic.geometry.getExtent();
-        
+
         var southWest = esri.geometry.xyToLngLat(coordinates.xmin, coordinates.ymin);
-        var northEast  = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymax);
+        var northEast = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymax);
         graphicsDataForMapLayer.geomatry_data = {};
         graphicsDataForMapLayer.geomatry_data['southwest_latitude'] = southWest[1];
         graphicsDataForMapLayer.geomatry_data['southwest_longitude'] = southWest[0];
@@ -423,9 +425,9 @@ function refreshCutoutData(parentToolbar, evt)
         graphicsDataForMapLayer.geomatry_data['northeast_longitude'] = northEast[0];
 
         newCutoutDetails(graphicsDataForMapLayer);
-}
+    }
     function addGraphic(parentToolbar, evt) {
-       
+
         //deactivate the toolbar and clear existing graphics 
         parentToolbar.deactivate();
         _map.enableMapNavigation();
@@ -442,22 +444,22 @@ function refreshCutoutData(parentToolbar, evt)
 
         lastDrawnGraphics = new Graphic(evt.geometry, symbol);
         _map.graphics.add(lastDrawnGraphics);
-        
-          editToolbar = new Edit(_map);
-        if (lastDrawnGraphics.geometry.type === "multipoint"||
+
+        editToolbar = new Edit(_map);
+        if (lastDrawnGraphics.geometry.type === "multipoint" ||
                 lastDrawnGraphics.geometry.type === "point") {
             editToolbar.activate(Edit.EDIT_VERTICES, lastDrawnGraphics);
             editToolbar.on("vertex-move-stop", dojo.partial(refreshCutoutData, editToolbar));
-            
-        }else{
+
+        } else {
             //editToolbar.activate(Edit.MOVE |Edit.ROTATE | Edit.SCALE, lastDrawnGraphics);
             editToolbar.activate(Edit.MOVE | Edit.SCALE, lastDrawnGraphics);
             //editToolbar.on("rotate-stop", dojo.partial(refreshCutoutData, editToolbar));
             editToolbar.on("scale-stop", dojo.partial(refreshCutoutData, editToolbar));
             editToolbar.on("graphic-move-stop", dojo.partial(refreshCutoutData, editToolbar));
-       
-        } 
-        
+
+        }
+
         $(selectedTool).toggleClass("down");
         var group = "input:checkbox[name='cutoutSelTool']";
         $(group).prop("checked", false);
@@ -465,60 +467,68 @@ function refreshCutoutData(parentToolbar, evt)
         /* collect data for server request*/
         graphicsDataForMapLayer.cutoutName = $("#newcutoutname").val();
         graphicsDataForMapLayer.geomatry_type = evt.geometry.type;
-        if (lastDrawnGraphics.geometry.type === "multipoint"||
+        if (lastDrawnGraphics.geometry.type === "multipoint" ||
                 lastDrawnGraphics.geometry.type === "point") {
-           graphicsDataForMapLayer.points = evt.geometry.points;
-    
-        }else {
+            graphicsDataForMapLayer.points = evt.geometry.points;
+
+        } else {
             var coordinates = evt.geometry.getExtent();
             var southWest = esri.geometry.xyToLngLat(coordinates.xmin, coordinates.ymin);
-            var northEast  = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymax);
+            var northEast = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymax);
             graphicsDataForMapLayer.geomatry_data = {};
             graphicsDataForMapLayer.geomatry_data['southwest_latitude'] = southWest[1];
             graphicsDataForMapLayer.geomatry_data['southwest_longitude'] = southWest[0];
             graphicsDataForMapLayer.geomatry_data['northeast_latitude'] = northEast[1];
             graphicsDataForMapLayer.geomatry_data['northeast_longitude'] = northEast[0];
-         }
+        }
         newCutoutDetails(graphicsDataForMapLayer);
     } // addGraphic end
-    
-     $('input[name="cutoutSelectorGroup"]:radio').change(
+
+    $('input[name="cutoutSelectorGroup"]:radio').change(
             function() {
-             
+                reatlasFunctions.cutoutSelectorChange(this);
+            });
+    
+    reatlasFunctions.cutoutSelectorChange = function (selectedRadio){
+        
+        // initilize default value
+        selectedRadio = typeof selectedRadio !== 'undefined' ? selectedRadio :
+            (typeof selectedRadio !== 'undefined' ? selectedRadio : $('input[name="cutoutSelectorGroup"]:radio:checked'));
+    
                 // disable capacity button
                 $("#capacitymapBtn").attr('disabled', 'disabled');
-     
+
                 $("#cutoutInfoDiv").html("");
-                
-                $("[id^=cutoutSelGrp]").each(function(){
+
+                $("[id^=cutoutSelGrp]").each(function() {
                     $(this).css('display', 'none');
                     if ($(this).prop("id") != "cutoutSelGrpNew")
                         $(this).html('No CutOut found');
                 });
-                if ($(this).val() == "default") {
+                if ($(selectedRadio).val() == "default") {
                     $('#cutoutSelGrpDefault').css('display', 'block');
                     $('#cutoutSelGrpDefault').html('Loading...');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpDefault');
-                    
-                } else if ($(this).val() == "own") {
+
+                } else if ($(selectedRadio).val() == "own") {
                     $('#cutoutSelGrpOwn').css('display', 'block');
                     $('#cutoutSelGrpOwn').html('Loading...');
                     fetchCutoutList(currentUserName, 'cutoutSelGrpOwn');
-                } else if ($(this).val() == "all") {
+                } else if ($(selectedRadio).val() == "all") {
                     $('#cutoutSelGrpAll').css('display', 'block');
                     $('#cutoutSelGrpAll').html('Loading...');
                     fetchCutoutList(defaultUserGroup, 'cutoutSelGrpAll');
                     fetchCutoutList(currentUserName, 'cutoutSelGrpAll');
-                } else if ($(this).val() == "new") {
+                } else if ($(selectedRadio).val() == "new") {
                     initNewCutoutOptions();
                     $('#cutoutSelGrpNew').css('display', 'block');
                 }
             }
-    );
-    
+       
+            
     $('input[name="layoutSelectorGroup"]:radio').change(
             function() {
-               
+
                 if ($(this).val() == "old") {
                     $('#layoutSelGrpOld').html('Loading...');
                     fetchLayoutList(selectedCutoutID);
@@ -527,14 +537,14 @@ function refreshCutoutData(parentToolbar, evt)
                     currentCapacityData = [];
                     drawGridPointsOnMap(originalCapacityData);
                     var $radios = $('input[name="layoutSelectorGroup"]:radio');
-                    if($radios.is(':checked') === false) {
-                     
+                    if ($radios.is(':checked') === false) {
+
                         $radios.filter('[value=new]').prop('checked', true);
-                    }           
-                } 
+                    }
+                }
             }
     );
-    
+
 });
 
 dojo.ready(function() {

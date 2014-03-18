@@ -28,6 +28,7 @@ if ($session->logged_in)
         <script src="js/jquery/jquery-1.10.2.min.js"></script>
         <script src="js/jquery/ui/jquery-ui.js"></script>
         <script src="js/jquery/jquery-scrollto.js"></script>
+        <script src="js/jquery/jquery-timing.min.js"></script>
       
         <script>
 
@@ -49,8 +50,9 @@ if ($session->logged_in)
         <script src="js/processing.js"></script>
         
         <script src="js/reatlas.functions.js"></script>
-        <script src="js/reatlas.js"></script>
         <script src="js/reatlas-divselection.js"></script>
+        <script src="js/reatlas.js"></script>
+        
         
       
     </head>
@@ -129,10 +131,16 @@ if (!$session->logged_in)
 
                         <div id="selectorDiv">
                             <div id="selectorTopDiv">
-                                <label class="blue"><input type="radio" name="cutoutSelectorGroup" value="default" checked="checked"><span>Default</span></label>
-                                <label class="green"><input type="radio" name="cutoutSelectorGroup" value="own"><span>Own</span></label>
-                                <label class="yellow"><input type="radio" name="cutoutSelectorGroup" value="all"><span>All</span></label>
-                                <label class="purple"><input type="radio" name="cutoutSelectorGroup" value="new"><span>New</span></label>
+                                <div id="selectorOptionDiv">
+                                    <span id="cutoutDelete" class="delete inactive" onclick="deleteCutout()"></span>
+                                    <span class="refresh" onclick="reatlasFunctions.cutoutSelectorChange()"></span>
+                                </div>
+                                <div style="float: left">
+                                    <label class="blue"><input type="radio" name="cutoutSelectorGroup" value="default" checked="checked"><span>Default</span></label>
+                                    <label class="green"><input type="radio" name="cutoutSelectorGroup" value="own"><span>Own</span></label>
+                                    <label class="yellow"><input type="radio" name="cutoutSelectorGroup" value="all"><span>All</span></label>
+                                    <label class="purple"><input type="radio" name="cutoutSelectorGroup" value="new"><span>New</span></label>
+                                </div>
                             </div>
                             <div id="selectorContentDiv" >
                                 <div id="cutoutSelGrpDefault" >
@@ -181,7 +189,7 @@ if (!$session->logged_in)
                          <!--onShow="fetchCapacityList(this)" id="Layout" -->
                          <div id="layoutDiv">
                             <div id="layoutTopDiv">
-                                <span id="layoutDelete" class="inactive" onclick="deleteLayout()"></span>
+                                <span id="layoutDelete" class="delete inactive" onclick="deleteLayout()"></span>
                                 <span class="refresh" onclick="fetchLayoutList(selectedCutoutID)"></span>
                             </div>
                              <div id="layoutContentDiv" >
