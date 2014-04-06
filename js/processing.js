@@ -3,13 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 function openProcessing() {
         $oLay = $('#processing-inAbox');
         
         if ($('#processing-shade').length == 0)
             $('body').prepend('<div id="processing-shade"></div>');
 
-        $('#processing-shade').fadeTo(300, 0.6, function() {
+        $('#processing-shade').fadeTo(30, 0.6, function() {
             var props = {
                 oLayWidth       : $oLay.width(),
                 scrTop          : $(window).scrollTop(),
@@ -28,7 +29,7 @@ function openProcessing() {
                 .animate({
                     top : props.scrTop + 240,
                     opacity : 1
-                }, 600);
+                }, 60);
         });
     }
 
@@ -36,14 +37,14 @@ function openProcessing() {
         $('.processing').animate({
             top : '-=100',
             opacity : 0
-        }, 400, function() {
-            $('#processing-shade').fadeOut(300);
+        }, 40, function() {
+            $('#processing-shade').fadeOut(30);
             $(this).css('display','none');
         });
     }
    
    // add "#processing-shade, " next to '.processing a' if you want to close popup on click backside
-   
+   /*
     $('body').on('click','.processing a', function(e) { 
         closeProcessing();
         if ($(this).attr('href') == '#') e.preventDefault();
@@ -57,4 +58,4 @@ function openProcessing() {
     });
     
   //  openProcessing();
-    
+    */

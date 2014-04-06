@@ -35,6 +35,7 @@ $offshoreconfig =  Tools::getValue("offshoreconfig");
 $onshoreconfig =  Tools::getValue("onshoreconfig");
 //capacitylayout
 $capacitylayout =  Tools::getValue("capacitylayout");
+$conversionName =  Tools::getValue("conversionName");
 $parentDir = Configurations::getConfiguration('REATLAS_CLIENT_PATH').'/data/'.$currentUser->aulogin;
 $layout_file = null;
 
@@ -75,6 +76,7 @@ $param = Configurations::getConfiguration('PEPSI_SERVER')." ".$cutout
         ." --username ".$currentUser->aulogin
         ." --password ".$currentUser->aupass
         ." --cutoutuser ".$filterUser
+        ." --name ".$conversionName
         ." --output JSON";
 
 

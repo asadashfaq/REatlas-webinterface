@@ -469,7 +469,7 @@
 #cutoutInfoDiv {
     margin-top: 20px;
     background-color: lightsteelblue;
-    height: 200px;
+    min-height: 200px;
     border-radius: 10px;
     padding: 10px;
     font-size: 0.8em;

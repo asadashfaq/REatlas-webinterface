@@ -29,7 +29,8 @@ if ($session->logged_in)
         <script src="js/jquery/ui/jquery-ui.js"></script>
         <script src="js/jquery/jquery-scrollto.js"></script>
         <script src="js/jquery/jquery-timing.min.js"></script>
-      
+        <script src="js/tools.js"></script>
+        
         <script>
 
 <?php if (SELECTION_TOOLBAR) { ?>
@@ -60,8 +61,10 @@ if ($session->logged_in)
     <body class="claro">
       <?php
       
-if (!$session->logged_in)
-    include 'login.php';
+if (!$session->logged_in) {
+    header ('Location: ./');
+    die();
+}
 
 ?>
 
@@ -155,7 +158,7 @@ if (!$session->logged_in)
                                     <input type="text" id="newcutoutname" name="newcutoutname" data-dojo-type="dijit/form/TextBox"/>
                                     <br/>
                                     <label><input type="radio" class="radio" name="cutoutSelTool" value="Rectangle" data-dojo-type="dijit/form/RadioButton">Rectangle</label><br/>
-                                    <label><input type="radio" class="radio" name="cutoutSelTool" value="Multipoint" data-dojo-type="dijit/form/RadioButton">Multipoint</label><br/>
+                                    <label><input type="radio" class="radio" name="cutoutSelTool" value="Multipoint" data-dojo-type="dijit/form/RadioButton">Point(s)</label><br/>
                                     <label>Start Month-Year:</label> 
                                     <input type="text" name="cutoutStartDate" id="cutoutStartDate" 
                                            data-dojo-type="dijit/form/DateTextBox" 
@@ -245,7 +248,11 @@ if (!$session->logged_in)
                              <input type="text" id="windhubheight" class="hidden" name="hubheight" data-dojo-type="dijit/form/NumberTextBox"/>
                             -->
                             <br/>
-                        
+                            <label>Wind Conversion layout Name:</label>
+                                 <br/>
+                                <input type="text" name="windconvert_name" id="windconvert_name">
+                               
+                                 <br/>
                             <button id="convertWind" value="convertWind" data-dojo-type="dijit/form/Button" disabled="disabled" onclick="convertWind();">Convert</button>
                             <div id="convertWindStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;display:none;"></div>
                         </div>
@@ -262,30 +269,49 @@ if (!$session->logged_in)
                              <div id="SolarInfoSubDiv">
                                  &nbsp;
                              </div>
-                            <label><input type="radio" class="radio" name="capacitySolarOption" value="FixedOrientation" >Fixed Orientation</label><br/>
+                            <label><input type="radio" class="radio" name="capacitySolarOption" value="FixedOrientation" >&nbsp;&nbsp;Fixed Orientation</label><br/>
                             <div id="FixedOrientationGrp" style="display: none;">
-                                <label for="FixedOrientationSlope" style="text-align: right;">Slope</label>
+                                <label for="FixedOrientationSlope" style="text-align: right;">Slope (0 - 90)</label>
                                 <input type="text" id="FixedOrientationSlope" name="FixedOrientationSlope" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
                               <br/><br/>
-                                <label for="FixedOrientationAzimuth" style="text-align: right;">Azimuth</label>
+                                <label for="FixedOrientationAzimuth" style="text-align: right;">Azimuth (-180 - 180)</label>
                                 <input type="text" id="FixedOrientationAzimuth" name="FixedOrientationAzimuth" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
                             </div>
                             <br/> 
-                            <label><input type="radio" class="radio" name="capacitySolarOption" value="VerticalTracking" >Vertical Tracking</label><br/>
+                            <label><input type="radio" class="radio" name="capacitySolarOption" value="VerticalTracking" >&nbsp;&nbsp;Vertical Tracking</label><br/>
                             <div id="VerticalTrackingGrp" style="display: none;">
-                             <label for="VerticalTrackingAzimuth" style="text-align: right;">Azimuth</label>
+                             <label for="VerticalTrackingAzimuth" style="text-align: right;">Azimuth (-180 - 180)</label>
                             <input type="text" id="VerticalTrackingAzimuth" name="VerticalTrackingAzimuth" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
                             </div>
                              <br/> 
-                            <label><input type="radio" class="radio" name="capacitySolarOption" value="HorizontalTracking" >Horizontal Tracking</label><br/>
+                            <label><input type="radio" class="radio" name="capacitySolarOption" value="HorizontalTracking" >&nbsp;&nbsp;Horizontal Tracking</label><br/>
                             <div id="HorizontalTrackingGrp" style="display: none;">
-                               <label for="HorizontalTrackingSlope" style="text-align: right;">Slope</label>
+                               <label for="HorizontalTrackingSlope" style="text-align: right;">Slope (0 - 90)</label>
                                <input type="text" id="HorizontalTrackingSlope" name="HorizontalTrackingSlope" class="solarInput" data-dojo-type="dijit/form/NumberTextBox"/>
                             </div>
                              <br/>
-                            <label><input type="radio" id="fullTracking" class="radio" name="capacitySolarOption" value="FullTracking" >Full tracking</label><br/>
+                            <label><input type="radio" id="fullTracking" class="radio" name="capacitySolarOption" value="FullTracking" >&nbsp;&nbsp;Full tracking</label><br/>
                              <br/>
+                              <br/>
+                            <label>Solar Conversion layout Name:</label>
+                                 <br/>
+                                <input type="text" name="solarconvert_name" id="solarconvert_name">
                             <button id="convertSolar" class="clearall" value="convertSolar" data-dojo-type="dijit/form/Button" onclick="convertSolar();">Convert</button>
+                            <div id="convertSolarStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;display:none;"></div>
+                        </div>
+                       
+                </div>
+                    <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Results',showTitle:true" onShow="" id="Results" >
+                         <div class="listContentDiv" id="ResultsList"> 
+                             <!-- Add here extra-->
+                        <div id="ResultsSubList">Loading...</div>
+                     </div>
+                         <div id="ResultsInfoDiv" class="capacityInfoDiv">
+                             <div id="ResultsInfoSubDiv">
+                                 &nbsp;
+                             </div>
+                            
+                            <button id="download" class="clearall" value="download" data-dojo-type="dijit/form/Button" onclick="">Download</button>
                             <div id="convertSolarStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;display:none;"></div>
                         </div>
                        

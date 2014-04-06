@@ -206,7 +206,8 @@ require([
         if (evt.target.id === "top-tool") {
             return;
         } else if (evt.target.id === "cutoutselectorBtn") {
-            _map.graphics.clear();
+            if(_map.getLayer('pointGraphicsLayer'))
+             _map.removeLayer(_map.getLayer('pointGraphicsLayer'));
             toggleGraphView(true);
             $(evt.target).show();
             $("#capacitymapContainer").hide();
@@ -218,7 +219,8 @@ require([
                 _map.graphics.add(lastDrawnGraphics);
             selectorMode = "cutout";
         } else if (evt.target.id === "capacitymapBtn") {
-            _map.graphics.clear();
+            if(_map.getLayer('rectGraphicsLayer'))
+             _map.removeLayer(_map.getLayer('rectGraphicsLayer'));
             toggleGraphView(true);
             $(evt.target).show();
             $("#cutoutselectorContainer").hide();
@@ -340,7 +342,7 @@ require([
                     var didConfirm = confirm("Clear will remove previous drawing.\nAre you sure for new selection?\n\n(You can edit existing selection using right click on selection.)");
                     if (didConfirm == true) {
                         $("#cutoutInfoDiv").html(""); // clear new cutout details
-                        $("#cutoutStartDate").val("");
+                        $("#cutoutStartDate").val("");                         
                         _map.graphics.clear();
                         lastDrawnGraphics = null;
                     } else {
@@ -380,8 +382,13 @@ require([
             _map.graphics.clear();
             selectedTool = evt.target;
             var tool = evt.target.value.toLowerCase();
-
-            _map.disableMapNavigation();
+            
+            if(tool == "rectangle" || tool == "polygon") { 
+                // disable map movement only for rectangle 
+                // otherwise drawing will be impossible
+                _map.disableMapNavigation(); 
+            }
+            
             tbForNew.activate(tool);
         });
 
@@ -389,48 +396,70 @@ require([
 
     function newCutoutDetails(cutoutData)
     {
+        
         var cutout_type = $("input:radio[name='cutoutSelTool']:checked").val();
         var infoDetails = "<div>";
         infoDetails = '<h4>Name of the selected cutout:</h4>' + cutoutData.cutoutName + '<br/>';
         infoDetails += '<h4>Type of the selected cutout:</h4>' + cutout_type + '<br/>';
         if (cutout_type == "Rectangle") {
-            infoDetails += '<h4>Coordinates:</h4>(<br/>('
-                    + Number(cutoutData.geomatry_data['southwest_latitude']).toFixed(2) + ','
-                    + Number(cutoutData.geomatry_data['southwest_longitude']).toFixed(2) + '),('
-                    + Number(cutoutData.geomatry_data['northeast_latitude']).toFixed(2) + ','
-                    + Number(cutoutData.geomatry_data['northeast_longitude']).toFixed(2) + ')<br/>)<br/>';
+            infoDetails += '<h4>Coordinates:</h4>'
+                    +'&nbsp;&nbsp;Left Bottom: ' + Number(cutoutData.geometry_data['southwest_latitude']).toFixed(2) + '<br/>'
+                    + '&nbsp;&nbsp;Left Top: '+Number(cutoutData.geometry_data['southwest_longitude']).toFixed(2) + '<br/>'
+                    + '&nbsp;&nbsp;Right Bottom: '+Number(cutoutData.geometry_data['northeast_latitude']).toFixed(2) + '<br/>'
+                    +'&nbsp;&nbsp;Right Top: '+ Number(cutoutData.geometry_data['northeast_longitude']).toFixed(2) + '<br/>';
+                            
         } else if (cutout_type == "Multipoint") {
-            infoDetails += '<h4>Points:</h4>(<br/>'
-            infoDetails += JSON.stringify(cutoutData.points);
-            infoDetails += '<br/>)<br/>';
+            
+            infoDetails += '<h4>Points:</h4>'
+            for (key in cutoutData.points) {
+                infoDetails += '&nbsp;&nbsp;(' + Number(cutoutData.points[key][0]).toFixed(2) + ', ' + Number(cutoutData.points[key][1]).toFixed(2) + ')<br/>';
+            }            
+            infoDetails += '<br/>';
         }
         infoDetails += "</div>";
         $("#cutoutInfoDiv").html(infoDetails);
     }
 
-    function refreshCutoutData(parentToolbar, evt)
+    function refreshCutoutData(currentAction,evt)
     {
-
-        /* collect data for server request*/
+    /* collect data for server request*/
         graphicsDataForMapLayer.cutoutName = $("#newcutoutname").val();
-        graphicsDataForMapLayer.geomatry_type = evt.graphic.geometry.type;
-        var coordinates = evt.graphic.geometry.getExtent();
+        graphicsDataForMapLayer.geometry_type = evt.graphic.geometry.type;
+         var cutout_type = $("input:radio[name='cutoutSelTool']:checked").val();
+        if (cutout_type == "Rectangle") {
+            var coordinates = evt.graphic.geometry.getExtent();
 
-        var southWest = esri.geometry.xyToLngLat(coordinates.xmin, coordinates.ymin);
-        var northEast = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymax);
-        graphicsDataForMapLayer.geomatry_data = {};
-        graphicsDataForMapLayer.geomatry_data['southwest_latitude'] = southWest[1];
-        graphicsDataForMapLayer.geomatry_data['southwest_longitude'] = southWest[0];
-        graphicsDataForMapLayer.geomatry_data['northeast_latitude'] = northEast[1];
-        graphicsDataForMapLayer.geomatry_data['northeast_longitude'] = northEast[0];
+            var southWest = esri.geometry.xyToLngLat(coordinates.xmin, coordinates.ymin);
+            var northEast = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymax);
+            graphicsDataForMapLayer.geometry_data = {};
+            graphicsDataForMapLayer.geometry_data['southwest_latitude'] = southWest[1];
+            graphicsDataForMapLayer.geometry_data['southwest_longitude'] = southWest[0];
+            graphicsDataForMapLayer.geometry_data['northeast_latitude'] = northEast[1];
+            graphicsDataForMapLayer.geometry_data['northeast_longitude'] = northEast[0];
+        }else  if (cutout_type == "Multipoint") {
+            if(currentAction == "vertex-delete"){
+                if(evt.vertexinfo.graphic.geometry.type == "point"){
+                 var point_tmp = pointForDelete?pointForDelete:evt.vertexinfo.graphic.geometry;
+                 var point =new esri.geometry.Point([point_tmp.x,point_tmp.y],new esri.SpatialReference({ wkid:4326 }));
+                 var pointLatLang = esri.geometry.xyToLngLat(point.x,point.y);
+                 if (graphicsDataForMapLayer.points.contains([pointLatLang[0],pointLatLang[1]]))
+                  graphicsDataForMapLayer.points.remove([pointLatLang[0],pointLatLang[1]]);
+                }
 
+                }else{
+                    for (var itemidx in evt.graphic.geometry.points){
+                        var point = new esri.geometry.Point([evt.graphic.geometry.points[itemidx][0],evt.graphic.geometry.points[itemidx][1]],new esri.SpatialReference({ wkid:4326 }));
+                        var pointLatLang = esri.geometry.xyToLngLat(point.x,point.y);
+                        if (!graphicsDataForMapLayer.points.hasOwnProperty(pointLatLang))
+                          graphicsDataForMapLayer.points.push(pointLatLang);
+                        }
+              }
+
+        }
         newCutoutDetails(graphicsDataForMapLayer);
     }
     function addGraphic(parentToolbar, evt) {
 
-        //deactivate the toolbar and clear existing graphics 
-        parentToolbar.deactivate();
-        _map.enableMapNavigation();
         // figure out which symbol to use
         var symbol;
         if (evt.geometry.type === "point" || evt.geometry.type === "multipoint") {
@@ -439,6 +468,9 @@ require([
             symbol = lineSymbol;
         }
         else {
+            //deactivate the toolbar and clear existing graphics 
+           parentToolbar.deactivate();
+           _map.enableMapNavigation();
             symbol = fillSymbol;
         }
 
@@ -448,15 +480,18 @@ require([
         editToolbar = new Edit(_map);
         if (lastDrawnGraphics.geometry.type === "multipoint" ||
                 lastDrawnGraphics.geometry.type === "point") {
-            editToolbar.activate(Edit.EDIT_VERTICES, lastDrawnGraphics);
-            editToolbar.on("vertex-move-stop", dojo.partial(refreshCutoutData, editToolbar));
-
-        } else {
+           editToolbar.activate(Edit.EDIT_VERTICES, lastDrawnGraphics);
+          //  editToolbar.on("vertex-move-stop", dojo.partial(refreshCutoutData, editToolbar));
+          editToolbar.on("vertex-delete",  dojo.partial(refreshCutoutData,"vertex-delete"));
+          editToolbar.on("vertex-first-move",  function(evt){ pointForDelete = evt.vertexinfo.graphic.geometry;});
+        
+        } else if (lastDrawnGraphics.geometry.type === "rectangle" ||
+                lastDrawnGraphics.geometry.type === "polygon"){
             //editToolbar.activate(Edit.MOVE |Edit.ROTATE | Edit.SCALE, lastDrawnGraphics);
             editToolbar.activate(Edit.MOVE | Edit.SCALE, lastDrawnGraphics);
             //editToolbar.on("rotate-stop", dojo.partial(refreshCutoutData, editToolbar));
-            editToolbar.on("scale-stop", dojo.partial(refreshCutoutData, editToolbar));
-            editToolbar.on("graphic-move-stop", dojo.partial(refreshCutoutData, editToolbar));
+            editToolbar.on("scale-stop",  dojo.partial(refreshCutoutData, "scale-stop"));
+            editToolbar.on("graphic-move-stop",  dojo.partial(refreshCutoutData, "graphic-move-stop"));
 
         }
 
@@ -466,20 +501,32 @@ require([
 
         /* collect data for server request*/
         graphicsDataForMapLayer.cutoutName = $("#newcutoutname").val();
-        graphicsDataForMapLayer.geomatry_type = evt.geometry.type;
+        graphicsDataForMapLayer.geometry_type = evt.geometry.type;
+        
         if (lastDrawnGraphics.geometry.type === "multipoint" ||
                 lastDrawnGraphics.geometry.type === "point") {
-            graphicsDataForMapLayer.points = evt.geometry.points;
+            
+            if(!graphicsDataForMapLayer.points)
+                graphicsDataForMapLayer.points = [];
 
-        } else {
+            for (var itemidx in evt.geometry.points){
+                var point = new esri.geometry.Point([evt.geometry.points[itemidx][0],evt.geometry.points[itemidx][1]],new esri.SpatialReference({ wkid:4326 }));
+                var pointLatLang = esri.geometry.xyToLngLat(point.x,point.y);
+                if (!graphicsDataForMapLayer.points.hasOwnProperty(pointLatLang))
+                  graphicsDataForMapLayer.points.push(pointLatLang);
+              }
+              
+
+        } else if (lastDrawnGraphics.geometry.type === "rectangle" ||
+                lastDrawnGraphics.geometry.type === "polygon"){
             var coordinates = evt.geometry.getExtent();
             var southWest = esri.geometry.xyToLngLat(coordinates.xmin, coordinates.ymin);
             var northEast = esri.geometry.xyToLngLat(coordinates.xmax, coordinates.ymax);
-            graphicsDataForMapLayer.geomatry_data = {};
-            graphicsDataForMapLayer.geomatry_data['southwest_latitude'] = southWest[1];
-            graphicsDataForMapLayer.geomatry_data['southwest_longitude'] = southWest[0];
-            graphicsDataForMapLayer.geomatry_data['northeast_latitude'] = northEast[1];
-            graphicsDataForMapLayer.geomatry_data['northeast_longitude'] = northEast[0];
+            graphicsDataForMapLayer.geometry_data = {};
+            graphicsDataForMapLayer.geometry_data['southwest_latitude'] = southWest[1];
+            graphicsDataForMapLayer.geometry_data['southwest_longitude'] = southWest[0];
+            graphicsDataForMapLayer.geometry_data['northeast_latitude'] = northEast[1];
+            graphicsDataForMapLayer.geometry_data['northeast_longitude'] = northEast[0];
         }
         newCutoutDetails(graphicsDataForMapLayer);
     } // addGraphic end
@@ -493,8 +540,11 @@ require([
         
         // initilize default value
         selectedRadio = typeof selectedRadio !== 'undefined' ? selectedRadio :
-            (typeof selectedRadio !== 'undefined' ? selectedRadio : $('input[name="cutoutSelectorGroup"]:radio:checked'));
-    
+            (typeof selectedRadio !== 'undefined' ? selectedRadio : 
+                    $('input[name="cutoutSelectorGroup"]:radio:checked'));
+            
+        
+               
                 // disable capacity button
                 $("#capacitymapBtn").attr('disabled', 'disabled');
 
@@ -521,6 +571,12 @@ require([
                     fetchCutoutList(currentUserName, 'cutoutSelGrpAll');
                 } else if ($(selectedRadio).val() == "new") {
                     initNewCutoutOptions();
+                    
+                    if(_map.getLayer('rectGraphicsLayer'))
+                        _map.removeLayer(_map.getLayer('rectGraphicsLayer'));
+                    if(_map.getLayer('pointGraphicsLayer'))
+                        _map.removeLayer(_map.getLayer('pointGraphicsLayer'));
+            
                     $('#cutoutSelGrpNew').css('display', 'block');
                 }
             }

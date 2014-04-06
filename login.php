@@ -3,8 +3,6 @@
 <link href="css/login.css" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="css/overlay.css"/> 
 <!--SCRIPTS-->
-<script type="text/javascript" src="js/jquery/jquery-1.9.1.js"></script>
-<script src="js/jquery/ui/jquery-ui.js"></script>
 <script src="js/overlay.js"></script>
 
 <?php

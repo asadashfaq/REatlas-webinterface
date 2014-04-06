@@ -36,6 +36,7 @@ $panelconf =  Tools::getValue("panelconf");
 $orientation =  Tools::getValue("orientation");
 //capacitylayout
 $capacitylayout =  Tools::getValue("capacitylayout");
+$conversionName =  Tools::getValue("conversionName");
 
 //slope
 $slope =  Tools::getValue("slope");
@@ -117,7 +118,8 @@ $param = Configurations::getConfiguration('PEPSI_SERVER')
         ." ".$layout_file
         ." --username ".$currentUser->aulogin
         ." --password ".$currentUser->aupass
-        ." --cutoutuser ".$filterUser;
+        ." --cutoutuser ".$filterUser
+        ." --name ".$conversionName;
 
 $command = "python ".Configurations::getConfiguration('REATLAS_CLIENT_PATH')."/cmd_convert_and_aggregate_PV.py";
 $command .= " $param --output JSON 2>&1";
