@@ -25,6 +25,9 @@ var pointForDelete = null;
 dojo.require("dojox.widget.MonthAndYearlyCalendar");
 dojo.require("dojox.form.DateTextBox");
 dojo.require("dojox.widget.Calendar");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dijit.Tooltip");
 
 
 function toggleGraphView(hide)
@@ -76,7 +79,10 @@ function fetchCutoutSummary()
                     }
            
                 // Enable capacity button
-                $("#capacitymapBtn").removeAttr("disabled");
+               // $("#capacitymapBtn").removeAttr("disabled");
+                
+                dijit.byId("capacitymapBtn").setAttribute('disabled', false);
+                 
                 $("#layout_name").val('');
                 var data =selectedCutoutID.split('/');
 
@@ -141,7 +147,7 @@ function fetchCutoutSummary()
                                    
                             } else if (dataJson.type == "Error") {
                                 alert(dataJson.text + "\n" + dataJson.desc);
-                                targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
+                                targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJson.text) + "</h4><span>" + nl2br(dataJson.desc) + "</span></div>";
                             }
 
                         }
@@ -272,7 +278,7 @@ function  initializeCapacityEvents(divID) {
                                 }
                             } else if (dataJSON.type == "Error") {
                                 alert(dataJSON.text + "\n" + dataJSON.desc);
-                                targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
+                                targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJSON.text) + "</h4><span>" + nl2br(dataJSON.desc) + "</span></div>";
                             }
 
                         }
@@ -433,6 +439,7 @@ function drawGraphicslayerOnMap(data)
         if (!_map || _map == 'undefined')
             return;
 
+        _map.graphics.clear();
         if(_map.getLayer('rectGraphicsLayer'))
         _map.removeLayer(_map.getLayer('rectGraphicsLayer'));
         
@@ -575,7 +582,7 @@ function fetchCutoutList(userName, divID) {
                     initializeEvents(divID);
                 } else if (dataJSON.type == "Error") {
                     alert(dataJSON.text + "\n" + dataJSON.desc);
-                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
+                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJSON.text) + "</h4><span>" + nl2br(dataJSON.desc) + "</span></div>";
                 }
             }
 
@@ -615,7 +622,8 @@ function submitGraphicsForMapLayerGen() {
         
         if(graphicsDataForMapLayer.geometry_type == "rectangle"|| graphicsDataForMapLayer.geometry_type == "polygon")
             geometry_data = JSON.stringify(graphicsDataForMapLayer.geometry_data)
-        else if(graphicsDataForMapLayer.geometry_type == "multipoint")
+        else if(graphicsDataForMapLayer.geometry_type === "multipoint"
+                ||graphicsDataForMapLayer.geometry_type === "point")
             geometry_data = JSON.stringify(graphicsDataForMapLayer.points)
         
         request.post("commands/submitGraphicsForMapLayerGen_ajax.php", {
@@ -626,11 +634,11 @@ function submitGraphicsForMapLayerGen() {
             if (data.type == "Error")
             {
                 alert(data.text + "\n" + data.desc);
-                $("#cutoutInfoDiv").append("<div  class=\"form-error alert alert-danger\"><h4>" + data.text + "</h4><span>" + data.desc + "</span></div>");
+                $("#cutoutInfoDiv").append("<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(data.text) + "</h4><span>" + nl2br(data.desc) + "</span></div>");
             } else if (data.type == "Success")
             {
                 alert(data.text + "\n" + data.desc);
-                $("#cutoutInfoDiv").append("<div><h4>" + data.text + "</h4><span>" + data.desc + "</span></div>");
+                $("#cutoutInfoDiv").append("<div><h4>" + nl2br(data.text) + "</h4><span>" + nl2br(data.desc) + "</span></div>");
             }
 
         });
@@ -701,7 +709,7 @@ function fetchCapacityList(targetDiv) {
 
                 } else if (dataJSON.type == "Error") {
                     alert(dataJSON.text + "\n" + dataJSON.desc);
-                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
+                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJSON.text) + "</h4><span>" + nl2br(dataJSON.desc) + "</span></div>";
                 }
             }
 
@@ -830,7 +838,7 @@ function  fetchGridData(cutoutID, clearOld) {
                     }
                 } else if (dataJson.type == "Error") {
                     alert(dataJson.text + "\n" + dataJson.desc);
-                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
+                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJson.text) + "</h4><span>" + nl2br(dataJson.desc) + "</span></div>";
                 }
             }
 
@@ -839,7 +847,6 @@ function  fetchGridData(cutoutID, clearOld) {
 }
 function drawGridPointsOnMap(points, capacityType, clearOld)
 {
-
     // initilize default value
     capacityType = typeof capacityType !== 'undefined' ? capacityType :
             (typeof selectedCapacityType !== 'undefined' ? selectedCapacityType : "OnOffshore");
@@ -913,7 +920,7 @@ function drawGridPointsOnMap(points, capacityType, clearOld)
                         //picSymbol.setUrl("images/windmill-icon-blue.png");
                     }
                 } else if (capacityType == "InstalledCapacity") {
-                    if (points[rowpoints][key].capacity == 1) {
+                    if (points[rowpoints][key].capacity > 0) {
                         symbol.setColor("red");
                         // picSymbol.setUrl("images/windmill-icon-red.png");
                     } else {
@@ -927,6 +934,16 @@ function drawGridPointsOnMap(points, capacityType, clearOld)
                     if (typeof currentCapacityData[rowpoints][key] != "undefined")
                         /* if(typeof currentCapacityData[rowpoints][key].capacity_wind != "undefined")*/
                         wind_capacity = currentCapacityData[rowpoints][key];
+                
+                if (capacityType == "InstalledCapacity") {
+                    if (wind_capacity > 0) {
+                        symbol.setColor("red");
+                        // picSymbol.setUrl("images/windmill-icon-red.png");
+                    } else {
+                        symbol.setColor("blue");
+                        //picSymbol.setUrl("images/windmill-icon-blue.png");
+                    }
+                }
                 /*if(points[rowpoints][key].wind_capacity == 0){
                  symbol.setColor("green");
                  // picSymbol.setUrl("images/windmill-icon-red.png");
@@ -943,8 +960,9 @@ function drawGridPointsOnMap(points, capacityType, clearOld)
                         "<span>HEIGHT:</span> " + points[rowpoints][key].height.toFixed() + "<br>" +
                         "<span>INSTALLED CAPACITY:</span>" +
                         "<input type=\"text\" id=\"capacity_wind_" + rowpoints + "_" + key + "\" class=\"capacityInputNum\" " +
-                        " value=\"" + parseFloat(wind_capacity).toFixed() + "\">" +
+                        " value=\"" + parseFloat(wind_capacity).toFixed() + "\">" + "<br>" +
                         "<a href=\"javascript:changeCapacity('wind'," + rowpoints + "," + key + ");\">Save</a><br>" +
+                        "<a href=\"javascript:cancelGridPointEdit();\">Cancel</a><br>" +
                         "<div id='latlong'></div>"));
 
                 if (graphic){
@@ -955,7 +973,7 @@ function drawGridPointsOnMap(points, capacityType, clearOld)
         } //End loop rowpoint
   
         _map.addLayer(pointGraphicsLayer);
-        //_map.reorderLayer(pointGraphicsLayer,0);
+        /*_map.reorderLayer(pointGraphicsLayer,0);*/
                
 
 /*
@@ -1006,10 +1024,21 @@ function changeCapacity(type, row, col) {
      currentCapacityData[row][col]={};
      */
     currentCapacityData[row][col] = $("#capacity_" + type + "_" + row + "_" + col).val();
+  
+    _map.infoWindow.hide();
+/*
+    if (currentCapacityData[row][col] > 0) {
+                        symbol.setColor("red");
+                        // picSymbol.setUrl("images/windmill-icon-red.png");
+                    }
+*/
+    drawGridPointsOnMap(originalCapacityData);
+    
+}
+function cancelGridPointEdit() {
 
     _map.infoWindow.hide();
 
-    drawGridPointsOnMap(originalCapacityData);
 }
 function checkLayoutNameExists(layout_name) {
     if (loadedLayoutList == null)
@@ -1023,6 +1052,16 @@ function checkLayoutNameExists(layout_name) {
 }
 function  saveCapacityData() {
 
+    var textBox = dijit.byId("layout_name");
+    if(!textBox.validate()){
+        dijit.showTooltip(
+            textBox.get('invalidMessage'), 
+            textBox.domNode, 
+            textBox.get('tooltipPosition'),
+            !textBox.isLeftToRight()
+        );        
+        return;
+    }
     if (currentCapacityData.length <= 0) {
         alert("Please make some changes in grid capacity");
         return;
@@ -1031,6 +1070,16 @@ function  saveCapacityData() {
         alert("Please provide your layout name");
         return;
     }
+    /*var str = $("#layout_name").val();
+   if(/^[a-zA-Z0-9_]*$/.test(str) == false) {
+    alert('Your search string contains illegal characters or space');
+    return;
+}*/
+
+   /* if ($("#layout_name").val().index("") == -1) {
+        alert("bad input");
+        return;
+    }*/
     if (selectedLayout == $("#layout_name").val() || checkLayoutNameExists($("#layout_name").val()))
     {
         if (!confirm("Saving layout with existing name \nwill overwrite existing layout.\nDo you want to continue?")) {
@@ -1088,7 +1137,7 @@ function  saveCapacityData() {
 
                 } else if (dataJson.type == "Error") {
                     alert(dataJson.text + "\n" + dataJson.desc);
-                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
+                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJson.text) + "</h4><span>" + nl2br(dataJson.desc) + "</span></div>";
                 }
             }
 
@@ -1145,7 +1194,7 @@ function fetchLayoutList(layoutID) {
                     initializelayoutSelectEvents();
                 } else if (dataJSON.type == "Error") {
                     alert(dataJSON.text + "\n" + dataJSON.desc);
-                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJSON.text + "</h4><span>" + dataJSON.desc + "</span></div>";
+                    targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJSON.text) + "</h4><span>" + nl2br(dataJSON.desc) + "</span></div>";
                 }
             } else
             {
@@ -1215,7 +1264,7 @@ function  initializelayoutSelectEvents() {
                                 // currentCapacityData = [];
                             } else if (dataJson.type == "Error") {
                                 alert(dataJson.text + "\n" + dataJson.desc);
-                                targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>";
+                                targetNode.innerHTML = "<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJson.text) + "</h4><span>" + nl2br(dataJson.desc) + "</span></div>";
                             }
 
                         }
@@ -1235,6 +1284,17 @@ function  initializelayoutSelectEvents() {
 
 function  convertSolar() {
 
+    var textBox = dijit.byId("solarconvert_name");
+    if(!textBox.validate()){
+        dijit.showTooltip(
+            textBox.get('invalidMessage'), 
+            textBox.domNode, 
+            textBox.get('tooltipPosition'),
+            !textBox.isLeftToRight()
+        );        
+        return;
+    }
+    
     if (!convertOptionsSel.panelconf
             || !convertOptionsSel.orientation)
     {
@@ -1300,11 +1360,11 @@ function  convertSolar() {
 
             if ($(dataJson).size() !== 0) {
                 if (dataJson.type == "Success") {
-                    alert(dataJson.text + "\n" + dataJson.desc + "\n" + dataJson.data);
-                    targetNode.html(dataJson.text + "<br/>" + dataJson.desc + "<br/>" + dataJson.data);
+                    alert(dataJson.text + "\n" + dataJson.desc );
+                    targetNode.html(nl2br(dataJson.text) + "<br/>" + nl2br(dataJson.desc) + "<br/>");
                 } else if (dataJson.type == "Error") {
                     alert(dataJson.text + "\n" + dataJson.desc);
-                    targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>");
+                    targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJson.text) + "</h4><span>" + nl2br(dataJson.desc) + "</span></div>");
                 }
             } else {
                 alert("Technical Error.");
@@ -1319,6 +1379,16 @@ function  convertSolar() {
 
 function  convertWind() {
 
+ var textBox = dijit.byId("windconvert_name");
+    if(!textBox.validate()){
+        dijit.showTooltip(
+            textBox.get('invalidMessage'), 
+            textBox.domNode, 
+            textBox.get('tooltipPosition'),
+            !textBox.isLeftToRight()
+        );        
+        return;
+    }
     if (!convertOptionsSel.onshoreWindName
             || !convertOptionsSel.offshoreWindName)
     {
@@ -1367,11 +1437,11 @@ function  convertWind() {
 
             if ($(dataJson).size() !== 0) {
                 if (dataJson.type == "Success") {
-                    alert(dataJson.text + "\n" + dataJson.desc + "\n" + dataJson.data);
-                    targetNode.html(dataJson.text + "<br/>" + dataJson.desc + "<br/>" + dataJson.data);
+                    alert(dataJson.text + "\n" + dataJson.desc);
+                    targetNode.html(nl2br(dataJson.text) + "<br/>" + nl2br(dataJson.desc) + "<br/>");
                 } else if (dataJson.type == "Error") {
                     alert(dataJson.text + "\n" + dataJson.desc);
-                    targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>" + dataJson.text + "</h4><span>" + dataJson.desc + "</span></div>");
+                    targetNode.html("<div  class=\"form-error alert alert-danger\"><h4>" + nl2br(dataJson.text) + "</h4><span>" + nl2br(dataJson.desc) + "</span></div>");
                 }
             } else {
                 alert("Technical error.");
@@ -1447,4 +1517,91 @@ function deleteLayout()
         }
     }
 }
+
+function toggleTopTool(val){
+      
+        var target = this;
+        if (target.id === "cutoutselectorBtn") {
+            if(selectorMode == "cutout")
+                return;
+            
+            if(_map.getLayer('pointGraphicsLayer'))
+             _map.removeLayer(_map.getLayer('pointGraphicsLayer'));
+         
+            toggleGraphView(true);
+            $(target).show();
+            $("#capacitymapContainer").hide();
+            dijit.byId("cutoutselectorContainer").domNode.style.display = 'block';
+            dijit.byId("cutoutselectorContainer").resize();
+           
+            // Restore previous graphics on map
+            if(_map.getLayer('rectGraphicsLayer'))
+             _map.removeLayer(_map.getLayer('rectGraphicsLayer'));
+            var rectGraphicsLayer = new esri.layers.GraphicsLayer();
+            rectGraphicsLayer.id = 'rectGraphicsLayer';               
+            if (lastDrawnGraphics){
+                rectGraphicsLayer.add(lastDrawnGraphics);
+                _map.addLayer(rectGraphicsLayer);
+            }
+            /*
+            if (lastDrawnGraphics) {
+                _map.graphics.clear();
+                _map.graphics.add(lastDrawnGraphics);
+            }*/
+            
+            selectorMode = "cutout";
+            fetchGridDataSync(selectedCutoutID);
+        } else if (target.id === "capacitymapBtn") {
+            if(selectorMode == "capacity")
+                return;
+            
+            if(_map.getLayer('rectGraphicsLayer'))
+             _map.removeLayer(_map.getLayer('rectGraphicsLayer'));
+         
+            toggleGraphView(true);
+            $(target).show();
+            $("#cutoutselectorContainer").hide();
+            fetchGridDataSync(selectedCutoutID);
+            
+            dijit.byId("capacitymapContainer").domNode.style.display = 'block';
+            dijit.byId("capacitymapContainer").resize();
+            selectorMode = "capacity";
+            
+            fetchLayoutList(selectedCutoutID);
+        }
+    }
      
+require(["dojo/ready", "dojo/parser", "dijit/Toolbar", "dijit/form/ToggleButton", "dojo/query", "dojo/dom-class", "dojo/on", "dojo/domReady!"], function (ready, parser, ToolBar, ToggleButton, query, domClass, on) {
+    ready(function() {
+        on(query(".dijitToggleButton"), "click", function (e) {
+            query(".dijitToggleButton").forEach(function (node) {
+               domClass.remove(node, "dijitToggleButtonChecked dijitToggleButtonRtlChecked dijitRtlChecked dijitChecked button_down");
+            });
+            domClass.add(this, "dijitToggleButtonChecked dijitToggleButtonRtlChecked dijitRtlChecked dijitChecked button_down");
+        });
+    }); 
+});
+
+function triggerOnClick(targetID){
+    var target = dojo.byId(targetID);
+    
+    // IE does things differently
+    if (dojo.isIE)
+    {
+        target.fireEvent("onclick");
+    }
+    else
+    { // Not IE
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent("click", false, true);
+        target.dispatchEvent(event);
+    }
+}
+
+function downloadSelectedJob(){
+    var selectedJob=$('input[name="joblist_conversion"]:radio:checked');
+    var selectedJobId =selectedJob.attr('id').split('_')[2];
+    var selectedJobName = selectedJob.val();
+    var downloadtype = $('input[name="downloadtype"]:radio:checked').val();
+    $("#secretDownloadIFrame").attr("src","commands/getresult.php?job_id="+selectedJobId+"&job_name="+selectedJobName+"&downloadtype="+downloadtype);
+}

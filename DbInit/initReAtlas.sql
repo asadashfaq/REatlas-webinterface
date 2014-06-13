@@ -102,17 +102,30 @@ CREATE TABLE `user_configuration` (
 -- ----------------------------
 -- Table structure for jobs
 -- ----------------------------
-CREATE TABLE `jobs` (
-    `job_id` int(10) NOT NULL,
+CREATE TABLE `job` (
     `userid` int(10) NOT NULL,
-    `start_time` int(11) unsigned,
-    `end_time` int(11) unsigned,
+    `user` VARCHAR( 22 ) NULL,
+    `job_id` int(10) NOT NULL,
+    `name` VARCHAR( 22 ) NOT NULL,
+    `type` VARCHAR( 22 ) NOT NULL,
+    `start_time` DATETIME NULL DEFAULT NULL,
+    `ETA` DECIMAL( 10, 3 ) NOT NULL DEFAULT '0',
+    `end_time` DATETIME NULL DEFAULT NULL,
     `desc` varchar(300) NOT NULL,
     `data` varchar(2000) default NULL,
     `status` VARCHAR(10) default NULL,
     PRIMARY KEY  (`job_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
+CREATE TABLE `job_progress` (
+    `id` int(10) NOT NULL,
+    `job_id` int(10) NOT NULL,
+    `time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `complete` int(10) default NULL,
+    `desc` varchar(300) default NULL,
+    `data` varchar(2000) default NULL,
+    `status` VARCHAR(10) default NULL,
+    PRIMARY KEY  (`job_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 -- ----------------------------
 -- Table structure for global preference
 -- ----------------------------

@@ -29,7 +29,7 @@ $withdata = Tools::getValue("withdata");
 $limit = Tools::getValue("limit");
 
 if(!$cutout)
-    die('Error: Cutout is not defined');
+    errorReturn('Error: Cutout is not defined');
 
 // filename: data/auesg/meta_Denmark.npz
 // cmd_cutout_details.py Pepsimax.imf.au.dk Denmark data/auesg/meta_Denmark.npz --username manila --password iet5hiuC --cutoutuser auesg 

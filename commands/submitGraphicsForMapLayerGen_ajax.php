@@ -103,7 +103,7 @@ $command .= " $param 2>&1";
 }
 if (!$command)
     exit();
-echo $command;
+
 $pid = popen( $command,"r");
 $result = '';
 

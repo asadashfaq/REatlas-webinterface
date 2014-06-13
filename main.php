@@ -4,7 +4,6 @@ include("init.php");
 if ($session->logged_in)
     $profile = new Profile($session->profileid);
 
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -18,7 +17,7 @@ if ($session->logged_in)
 
         <link href="css/login.css" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" href="http://js.arcgis.com/3.8/js/dojo/dijit/themes/claro/claro.css">
-        <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
+        <link rel="stylesheet" type="text/css" href="http://js.arcgis.com/3.8/js/esri/css/esri.css">
         <link rel="stylesheet" href="css/layout.css"/> 
         <link rel="stylesheet" href="http://js.arcgis.com/3.8/js/dojo/dojox/grid/resources/claroGrid.css">
         <link rel="stylesheet" href="http://js.arcgis.com/3.8/js/dojo/dojox/widget/Calendar/Calendar.css">
@@ -87,6 +86,22 @@ if (!$session->logged_in) {
                     <div id="subheader">Aarhus University,Aarhus Denmark</div>
                 </div>
                 <div id="top-tool" >
+                    <button id="cutoutselectorBtn" 
+                            class="dijitReset top_tool_button button_down"
+                            onChange="toggleTopTool"
+                            data-dojo-type="dijit/form/ToggleButton" 
+                            data-dojo-props="showLabel:true,checked:true">
+                        Cutout Selector
+                     </button>
+                    <span dojoType="dijit.ToolbarSeparator"></span>
+                    <button id="capacitymapBtn" 
+                            class="dijitReset top_tool_button"
+                            onChange="toggleTopTool"
+                            data-dojo-type="dijit/form/ToggleButton" 
+                            data-dojo-props="showLabel:true">
+                        Capacity Map
+                    </button>
+                    <!--
                     <span>
                         <button id="cutoutselectorBtn" class="down">Cutout Selector</button>
                         <span class="disabled-detector"></span>
@@ -95,7 +110,7 @@ if (!$session->logged_in) {
                         <button id="capacitymapBtn">Capacity Map</button>
                         <span class="disabled-detector"></span>
                     </span>
-                    
+                    -->
                 </div>
                 <div id="headerRight"><?php if ($session->logged_in): ?>
                     Welcome, <?php echo $profile->fullname;?><br/>
@@ -158,7 +173,7 @@ if (!$session->logged_in) {
                                     <input type="text" id="newcutoutname" name="newcutoutname" data-dojo-type="dijit/form/TextBox"/>
                                     <br/>
                                     <label><input type="radio" class="radio" name="cutoutSelTool" value="Rectangle" data-dojo-type="dijit/form/RadioButton">Rectangle</label><br/>
-                                    <label><input type="radio" class="radio" name="cutoutSelTool" value="Multipoint" data-dojo-type="dijit/form/RadioButton">Point(s)</label><br/>
+                                    <label><input type="radio" class="radio" name="cutoutSelTool" value="Point" data-dojo-type="dijit/form/RadioButton">Point(s)</label><br/>
                                     <label>Start Month-Year:</label> 
                                     <input type="text" name="cutoutStartDate" id="cutoutStartDate" 
                                            data-dojo-type="dijit/form/DateTextBox" 
@@ -187,9 +202,13 @@ if (!$session->logged_in) {
 
                 </div>
                 <div id="capacitymapContainer" data-dojo-type="dijit.layout.TabContainer" style="display:none;height:100%"><!-- tabPosition="left-h" tabStrip="false"-->
+                    
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Layout', selected:true" 
                          >
                          <!--onShow="fetchCapacityList(this)" id="Layout" -->
+                         <div id="hintLayoutBox" class="hintInfoDiv">
+                          <label>Hint for Layout tab</label>  
+                        </div>
                          <div id="layoutDiv">
                             <div id="layoutTopDiv">
                                 <span id="layoutDelete" class="delete inactive" onclick="deleteLayout()"></span>
@@ -210,7 +229,9 @@ if (!$session->logged_in) {
                         <div class="colorLayoutDiv" id="colorLayoutList">
                             <div id="capacityLayoutTopDiv">
                                 <label>Capacity layout Name:</label>
-                                <input type="text" name="layout_name" id="layout_name">
+                                <input type="text" name="layout_name" id="layout_name" required="true"
+                                       data-dojo-type="dijit/form/ValidationTextBox"
+                                       data-dojo-props="regExp:'[\\w,\\d,\\.]+', invalidMessage:'Name can contain only \n characters, numbers and underscore.'" >
                                
                                  <br/>
                                 <button id="reset" value="reset" data-dojo-type="dijit/form/Button" onclick="resetCapacityData()">Reset</button>
@@ -229,6 +250,9 @@ if (!$session->logged_in) {
                      
                   
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Wind',showTitle:true" onShow="fetchCapacityList(this)" id="Wind" >
+                        <div id="hintWindBox" class="hintInfoDiv">
+                          <label>Hint for Wind tab</label>  
+                        </div>
                         <div id="WindList" style="height: 68%">
                             <div id="capacityWindTopDiv">
                                 <label class="blue"><input type="radio" name="capacityWindType" value="onshore" ><span>Onshore</span></label>
@@ -250,7 +274,9 @@ if (!$session->logged_in) {
                             <br/>
                             <label>Wind Conversion layout Name:</label>
                                  <br/>
-                                <input type="text" name="windconvert_name" id="windconvert_name">
+                                <input type="text" name="windconvert_name" id="windconvert_name"  required="true"
+                                       data-dojo-type="dijit/form/ValidationTextBox"
+                                       data-dojo-props="regExp:'[\\w,\\d,\\.]+', invalidMessage:'Name can contain only \n characters, numbers and underscore.'" >
                                
                                  <br/>
                             <button id="convertWind" value="convertWind" data-dojo-type="dijit/form/Button" disabled="disabled" onclick="convertWind();">Convert</button>
@@ -261,6 +287,9 @@ if (!$session->logged_in) {
                     
                                    
                      <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Solar',showTitle:true" onShow="fetchCapacityList(this)" id="Solar" >
+                         <div id="hintSolarBox" class="hintInfoDiv">
+                          <label>Hint for Solar tab</label>  
+                        </div>
                          <div class="listContentDiv" id="SolarList"> 
                              <!-- Add here extra-->
                         <div id="SolarSubList">Loading...</div>
@@ -295,23 +324,35 @@ if (!$session->logged_in) {
                               <br/>
                             <label>Solar Conversion layout Name:</label>
                                  <br/>
-                                <input type="text" name="solarconvert_name" id="solarconvert_name">
+                                <input type="text" name="solarconvert_name" id="solarconvert_name" required="true"
+                                       data-dojo-type="dijit/form/ValidationTextBox"
+                                       data-dojo-props="regExp:'[\\w,\\d,\\.]+', invalidMessage:'Name can contain only \n characters, numbers and underscore.'" >
                             <button id="convertSolar" class="clearall" value="convertSolar" data-dojo-type="dijit/form/Button" onclick="convertSolar();">Convert</button>
                             <div id="convertSolarStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;display:none;"></div>
                         </div>
                        
                 </div>
                     <div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="title:'Results',showTitle:true" onShow="" id="Results" >
+                        <div id="hintResultsBox" class="hintInfoDiv">
+                          <label>Hint for Results tab</label>  
+                        </div>
                          <div class="listContentDiv" id="ResultsList"> 
                              <!-- Add here extra-->
-                        <div id="ResultsSubList">Loading...</div>
+                        <div id="ResultsSubList"><?php echo Job::getJobListForUser($session->userid,$session->username,'conversion','wind')?></div>
                      </div>
                          <div id="ResultsInfoDiv" class="capacityInfoDiv">
                              <div id="ResultsInfoSubDiv">
                                  &nbsp;
                              </div>
-                            
-                            <button id="download" class="clearall" value="download" data-dojo-type="dijit/form/Button" onclick="">Download</button>
+                             Download type:
+                             <input type="radio" name="downloadtype" id="downloadtype_1" value="csv" checked="checked">
+                             <label for="downloadtype_1">CSV</label>
+                             <input type="radio" name="downloadtype" id="downloadtype_2" value="npy">
+                             <label for="downloadtype_2">NPY</label>
+                             <input type="radio" name="downloadtype" id="downloadtype_3" value="mat">
+                             <label for="downloadtype_3">MAT</label>
+                            <button id="job_download" class="clearall" value="download" data-dojo-type="dijit/form/Button" onclick="downloadSelectedJob()">Download</button>
+                            <iframe id="secretDownloadIFrame" src="" style="display:none; visibility:hidden;"></iframe>
                             <div id="convertSolarStatus" class="roundcorner withborder"  style="float: right;background-color: #D3D3D3;display:none;"></div>
                         </div>
                        

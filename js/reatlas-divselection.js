@@ -5,7 +5,8 @@
  */
 
 $(document).ready(function() {
-    // Handler for .ready() called.
+    /* Handler for .ready() called.*/
+    
     $("#cutoutselectorContainer input:checkbox").click(function() {
         var group = "input:checkbox[name='" + $(this).prop("name") + "']";
         $(group).prop("checked", false);
@@ -104,6 +105,7 @@ $(document).ready(function() {
 
     // disable capacity button
     $("#capacitymapBtn").attr('disabled', 'disabled');
+    
 
     // Top menu click event handler
     $(document).on("click", ".disabled-detector", function(e) {
@@ -161,6 +163,31 @@ $(document).ready(function() {
     $('input[name="capacityWindType"]:radio').filter('[value="onshore"]').attr('checked', true);
     $('input[name="capacityWindType"]:radio').filter('[value="onshore"]').trigger('change');
 
+/* Conversion result radio change event */
+$('input[name="joblist_conversion"]:radio').change(
+            function() {
+            var className = $(this).attr('class');
+            var isDownloadable = false;
+            var statusClass=className.split(" ")[1];
+            switch(statusClass){
+              case 'success':
+                    isDownloadable = true;
+                    break;
+                case 'failure':
+                    isDownloadable = false;
+                    break;
+                case 'waiting':
+                    isDownloadable = false;
+                    break;
+                case 'error':
+                default:
+                    isDownloadable = false;
+                    break;
+              }
+             dijit.byId("job_download").setAttribute('disabled', !isDownloadable);
+            });
+ 
+            
 
 });
 

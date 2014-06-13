@@ -68,6 +68,50 @@
        #top-tool button:disabled {
         background-color: #bbb;
         }
+        
+        /* Dojo button css */
+        
+       .top_tool_button {
+            padding: 0 0.3em;
+            text-align: center;
+            -moz-user-select: none;
+            cursor: pointer;
+            background-repeat: repeat-x;
+            white-space: nowrap;
+            background-color: #BCD8F4;
+            background-image: linear-gradient(#FFFFFF 0px, rgba(255, 255, 255, 0) 3px, rgba(255, 255, 255, 0.75) 100%);
+            background-repeat: repeat-x;
+            border: 1px solid #759DC0;
+            border-radius: 4px 4px 4px 4px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+            color: #000000;
+            padding: 2px 4px 4px;
+            font-size: 0.6em;
+      }
+      .top_tool_button span{
+          border: none !important;
+          background-color: #BCD8F4 !important;
+          background-image: linear-gradient(#FFFFFF 0px, rgba(255, 255, 255, 0) 3px, rgba(255, 255, 255, 0.75) 100%) !important;
+          background-repeat: repeat-x !important;
+           
+      }
+      .button_down{
+        background: #bbb;
+        border-top: solid 2px #777;
+        border-left: solid 2px #777;
+        border-bottom:solid 2px  #eaeaea;
+        border-right: solid 2px #eaeaea;
+        }
+        .button_down span {
+        background: #bbb !important;
+        border: none !important;
+        }
+       #top-tool .button:disabled {
+        background-color: #bbb !important;
+        }
+        
+        /* Dojo button css end */
+        
       #headerRight {
           float: right;
           font-size:small;
@@ -482,7 +526,17 @@
     padding: 10px;
     font-size: 0.8em;
 }
-
+.hintInfoDiv {
+    margin-top: 15px;
+    background-color: lightsteelblue;
+    min-height: 50px;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.8em;
+    border-style:solid;
+    border-width:3px;
+    border-color:#000000;
+}
 
 .listContentDiv {
     clear: both;
@@ -609,4 +663,14 @@ input[disabled]+span.disabled-detector {
 }
 #selectorOptionDiv {
     float: right;
+}
+
+#ResultsList .error{
+    color: red;
+}
+#ResultsList .success{
+    color: green;
+}
+#ResultsList .running{
+    color: gray;
 }

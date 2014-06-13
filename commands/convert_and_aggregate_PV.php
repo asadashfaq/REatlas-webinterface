@@ -134,6 +134,34 @@ $result .= fread($pid, 256);
 }
 pclose($pid);
 
+/*
+ * {
+ * "text": "Submitted wind conversion job.", 
+ * "traceback": "", 
+ * "type": "Success", 
+ * "data": "{\"job_id\":72,\"resultname\":\"wind_manila_Denmark_test_wind_conv_13Apr_6\",\"ETA\":\"0:01:00\"}", 
+ * "desc": " Job id: 72\n Result name: wind_manila_Denmark_test_wind_conv_13Apr_6\n ETA: 0:01:00"
+ * } 
+ */
+$return_res = json_decode($result);
+if($return_res && $return_res->data)
+    $return_data = json_decode ($return_res->data);
+
+if($return_res && $return_data){
+    $job = new Job();
+    $job->job_id = $return_data->job_id;
+    $job->name = "solar_".$currentUser->aulogin."_".$cutout."_".$conversionName;
+    $job->action = "conversion";
+    $job->type = "solar";
+    $job->desc = $return_res->desc;
+    $job->ETA = $return_data->ETA;
+    $job->user = $currentUser->username;
+    $job->userid = $currentUser->id;
+    $job->status = $return_res->type;
+    $job->data = $return_res->data;
+    $job->save();
+
+}
 
 echo $result ;
 

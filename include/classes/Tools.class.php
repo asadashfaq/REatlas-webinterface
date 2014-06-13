@@ -121,7 +121,7 @@ class Tools {
      * @return String
      */
     public static function getSiteProtocol() {
-        $protocol = (Configuration::get('PS_SSL_ENABLED') || (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off')) ? 'https://' : 'http://';
+        $protocol = ((!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off')) ? 'https://' : 'http://';
         return $protocol;
     }
 
@@ -182,7 +182,7 @@ class Tools {
         if ($entities)
             $domain = htmlspecialchars($domain, ENT_COMPAT, 'UTF-8');
         if ($http)
-            $domain = (Configuration::get('PS_SSL_ENABLED') ? 'https://' : 'http://') . $domain;
+            $domain = ((isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") ? 'https://' : 'http://') . $domain;
         return $domain;
     }
 

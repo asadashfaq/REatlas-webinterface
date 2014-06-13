@@ -2,3 +2,7 @@ python /development/AU/REatlas-client/cmd_cutout_details.py Pepsimax.imf.au.dk E
 python /development/AU/REatlas-client/cmd_save_layout.py Pepsimax.imf.au.dk Denmark /tmp/DenmarkdPrJ6y  --metadata /development/AU/REatlas-client/data/auesg/meta_Denmark.npz --username manila --password iet5hiuC --cutoutuser auesg --output JSON
 
 python /development/AU/REatlas-client/cmd_list_layout.py Pepsimax.imf.au.dk --username manila --password iet5hiuC --layoutuser auesg --output JSON
+
+python /development/AU/REatlas-client/cmd_get_result.py Pepsimax.imf.au.dk 72 wind_manila_Denmark_test_wind_conv_13Apr_6 tmpdata/wind_manila_Denmark_test_wind_conv_13Apr_6.csv --username manila --password iet5hiuC
+
+python /development/AU/REatlas-client/cmd_job_status.py Pepsimax.imf.au.dk 75 --username manila --password iet5hiuC --output JSON
